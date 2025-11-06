@@ -8,10 +8,11 @@ LATEXMK = latexmk
 SHELL_ESCAPE = -shell-escape
 INTERACTION = -interaction=nonstopmode
 FILE_LINE_ERROR = -file-line-error
+FORCE = -f   # ← permet d'ignorer les erreurs non bloquantes (warnings xdvipdfmx)
 
 # Cible principale : génération du PDF
 pdf: $(MAIN).tex
-	$(LATEXMK) -$(TEX_ENGINE) $(SHELL_ESCAPE) $(INTERACTION) $(FILE_LINE_ERROR) $(MAIN).tex
+	$(LATEXMK) -$(TEX_ENGINE) $(SHELL_ESCAPE) $(INTERACTION) $(FILE_LINE_ERROR) $(FORCE) $(MAIN).tex
 
 # Cible pour compilation rapide (sans mise à jour de la bibliographie)
 quick: $(MAIN).tex
@@ -19,11 +20,11 @@ quick: $(MAIN).tex
 
 # Cible pour compilation avec mise à jour de la bibliographie
 full: $(MAIN).tex
-	$(LATEXMK) -$(TEX_ENGINE) $(SHELL_ESCAPE) $(INTERACTION) $(FILE_LINE_ERROR) -bibtex $(MAIN).tex
+	$(LATEXMK) -$(TEX_ENGINE) $(SHELL_ESCAPE) $(INTERACTION) $(FILE_LINE_ERROR) $(FORCE) -bibtex $(MAIN).tex
 
 # Cible pour compilation continue (surveillance des changements)
 watch: $(MAIN).tex
-	$(LATEXMK) -$(TEX_ENGINE) $(SHELL_ESCAPE) $(INTERACTION) $(FILE_LINE_ERROR) -pvc $(MAIN).tex
+	$(LATEXMK) -$(TEX_ENGINE) $(SHELL_ESCAPE) $(INTERACTION) $(FILE_LINE_ERROR) $(FORCE) -pvc $(MAIN).tex
 
 # Nettoyage des fichiers temporaires
 clean:
@@ -51,7 +52,7 @@ check-structure:
 # Génération d'un PDF de test (sans le logo)
 test-pdf: check-structure
 	@echo "Génération d'un PDF de test..."
-	$(LATEXMK) -$(TEX_ENGINE) $(SHELL_ESCAPE) $(INTERACTION) $(FILE_LINE_ERROR) $(MAIN).tex
+	$(LATEXMK) -$(TEX_ENGINE) $(SHELL_ESCAPE) $(INTERACTION) $(FILE_LINE_ERROR) $(FORCE) $(MAIN).tex
 
 # Aide
 help:

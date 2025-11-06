@@ -1,322 +1,1272 @@
 \chapter{Cadrage et Cahier des Charges}
 
-\section{Objectifs du projet}
+\section{Objectifs métier, techniques et pédagogiques}
 
-\subsection{Objectifs métier et bénéfices attendus}
+\subsection{Objectifs métier}
 
-\textbf{My Smart Budget} vise à simplifier la gestion budgétaire personnelle pour étudiants, jeunes actifs et familles via une interface automatisée offrant une vision temps réel de la situation financière.
+\textbf{My Smart Budget} répond à un besoin concret identifié auprès de plusieurs profils d'utilisateurs : de nombreux étudiants, jeunes actifs et familles peinent à suivre leurs dépenses quotidiennes et à planifier leurs budgets mensuels de manière efficace.
+
+L'objectif métier principal est de \textbf{simplifier la gestion budgétaire personnelle} via une interface claire, automatisée et personnalisable, tout en offrant une vision en temps réel de la situation financière.
+
+\subsubsection{Bénéfices attendus mesurables}
 
 \begin{center}
-\small
-\begin{tabular}{|p{3.5cm}|p{4cm}|p{2.5cm}|p{3cm}|}
+\begin{tabular}{|p{4cm}|p{4.5cm}|p{3cm}|}
 \hline
-\textbf{Bénéfice} & \textbf{Indicateur} & \textbf{Objectif} & \textbf{Justification} \\
+\textbf{Bénéfice} & \textbf{Indicateur de succès} & \textbf{Objectif} \\
 \hline
-Gain de temps & Temps saisie mensuelle & $< 15$ min & Import CSV automatisé \\
+\textbf{Gain de temps} & Temps moyen de saisie mensuelle & $< 15$ min/mois via import CSV \\
 \hline
-Visibilité financière & Temps accès dashboard & $< 5$s & Décision rapide \\
+\textbf{Accessibilité multi-profils} & Taux d'adoption par profil & $\geq 70\,\%$ pour chaque persona \\
 \hline
-Éducation financière & \% utilisateurs atteignant objectifs & $\geq 60\,\%$ (3 mois) & Enveloppes budgétaires \\
+\textbf{Éducation financière} & \% utilisateurs atteignant objectifs & $\geq 60\,\%$ après 3 mois \\
 \hline
-Accessibilité & Taux adoption par persona & $\geq 70\,\%$ & Interface intuitive \\
+\textbf{Visibilité financière} & Temps d'accès données clés & $< 5$ secondes (dashboard) \\
+\hline
+\textbf{Simplification du suivi} & Réduction erreurs budgétaires & $-40\,\%$ vs saisie manuelle \\
 \hline
 \end{tabular}
 \end{center}
 
 \subsection{Objectifs techniques}
 
-Architecture \textbf{3-tiers} : Next.js 14/React 18 (Front), NestJS 10/Node.js 20 (Back), PostgreSQL 15 via Prisma 5 (DB).
+Architecture \textbf{3-tiers évolutive} : Front-end (Next.js 14/React 18), Back-end (Node.js 20/NestJS 10), Base de données (PostgreSQL 15 via Prisma 5).
+
+\subsubsection{Exigences de performance (mesurables)}
 
 \begin{center}
-\scriptsize
-\begin{tabular}{|l|p{3cm}|p{2cm}|p{4.5cm}|}
+\begin{tabular}{|l|p{3.5cm}|p{2.5cm}|p{4.5cm}|}
 \hline
-\textbf{Critère} & \textbf{Métrique} & \textbf{Objectif} & \textbf{Justification} \\
+\textbf{Critère} & \textbf{Métrique} & \textbf{Objectif} & \textbf{Justification métier} \\
 \hline
-Performance & TTR dashboard / Latence API & $< 2$s / $< 500$ms & UX fluide, réactivité CRUD \\
+\multirow{2}{*}{\textbf{Performance}} & Time-to-Render dashboard & $< 2$s (P95) & Expérience utilisateur fluide \\
+\cline{2-4}
+ & Latence API & $< 500$ms (P95) & Réactivité opérations CRUD \\
 \hline
-Sécurité & JWT + bcrypt ($\geq 12$) / HTTPS TLS 1.3 & 0 faille critique & Protection RGPD, OWASP Top 10 \\
+\multirow{3}{*}{\textbf{Sécurité}} & Authentification & JWT + bcrypt (cost $\geq 12$) & Protection données RGPD \\
+\cline{2-4}
+ & Chiffrement & HTTPS/TLS 1.3 & Confidentialité transactions \\
+\cline{2-4}
+ & Audit & Logs connexions & Traçabilité conformité \\
 \hline
-Maintenabilité & Couverture tests / Migrations & $\geq 60\,\%$ / Versionnées & Réduction bugs, évolutivité \\
+\multirow{2}{*}{\textbf{Maintenabilité}} & Couverture tests & $\geq 60\,\%$ (v1.0) & Réduction bugs production \\
+\cline{2-4}
+ & Migrations & Schémas versionnés & Évolutivité sans rupture \\
 \hline
-Scalabilité & Architecture / Cache & Stateless + Docker / Redis v2 & 100 $\rightarrow$ 10k users \\
+\multirow{2}{*}{\textbf{Scalabilité}} & Architecture & Stateless API + Docker & Support 100 $\rightarrow$ 10k users \\
+\cline{2-4}
+ & Cache (v2) & Redis sessions & Réduction charge DB \\
 \hline
-Fiabilité & Disponibilité / Sauvegardes & $99{,}5\,\%$ / Quotidiennes & RPO $< 24$h, RTO $< 4$h \\
+\multirow{2}{*}{\textbf{Fiabilité}} & Disponibilité & $99{,}5\,\%$ (hors maint.) & Accès continu données \\
+\cline{2-4}
+ & Sauvegardes & Quotidiennes + tests & RPO $< 24$h, RTO $< 4$h \\
 \hline
 \end{tabular}
 \end{center}
 
-\subsection{Objectifs pédagogiques (CDA Niveau 6)}
+\subsection{Objectifs pédagogiques}
+
+Projet inscrit dans le cadre du \textbf{Titre Professionnel Concepteur Développeur d'Applications (CDA - Niveau 6)}.
+
+\subsubsection{Compétences visées et référentiel}
+
+\begin{center}
+\begin{tabular}{|p{4.5cm}|p{5cm}|p{5cm}|}
+\hline
+\textbf{Bloc de compétences CDA} & \textbf{Compétences développées} & \textbf{Livrables associés} \\
+\hline
+\textbf{Concevoir et développer des composants d'interface} & Design System, composants React réutilisables, accessibilité (WCAG 2.1 AA) & Pages Auth, Dashboard, formulaires validés \\
+\hline
+\textbf{Concevoir et développer la persistance des données} & Modélisation Merise (MCD/MLD/MPD), Prisma ORM, migrations versionnées & Schémas DB, documentation MCD, scripts SQL \\
+\hline
+\textbf{Concevoir et développer une application multicouche répartie} & Architecture 3-tiers, API REST (OpenAPI 3.0), services métier (NestJS) & Documentation architecture, API Swagger, tests E2E \\
+\hline
+\end{tabular}
+\end{center}
+
+\textbf{Méthodologie agile} : Sprints de 2 semaines, backlog GitHub, retrospectives documentées, déploiement continu (CI/CD).
+
+\section{Priorisation des fonctionnalités (Méthode MoSCoW)}
+
+La méthode MoSCoW permet de classer les exigences selon leur criticité pour garantir un MVP (Minimum Viable Product) cohérent et livrable.
+
+\subsection{Tableau de priorisation détaillé}
 
 \begin{center}
 \small
-\begin{tabular}{|p{4cm}|p{4.5cm}|p{5cm}|}
+\begin{tabular}{|p{2.5cm}|p{4cm}|p{4.5cm}|p{2cm}|}
 \hline
-\textbf{Bloc CDA} & \textbf{Compétences} & \textbf{Livrables} \\
+\textbf{Priorité} & \textbf{Fonctionnalité} & \textbf{Justification métier} & \textbf{Complexité} \\
 \hline
-Composants d'interface & Design System, React, WCAG 2.1 AA & Pages Auth/Dashboard, formulaires \\
+\textbf{Must Have} & Authentification JWT + gestion sessions & Sécurité, protection RGPD, prérequis légal & Moyenne (5j) \\
 \hline
-Persistance données & MCD/MLD/MPD, Prisma, migrations & Schémas DB, scripts SQL \\
+\textbf{Must Have} & Transactions CRUD + catégorisation & Cœur fonctionnel du suivi budgétaire & Moyenne (8j) \\
 \hline
-Application multicouche & 3-tiers, API REST, NestJS & Doc architecture, Swagger, tests E2E \\
+\textbf{Must Have} & Enveloppes budgétaires (plafonds mensuels) & Différenciateur vs tableurs, contrôle budgétaire & Moyenne (6j) \\
 \hline
-\end{tabular}
-\end{center}
-
-\textbf{Méthodologie} : Sprints 2 semaines, backlog GitHub, CI/CD.
-
-\section{Priorisation MoSCoW et Périmètre MVP}
-
-\subsection{Matrice de priorisation}
-
-\begin{center}
-\scriptsize
-\begin{tabular}{|p{2cm}|p{3.5cm}|p{4.5cm}|p{2cm}|}
+\textbf{Must Have} & Dashboard synthétique (KPIs + graphiques) & Visibilité immédiate, prise de décision & Élevée (10j) \\
 \hline
-\textbf{Priorité} & \textbf{Fonctionnalité} & \textbf{Justification métier} & \textbf{Effort} \\
+\textbf{Should Have} & Import CSV standardisé & Gain de temps $\times$10, adoption utilisateurs & Moyenne (5j) \\
 \hline
-\textbf{Must Have} & Auth JWT + sessions & Sécurité RGPD, prérequis légal & 5j \\
+\textbf{Should Have} & Export CSV/JSON (portabilité RGPD) & Conformité Article 20 RGPD, transparence & Faible (3j) \\
 \hline
-\textbf{Must Have} & Transactions CRUD & Cœur fonctionnel suivi budgétaire & 8j \\
+\textbf{Could Have} & Notifications (dépassement enveloppe) & Valeur ajoutée, prévention dépassements & Faible (4j) \\
 \hline
-\textbf{Must Have} & Enveloppes budgétaires & Différenciateur vs tableurs & 6j \\
+\textbf{Could Have} & Gestion multi-comptes bancaires & Réalisme pour utilisateurs multiples banques & Moyenne (5j) \\
 \hline
-\textbf{Must Have} & Dashboard (KPIs + graphiques) & Visibilité immédiate, décision & 10j \\
+\textbf{Won't Have (v1)} & Agrégation bancaire automatique (DSP2) & Complexe (PSD2, APIs tierces), coût élevé & --- \\
 \hline
-\textbf{Should Have} & Import/Export CSV & Gain temps $\times$10, conformité RGPD Art. 20 & 5j + 3j \\
+\textbf{Won't Have (v1)} & OCR de factures/tickets & Technologie ML, précision insuffisante v1 & --- \\
 \hline
-\textbf{Could Have} & Notifications dépassement & Valeur ajoutée, prévention & 4j \\
-\hline
-\textbf{Won't Have v1} & Agrégation bancaire DSP2 / OCR / IA & Complexité, coût, dataset insuffisant & v2.0+ \\
+\textbf{Won't Have (v1)} & Recommandations IA budgétaires & Nécessite historique $> 6$ mois & --- \\
 \hline
 \end{tabular}
 \end{center}
 
-\subsection{Périmètre MVP v1.0}
+\subsection{Justification des exclusions (Won't Have v1)}
 
-\textbf{9 modules inclus} : (1) Auth JWT, (2) Profil utilisateur, (3) 15 catégories + perso, (4) Enveloppes avec plafonds mensuels, (5) Transactions CRUD + filtres, (6) Import CSV avec validation, (7) Dashboard 4 KPIs + 2 graphiques, (8) Export CSV/JSON, (9) Droits Utilisateur/Admin.
+\begin{itemize}
+  \item \textbf{Agrégation bancaire} : Nécessite certification PSD2 (6--12 mois), coûts APIs élevés (Plaid/Budget Insight), maintenance complexe. Prévu v2.0 après POC.
+  \item \textbf{OCR} : Taux d'erreur élevé sur tickets français (formats variés), coût API externe (\$1.50/1000 requêtes). Évaluation v2.1.
+  \item \textbf{IA de recommandations} : Algorithmes ML nécessitant dataset de 1000+ utilisateurs sur 6 mois minimum. Prévu v2.5.
+\end{itemize}
 
-\textbf{Exclusions v1} : Agrégation bancaire, OCR, IA, multi-devises, partage budgets, app mobile native.
+\section{Périmètre du MVP (Version 1.0)}
 
-\textbf{Contraintes d'acceptation} : TTR dashboard P95 $< 2$s (Lighthouse), API taux erreur $< 1\,\%$, disponibilité $99{,}5\,\%$ (UptimeRobot), 0 vulnérabilité critique (Snyk).
-
-\section{Personae et parties prenantes}
-
-\subsection{Personae cibles}
-
-\textbf{Persona 1 : Léa, 23 ans, Étudiante} --- 800€/mois, Lyon. \textit{Objectifs} : Éviter découverts (frais 8€), reste à vivre 30€/semaine. \textit{Douleurs} : Oublie 40\,\% achats, fin de mois difficile. \textit{Succès attendu} : Visualiser reste à vivre en 1 clic ($< 5$s), alerte avant épuisement enveloppe, réduire saisie 2h $\rightarrow$ 15 min.
-
-\textbf{Persona 2 : Marc, 38 ans, Père famille} --- 4500€/mois, Paris. \textit{Objectifs} : Répartir budget 8 enveloppes (courses 600€, loisirs 300€), anticiper pics (rentrée +800€). \textit{Douleurs} : Manque visibilité catégories, dépassements +20\,\% loisirs. \textit{Succès attendu} : Respecter 90\,\% plafonds, export PDF mensuel.
-
-\subsection{Matrice parties prenantes}
+\subsection{Fonctionnalités incluses}
 
 \begin{center}
-\scriptsize
-\begin{tabular}{|p{2.5cm}|p{2cm}|c|c|p{5cm}|}
+\small
+\begin{tabular}{|p{2.5cm}|p{5.5cm}|p{5.5cm}|}
 \hline
-\textbf{Acteur} & \textbf{Rôle} & \textbf{Influence} & \textbf{Intérêt} & \textbf{Stratégie} \\
+\textbf{Module} & \textbf{Fonctionnalités} & \textbf{Livrables techniques} \\
 \hline
-Porteur projet & Dev CDA & Forte & Fort & \textbf{Gérer étroitement} : validation hebdo jalons \\
+\textbf{Authentification} & Inscription, Connexion JWT (exp 24h), Déconnexion, Réinit. mot de passe & Module NestJS \texttt{auth}, endpoints REST, tests unitaires \\
 \hline
-Jury CDA & Évaluateurs & Forte & Fort & \textbf{Gérer étroitement} : conformité référentiel \\
+\textbf{Profil utilisateur} & CRUD profil, Modification mot de passe, Suppression compte (RGPD) & Module \texttt{users}, page React \texttt{/profile}, validation Zod \\
 \hline
-Utilisateurs testeurs & Validation MVP & Faible & Fort & \textbf{Tenir informés} : changelog, feedback loops \\
+\textbf{Catégories} & 15 catégories prédéfinies, Catégories personnalisées, CRUD & Table \texttt{Category}, API CRUD, composant \texttt{CategoryManager} \\
 \hline
-Hébergeur OVH/Vercel & Infra & Moyenne & Faible & \textbf{Maintenir satisfait} : monitoring SLA \\
+\textbf{Enveloppes} & Création avec plafond mensuel, Calcul "reste à vivre", Indicateurs visuels, Historique & Module \texttt{budgets}, calculs temps réel, page \texttt{/envelopes} \\
+\hline
+\textbf{Transactions} & CRUD complet, Filtres (date, catégorie, montant), Recherche textuelle & Module \texttt{transactions}, API paginée (limit 50), tests E2E \\
+\hline
+\textbf{Import CSV} & Format gabarit, Validation + détection doublons, Rapport d'import & Endpoint \texttt{/import/csv}, parser Papaparse, page \texttt{/import} \\
+\hline
+\textbf{Dashboard} & KPIs (solde, dépenses, revenus), Graphiques (camembert, courbes), Filtres temporels & Page \texttt{/dashboard}, composants Recharts, requêtes optimisées \\
+\hline
+\textbf{Export} & Export CSV et JSON des transactions & Endpoints \texttt{/export/csv} et \texttt{/export/json}, boutons UI \\
+\hline
+\textbf{Droits d'accès} & Rôle Utilisateur et Admin & Guards NestJS \texttt{RoleGuard}, middleware autorisation \\
 \hline
 \end{tabular}
 \end{center}
 
-\section{User Stories et critères d'acceptation}
+\subsection{Fonctionnalités exclues de la v1.0}
 
-\subsection{Récapitulatif des User Stories}
+\begin{itemize}
+  \item Agrégation bancaire automatique
+  \item OCR de factures
+  \item Recommandations IA
+  \item Multi-devises (euro uniquement en v1)
+  \item Partage de budgets entre utilisateurs
+  \item Application mobile native (PWA responsive uniquement)
+\end{itemize}
+
+\subsection{Contraintes d'acceptation globales}
 
 \begin{center}
-\scriptsize
-\begin{tabular}{|c|c|p{5.5cm}|c|c|}
+\begin{tabular}{|p{4cm}|p{4cm}|p{5cm}|}
+\hline
+\textbf{Critère} & \textbf{Seuil d'acceptation} & \textbf{Méthode de mesure} \\
+\hline
+Performance dashboard & TTR P95 $< 2$s & Lighthouse, GTmetrix \\
+\hline
+Fiabilité API & Taux d'erreur $< 1\,\%$ (P95) & Logs applicatifs, monitoring \\
+\hline
+Disponibilité & $99{,}5\,\%$ (hors maintenance) & Uptime monitoring (UptimeRobot) \\
+\hline
+Sécurité & 0 vulnérabilité critique (OWASP Top 10) & npm audit, Snyk, revue code \\
+\hline
+\end{tabular}
+\end{center}
+
+\section{Cibles, personae et parties prenantes}
+
+\subsection{Personae détaillés}
+
+\subsubsection{Persona 1 --- Léa, 23 ans, Étudiante en Master}
+
+\textbf{Profil} : 800€/mois (APL + job étudiant), vit en colocation à Lyon.
+
+\paragraph{Objectifs}
+\begin{itemize}
+  \item Suivre ses dépenses contraintes (loyer 400€, transport 70€, alimentation 200€)
+  \item Garder un reste à vivre hebdomadaire de 30€ minimum
+  \item Éviter les découverts bancaires (frais 8€/incident)
+\end{itemize}
+
+\paragraph{Points de douleur actuels}
+\begin{itemize}
+  \item Oublie de noter 40\,\% de ses achats quotidiens
+  \item Fin de mois difficile (reste $< 20$€ les 5 derniers jours)
+  \item Utilise un tableur Excel compliqué et non synchronisé
+\end{itemize}
+
+\paragraph{Critères de succès avec My Smart Budget}
+\begin{itemize}
+  \item Visualiser son reste à vivre en 1 clic ($< 5$s)
+  \item Recevoir une alerte 3 jours avant épuisement d'une enveloppe
+  \item Réduire le temps de saisie mensuel de 2h à 15 min (import CSV)
+\end{itemize}
+
+\paragraph{Scénarios d'usage prioritaires}
+\begin{enumerate}
+  \item Ajout rapide d'une transaction mobile (course de 15€)
+  \item Consultation du reste à vivre avant une sortie
+  \item Import CSV mensuel de son relevé bancaire
+\end{enumerate}
+
+\subsubsection{Persona 2 --- Marc, 38 ans, Père de famille}
+
+\textbf{Profil} : 4500€/mois (couple biactif), 2 enfants (8 et 12 ans), propriétaire en région parisienne.
+
+\paragraph{Objectifs}
+\begin{itemize}
+  \item Répartir le budget familial par enveloppes (courses 600€, loisirs 300€, enfants 400€, épargne 500€)
+  \item Anticiper les pics de dépenses (rentrée scolaire +800€, vacances +1500€)
+  \item Impliquer sa conjointe dans le suivi budgétaire
+\end{itemize}
+
+\paragraph{Points de douleur actuels}
+\begin{itemize}
+  \item Manque de visibilité par catégorie (dépenses enfants dispersées)
+  \item Dépassements fréquents sur l'enveloppe "loisirs" (+20\,\% en moyenne)
+  \item Aucun outil partagé avec sa conjointe (double saisie fastidieuse)
+\end{itemize}
+
+\paragraph{Critères de succès avec My Smart Budget}
+\begin{itemize}
+  \item Respecter 90\,\% des plafonds mensuels d'enveloppes
+  \item Visualiser les dépenses enfants consolidées (école, activités, santé)
+  \item Exporter un bilan mensuel en PDF pour discussions de couple
+\end{itemize}
+
+\paragraph{Scénarios d'usage prioritaires}
+\begin{enumerate}
+  \item Création de 8 enveloppes avec plafonds mensuels
+  \item Analyse des dépassements du mois précédent
+  \item Export CSV pour comptable (déclaration impôts)
+\end{enumerate}
+
+\subsection{Parties prenantes}
+
+\subsubsection{Parties prenantes primaires}
+
+\begin{center}
+\small
+\begin{tabular}{|p{3cm}|p{2cm}|p{4cm}|p{4.5cm}|}
+\hline
+\textbf{Acteur} & \textbf{Rôle} & \textbf{Besoins} & \textbf{Critères de satisfaction} \\
+\hline
+\textbf{Abdelghani Saidi} & Porteur projet / Dev CDA & Valider compétences CDA, livrables conformes & Soutenance réussie, projet déployé, doc complète \\
+\hline
+\textbf{Utilisateurs finaux} & Testeurs MVP (3--5 pers.) & Appli stable, intuitive, sans bugs & SUS Score $\geq 75$, erreurs $< 5\,\%$ \\
+\hline
+\textbf{Jury CDA} & Évaluateurs certification & Conformité référentiel, qualité technique & Grille CDA : $\geq 12/20$ par bloc \\
+\hline
+\end{tabular}
+\end{center}
+
+\subsubsection{Parties prenantes secondaires}
+
+\begin{center}
+\small
+\begin{tabular}{|p{3.5cm}|c|c|p{6cm}|}
+\hline
+\textbf{Acteur} & \textbf{Influence} & \textbf{Intérêt} & \textbf{Stratégie d'engagement} \\
+\hline
+Hébergeur cloud (OVH/Vercel) & Moyenne & Faible & Contrat SLA, surveillance coûts ($< 50$€/mois v1) \\
+\hline
+Fournisseurs APIs bancaires (v2) & Moyenne & Moyen & Veille technologique, POC Budget Insight (2026) \\
+\hline
+GitHub/Docker Hub & Faible & Faible & Utilisation gratuite (repos publics), CI/CD inclus \\
+\hline
+Communauté open-source (post-v1) & Faible & Moyen & Doc contributeurs, licence MIT, roadmap publique \\
+\hline
+\end{tabular}
+\end{center}
+
+\subsection{Matrice influence/intérêt}
+
+\begin{center}
+\begin{tabular}{|p{4.5cm}|p{4cm}|p{5cm}|}
+\hline
+\textbf{Quadrant} & \textbf{Acteurs} & \textbf{Stratégie} \\
+\hline
+Forte influence + Fort intérêt & Porteur de projet, Jury CDA & \textbf{Gérer étroitement} : communication hebdo, validation jalons \\
+\hline
+Forte influence + Faible intérêt & Hébergeur (si indispo) & \textbf{Maintenir satisfait} : monitoring 24/7, SLA respecté \\
+\hline
+Faible influence + Fort intérêt & Utilisateurs testeurs & \textbf{Tenir informés} : newsletter sprint, changelog, feedback loops \\
+\hline
+Faible influence + Faible intérêt & Fournisseurs secondaires & \textbf{Surveiller} : veille passive, pas d'actions v1 \\
+\hline
+\end{tabular}
+\end{center}
+
+\section{User Stories et Critères d'Acceptation}
+
+\subsection{User Stories priorisées (P1 $\rightarrow$ P3)}
+
+\begin{center}
+\small
+\begin{tabular}{|c|c|p{6cm}|c|c|}
 \hline
 \textbf{ID} & \textbf{P} & \textbf{User Story} & \textbf{Valeur} & \textbf{Effort} \\
 \hline
-US-01 & P1 & Créer compte et se connecter & Prérequis RGPD & 5 \\
+US-01 & P1 & En tant qu'utilisateur, je peux créer un compte et me connecter & Prérequis RGPD & 5 \\
 \hline
-US-02 & P1 & CRUD transactions + catégorisation & Cœur fonctionnel & 8 \\
+US-02 & P1 & En tant qu'utilisateur, je peux créer/éditer/supprimer des transactions et les catégoriser & Cœur fonctionnel & 8 \\
 \hline
-US-03 & P1 & Créer enveloppes + reste à vivre & Différenciateur & 8 \\
+US-03 & P1 & En tant qu'utilisateur, je peux créer des enveloppes et voir mon reste à vivre & Différenciateur & 8 \\
 \hline
-US-04 & P2 & Importer CSV transactions & Gain temps x10 & 5 \\
+US-04 & P2 & En tant qu'utilisateur, je peux importer un CSV de transactions & Gain temps x10 & 5 \\
 \hline
-US-05 & P2 & Dashboard graphiques + KPIs & Décision rapide & 13 \\
+US-05 & P2 & En tant qu'utilisateur, je vois un dashboard avec graphiques et KPIs & Décision rapide & 13 \\
 \hline
-US-06 & P2 & Exporter CSV/JSON & RGPD Art. 20 & 3 \\
+US-06 & P2 & En tant qu'utilisateur, je peux exporter mes transactions (CSV/JSON) & Conformité RGPD & 3 \\
 \hline
-US-07 & P3 & Notification 80\,\% plafond & Prévention & 5 \\
+US-07 & P3 & En tant qu'utilisateur, je reçois une notification à 80\,\% du plafond & Prévention & 5 \\
 \hline
-US-08 & P3 & Backoffice admin stats & Pilotage produit & 8 \\
-\hline
-\end{tabular}
-\end{center}
-
-\subsection{Exemples de critères d'acceptation (DoD)}
-
-\subsubsection{US-01 : Authentification}
-
-\textbf{Fonctionnel} : Email unique RFC 5322, mot de passe $\geq 12$ car (1 maj/min/chiffre/spécial), JWT HS256 exp 24h, redirection \texttt{/dashboard}, anti-brute force (3 tentatives $\rightarrow$ 5 min).
-
-\textbf{Technique} : Tests unitaires (5 cas), E2E (inscription $\rightarrow$ connexion), latence \texttt{/register} $< 800$ms P95, logs audit (IP, 90j).
-
-\textbf{Mesurable} : 100\,\% connexions valides réussissent, 0 JWT expiré accepté, taux activation $\geq 80\,\%$ (7j).
-
-\subsubsection{US-05 : Dashboard}
-
-\textbf{Fonctionnel} : 4 KPIs (solde, dépenses, revenus, reste à vivre), camembert top 10 catégories, courbe évolution 12 mois, filtres temporels (mois/trim./année/perso), responsive (400/768/1024px).
-
-\textbf{Technique} : Recharts, agrégations SQL + index \texttt{date}, cache memoization TTL 1h, tests E2E graphiques.
-
-\textbf{Mesurable} : TTR $< 2$s P95 (Lighthouse), usage hebdo $> 60\,\%$ (GA4), 0 erreur console (Chrome 120+, Firefox 120+, Safari 17+).
-
-\textit{Note : Détails US-02, US-03, US-04, US-06 en Annexe A.}
-
-\section{Architecture et choix techniques}
-
-\subsection{Architecture 3-tiers}
-
-\textbf{Client Web} (navigateur) : Interface Next.js 14, validation Zod, state Zustand, WCAG 2.1 AA. \textbf{API REST} (NestJS/Node.js) : Logique métier, JWT auth, rate limiting (10 req/sec), logs Winston. \textbf{Base PostgreSQL} : Schémas Prisma, contraintes FK, index performances, sauvegardes pg\_dump quotidiennes.
-
-\textbf{Déploiement} : Docker Compose (v1), GitHub Actions CI/CD, Vercel (front) + OVH VPS (back/DB).
-
-\subsection{Justification choix technologiques}
-
-\begin{center}
-\tiny
-\begin{tabular}{|p{2cm}|p{2cm}|p{2cm}|p{5cm}|}
-\hline
-\textbf{Composant} & \textbf{Choix} & \textbf{Alternative} & \textbf{Raison} \\
-\hline
-Back-end & NestJS & Express.js & DI modulaire, décorateurs, tests facilités, CLI \\
-\hline
-Front-end & Next.js & Vite & SSR/SSG, routage App Router, optimisations auto \\
-\hline
-Base données & PostgreSQL & MongoDB & ACID transactions financières, agrégations SQL, FK \\
-\hline
-ORM & Prisma & TypeORM & Types auto-générés, migrations déclaratives, Prisma Studio \\
-\hline
-Validation & Zod & Yup & Inférence TypeScript, partage front/back \\
-\hline
-Tests E2E & Playwright & Cypress & Multi-navigateurs, parallélisation \\
-\hline
-Hébergement & Vercel + OVH & AWS & Coûts 20€/mois, souveraineté RGPD EU \\
+US-08 & P3 & En tant qu'admin, j'accède au backoffice avec stats globales & Pilotage produit & 8 \\
 \hline
 \end{tabular}
 \end{center}
 
-\textbf{PostgreSQL vs MongoDB} : Données transactionnelles nécessitent ACID strict. Modèle relationnel adapté User $\leftrightarrow$ Transaction $\leftrightarrow$ Category $\leftrightarrow$ Budget. Agrégations SQL plus performantes. Foreign keys \texttt{ON DELETE CASCADE} garantissent cohérence.
+\subsection{Critères d'acceptation détaillés (Definition of Done)}
 
-\subsection{Sécurité et RGPD}
+\subsubsection{US-01 : Compte \& Connexion}
+
+\paragraph{Critères fonctionnels}
+\begin{enumerate}
+  \item Formulaire d'inscription avec validations :
+    \begin{itemize}
+      \item Email unique (format RFC 5322)
+      \item Mot de passe $\geq 12$ caractères (1 maj, 1 min, 1 chiffre, 1 spécial)
+      \item Confirmation mot de passe identique
+    \end{itemize}
+  \item Mot de passe haché avec bcrypt (cost factor $\geq 12$)
+  \item Token JWT signé (HS256, expiration 24h, payload : userId + rôle)
+  \item Redirection automatique vers \texttt{/dashboard} après connexion
+  \item Mécanisme anti-brute force : 3 tentatives $\rightarrow$ temporisation 5 min
+\end{enumerate}
+
+\paragraph{Critères techniques}
+\begin{itemize}
+  \item Tests unitaires : 5 cas (inscription OK, email doublon, mot de passe faible, JWT valide, JWT expiré)
+  \item Tests E2E : parcours complet inscription $\rightarrow$ connexion $\rightarrow$ page protégée
+  \item Latence endpoint \texttt{/register} $< 800$ms (P95)
+  \item Logs audit : tentatives échouées + IP (conservation 90j)
+\end{itemize}
+
+\paragraph{Critères d'acceptation mesurables}
+\begin{itemize}
+  \item[$\checkmark$] 100\,\% des connexions avec credentials valides réussissent
+  \item[$\checkmark$] 0 token JWT accepté après expiration
+  \item[$\checkmark$] Taux d'activation $\geq 80\,\%$ (compte créé $\rightarrow$ 1\textsuperscript{re} connexion dans 7j)
+\end{itemize}
+
+\subsubsection{US-02 : Transactions CRUD}
+
+\paragraph{Critères fonctionnels}
+\begin{enumerate}
+  \item Champs obligatoires : date (ISO 8601), montant (décimal 2 chiffres), catégorie (FK), libellé (max 200 char), type (DEBIT/CREDIT)
+  \item Création d'une transaction $< 500$ms (P95)
+  \item Liste paginée (50 items/page) avec tri (date DESC) et filtres (catégorie, dates, montant)
+  \item Édition conservant historique (champ \texttt{updated\_at})
+  \item Suppression avec confirmation modale
+  \item Total par catégorie mis à jour instantanément
+\end{enumerate}
+
+\paragraph{Critères techniques}
+\begin{itemize}
+  \item Index DB : \texttt{(userId, date DESC)}, \texttt{(userId, category\_id)}
+  \item Validation backend (Zod) + frontend (React Hook Form)
+  \item Tests unitaires : CRUD complet (8 cas), calculs totaux (3 cas)
+  \item Tests E2E : scénario ajout $\rightarrow$ édition $\rightarrow$ suppression
+\end{itemize}
+
+\paragraph{Critères d'acceptation mesurables}
+\begin{itemize}
+  \item[$\checkmark$] Latence création P95 $< 500$ms
+  \item[$\checkmark$] 0 incohérence entre total affiché et somme DB
+  \item[$\checkmark$] Taux d'erreur validation $< 2\,\%$
+\end{itemize}
+
+\subsubsection{US-03 : Enveloppes Budgétaires}
+
+\paragraph{Critères fonctionnels}
+\begin{enumerate}
+  \item Création enveloppe : nom (unique), plafond mensuel (€), catégories liées (1 à N)
+  \item Calcul "reste à vivre" : $\text{Revenus} - \Sigma(\text{Dépenses enveloppes}) - \Sigma(\text{Dépenses hors env.})$
+  \item Indicateurs visuels :
+    \begin{itemize}
+      \item Vert : consommé $< 80\,\%$
+      \item Orange : $80\,\% \leq$ consommé $< 100\,\%$
+      \item Rouge : consommé $\geq 100\,\%$
+    \end{itemize}
+  \item Historique mensuel : graphique évolution sur 12 mois
+  \item Export CSV des enveloppes
+\end{enumerate}
+
+\paragraph{Critères techniques}
+\begin{itemize}
+  \item Requête SQL optimisée : agrégation par \texttt{envelope\_id} avec index
+  \item Recalcul temps réel : polling 30s (v1)
+  \item Tests unitaires : calculs "reste à vivre" (5 cas limites)
+\end{itemize}
+
+\paragraph{Critères d'acceptation mesurables}
+\begin{itemize}
+  \item[$\checkmark$] Temps chargement page \texttt{/envelopes} $< 1{,}5$s (P95)
+  \item[$\checkmark$] Précision calculs : 0 écart vs calcul SQL manuel
+  \item[$\checkmark$] Adoption : $\geq 70\,\%$ utilisateurs créent $\geq 3$ enveloppes (30j)
+\end{itemize}
+
+\subsubsection{US-04 : Import CSV}
+
+\paragraph{Critères fonctionnels}
+\begin{enumerate}
+  \item Format gabarit : \texttt{date,amount,category,label,type}
+  \item Validation fichier :
+    \begin{itemize}
+      \item Format date : ISO 8601 ou français (DD/MM/YYYY)
+      \item Montant : décimal positif
+      \item Catégorie : nom exact ou ID existant
+      \item Détection doublons : même date + montant + libellé
+    \end{itemize}
+  \item Performance : import 10\,000 lignes en $< 20$s
+  \item Rapport d'import : créées/ignorées/erreurs avec numéros de ligne
+\end{enumerate}
+
+\paragraph{Critères techniques}
+\begin{itemize}
+  \item Parser : Papaparse (UTF-8/Latin1)
+  \item Traitement par batchs de 500 lignes
+  \item Transaction DB : rollback si $> 10\,\%$ lignes invalides
+  \item Tests unitaires : 8 cas (fichier valide, date invalide, doublons, etc.)
+\end{itemize}
+
+\paragraph{Critères d'acceptation mesurables}
+\begin{itemize}
+  \item[$\checkmark$] Taux d'import réussi $> 95\,\%$ (fichiers réels)
+  \item[$\checkmark$] Temps import 10k lignes $< 20$s
+  \item[$\checkmark$] 0 perte de données si interruption
+\end{itemize}
+
+\subsubsection{US-05 : Dashboard Interactif}
+
+\paragraph{Critères fonctionnels}
+\begin{enumerate}
+  \item KPIs affichés :
+    \begin{itemize}
+      \item Solde total actuel (€)
+      \item Dépenses du mois en cours (€)
+      \item Revenus du mois en cours (€)
+      \item Reste à vivre estimé (€)
+    \end{itemize}
+  \item Graphiques :
+    \begin{itemize}
+      \item Camembert : répartition dépenses par catégorie (top 10)
+      \item Courbe : évolution dépenses/revenus sur 12 mois
+    \end{itemize}
+  \item Filtres temporels : mois, trimestre, année, période personnalisée
+  \item Responsive : breakpoints 400px, 768px, 1024px
+\end{enumerate}
+
+\paragraph{Critères techniques}
+\begin{itemize}
+  \item Librairie graphiques : Recharts (composants React natifs)
+  \item Optimisation requêtes : agrégations SQL avec \texttt{GROUP BY} + index sur \texttt{date}
+  \item Cache côté serveur : memoization (v1) pour données mensuelles (TTL 1h)
+  \item Tests E2E : vérification affichage graphiques, filtres fonctionnels
+\end{itemize}
+
+\paragraph{Critères d'acceptation mesurables}
+\begin{itemize}
+  \item[$\checkmark$] Time-to-Render (TTR) $< 2$s (P95, Lighthouse)
+  \item[$\checkmark$] Taux d'usage hebdomadaire $> 60\,\%$ (Google Analytics)
+  \item[$\checkmark$] 0 erreur JS console sur Chrome 120+, Firefox 120+, Safari 17+
+\end{itemize}
+
+\subsubsection{US-06 : Export CSV/JSON}
+
+\paragraph{Critères fonctionnels}
+\begin{enumerate}
+  \item Export CSV : format compatible Excel/LibreOffice (séparateur \texttt{;}, encodage UTF-8 BOM)
+  \item Export JSON : structure conforme Article 20 RGPD (machine-readable)
+  \item Période sélectionnable : mois, trimestre, année, tout l'historique
+  \item Nom fichier : \texttt{transactions\_2025-11.csv} (inclut période)
+\end{enumerate}
+
+\paragraph{Critères techniques}
+\begin{itemize}
+  \item Génération côté serveur (éviter surcharge client)
+  \item Limite : 50\,000 transactions max par export
+  \item Tests unitaires : 3 formats (CSV, JSON, période vide)
+\end{itemize}
+
+\paragraph{Critères d'acceptation mesurables}
+\begin{itemize}
+  \item[$\checkmark$] Temps génération $< 5$s pour 10k transactions
+  \item[$\checkmark$] 100\,\% des exports téléchargés sont lisibles
+  \item[$\checkmark$] Conformité RGPD : export inclut toutes les données personnelles
+\end{itemize}
+
+\section{Spécifications Fonctionnelles et Techniques}
+
+\subsection{Répartition Front-end / Back-end}
 
 \begin{center}
 \scriptsize
-\begin{tabular}{|p{3cm}|p{4.5cm}|p{5cm}|}
+\begin{tabular}{|p{2cm}|p{3.5cm}|p{4cm}|p{4cm}|}
 \hline
-\textbf{Mesure} & \textbf{Implémentation} & \textbf{Justification} \\
+\textbf{Couche} & \textbf{Technologies} & \textbf{Responsabilités} & \textbf{Livrables v1.0} \\
 \hline
-Auth & JWT HS256 256 bits exp 24h & Stateless, scalable, standard \\
+\textbf{Front-end} & Next.js 14, React 18, TypeScript, Tailwind CSS, React Hook Form + Zod, Recharts & Interface responsive, Validation formulaires, State management, Graphiques, Accessibilité WCAG 2.1 AA & Pages : \texttt{/auth}, \texttt{/transactions}, \texttt{/envelopes}, \texttt{/dashboard}, \texttt{/profile}, \texttt{/import}. Composants réutilisables. Tests E2E (Playwright) \\
 \hline
-Mots de passe & Bcrypt cost 12 & Résistance brute-force ($2^{12}$ iter $\approx 250$ms) \\
+\textbf{Back-end} & Node.js 20, NestJS 10, TypeScript, Passport (JWT), class-validator, Swagger/OpenAPI & API REST (CRUD), Logique métier, Authentification, Rate limiting (10 req/sec), Logs (Winston) & Modules : \texttt{auth}, \texttt{users}, \texttt{transactions}, \texttt{budgets}, \texttt{categories}. Documentation OpenAPI. Tests unitaires (Jest, couv. $\geq 60\,\%$) \\
 \hline
-HTTPS & TLS 1.3 (Let's Encrypt) & Chiffrement transit, anti-MITM \\
+\textbf{Base de données} & PostgreSQL 15, Prisma 5, Prisma Migrate & Schémas versionnés, Contraintes d'intégrité, Index performance, Sauvegardes (pg\_dump) & MCD/MLD/MPD (diagrammes UML + Merise). Scripts migrations. Seeds. Politique rétention (soft delete $< 7$ ans) \\
 \hline
 \end{tabular}
 \end{center}
 
-\textbf{Matrice Rôles/Permissions} : Utilisateur (ses transactions/enveloppes, export RGPD), Admin (backoffice stats, catégories globales, suppression comptes), Invité (aucun accès).
+\subsection{Sécurité, Confidentialité et RGPD}
 
-\textbf{Conformité RGPD} : Droit à l'oubli (endpoint \texttt{DELETE /users/:id}, soft delete 30j), portabilité (endpoint \texttt{GET /export/all} JSON, $< 5$s), journalisation (table \texttt{audit\_logs}, 90j).
+\subsubsection{Authentification et Chiffrement}
 
-\section{Risques, validation et suivi}
+\begin{center}
+\begin{tabular}{|p{3.5cm}|p{5cm}|p{5cm}|}
+\hline
+\textbf{Mesure} & \textbf{Implémentation} & \textbf{Justification} \\
+\hline
+Authentification & JWT (algorithme HS256, clé 256 bits, exp 24h) & Stateless, scalable, standard industrie \\
+\hline
+Mots de passe & Bcrypt (cost factor 12, salts automatiques) & Résistance brute-force ($2^{12}$ itérations $\approx 250$ms/hash) \\
+\hline
+HTTPS & TLS 1.3 obligatoire (Let's Encrypt) & Chiffrement transit, protection MITM \\
+\hline
+Secrets & Variables d'environnement (\texttt{.env} exclu Git) & Pas de secrets en clair dans le code \\
+\hline
+\end{tabular}
+\end{center}
+
+\subsubsection{Matrice Rôles / Permissions}
+
+\begin{center}
+\begin{tabular}{|p{4.5cm}|c|c|c|}
+\hline
+\textbf{Action} & \textbf{Utilisateur} & \textbf{Admin} & \textbf{Invité} \\
+\hline
+Voir ses transactions & \checkmark & \checkmark & $\times$ \\
+\hline
+Modifier ses transactions & \checkmark & \checkmark & $\times$ \\
+\hline
+Voir transactions autres users & $\times$ & \checkmark (anon.) & $\times$ \\
+\hline
+Créer enveloppes & \checkmark & \checkmark & $\times$ \\
+\hline
+Accéder backoffice stats & $\times$ & \checkmark & $\times$ \\
+\hline
+Supprimer compte utilisateur & \checkmark (son compte) & \checkmark (tous) & $\times$ \\
+\hline
+Gérer catégories globales & $\times$ & \checkmark & $\times$ \\
+\hline
+Exporter données (RGPD) & \checkmark & \checkmark & $\times$ \\
+\hline
+\end{tabular}
+\end{center}
+
+\subsubsection{Conformité RGPD}
+
+\paragraph{Droits des utilisateurs (implémentation)}
+
+\begin{center}
+\begin{tabular}{|p{4cm}|p{5cm}|p{4.5cm}|}
+\hline
+\textbf{Droit RGPD} & \textbf{Implémentation technique} & \textbf{Délai de réponse} \\
+\hline
+\textbf{Droit à l'oubli} (Art. 17) & Endpoint \texttt{DELETE /users/:id} avec suppression en cascade (transactions, enveloppes, catégories perso) & Immédiat (soft delete 30j) \\
+\hline
+\textbf{Droit à la portabilité} (Art. 20) & Endpoint \texttt{GET /export/all} (JSON structuré : profil + transactions + enveloppes) & $< 5$ secondes \\
+\hline
+\textbf{Droit d'accès} (Art. 15) & Page \texttt{/profile/data} listant toutes les données stockées & Temps réel \\
+\hline
+\textbf{Consentement explicite} (Art. 7) & Case à cocher lors de l'inscription ("J'accepte la politique de confidentialité") & Inscription bloquée si refus \\
+\hline
+\textbf{Journalisation accès} (Art. 30) & Table \texttt{audit\_logs} : \texttt{user\_id}, \texttt{action}, \texttt{ip}, \texttt{timestamp} (conservation 90j) & Temps réel \\
+\hline
+\end{tabular}
+\end{center}
+
+\paragraph{Procédure d'exécution (SOP)}
+
+\begin{enumerate}
+  \item \textbf{Suppression compte} :
+    \begin{itemize}
+      \item Utilisateur clique sur "Supprimer mon compte" (\texttt{/profile/delete})
+      \item Confirmation par email (lien sécurisé valide 24h)
+      \item Soft delete : \texttt{deleted\_at = NOW()}, données conservées 30j (récupération possible)
+      \item Hard delete après 30j : purge définitive par job CRON quotidien
+    \end{itemize}
+  \item \textbf{Export données} :
+    \begin{itemize}
+      \item Utilisateur clique sur "Télécharger mes données" (\texttt{/profile/export})
+      \item Génération archive ZIP (JSON + CSV) côté serveur
+      \item Téléchargement direct (pas de stockage temporaire)
+      \item Log de l'action dans \texttt{audit\_logs}
+    \end{itemize}
+\end{enumerate}
+
+\section{Architecture 3-tiers et Responsabilités}
+
+\subsection{Vue d'ensemble (description textuelle)}
+
+L'application suit une architecture \textbf{3-tiers classique} séparant les responsabilités :
+
+\begin{itemize}
+  \item \textbf{Client Web} (navigateur) : Interface utilisateur interactive, validation côté client, gestion du state local (React Context/Zustand).
+  \item \textbf{API REST} (NestJS sur Node.js) : Logique métier, authentification JWT, validation des entrées, orchestration des requêtes DB, rate limiting, logs structurés.
+  \item \textbf{Base de données} (PostgreSQL) : Persistance des données, contraintes d'intégrité référentielle, index de performance, sauvegardes automatisées.
+\end{itemize}
+
+\textbf{Déploiement} : Conteneurs Docker orchestrés via Docker Compose (v1) ou Kubernetes (v2). CI/CD via GitHub Actions (tests automatisés, build, déploiement sur Vercel/OVH).
+
+\textbf{Observabilité minimale (v1)} : Journaux applicatifs centralisés (Winston $\rightarrow$ fichiers), métriques de performance (Lighthouse CI), monitoring uptime (UptimeRobot).
+
+\subsection{Architecture logique (responsabilités détaillées)}
+
+\subsubsection{Couche Présentation (Front-end)}
+
+\begin{itemize}
+  \item \textbf{Pages} : Routage App Router Next.js (\texttt{app/auth/page.tsx}, \texttt{app/dashboard/page.tsx}, etc.)
+  \item \textbf{Composants} : Découpage atomique (Atomic Design) : atomes (boutons, inputs), molécules (formulaires), organismes (cartes dashboard)
+  \item \textbf{Validation UI} : React Hook Form + Zod (schémas partagés avec back-end via package commun)
+  \item \textbf{State management} : Zustand pour état global (utilisateur connecté, filtres actifs), Context API pour thèmes/i18n
+  \item \textbf{Accessibilité} : Attributs ARIA, navigation clavier, contrastes WCAG 2.1 AA, tests avec axe-core
+  \item \textbf{Internationalisation (v2)} : next-i18next (français/anglais), détection automatique locale navigateur
+\end{itemize}
+
+\subsubsection{Couche Métier (Back-end)}
+
+\begin{itemize}
+  \item \textbf{Modules NestJS} : Architecture modulaire avec injection de dépendances (DI) :
+    \begin{itemize}
+      \item \texttt{AuthModule} : Inscription, connexion, JWT strategy (Passport), refresh tokens (v2)
+      \item \texttt{UsersModule} : CRUD profils, gestion rôles, suppression RGPD
+      \item \texttt{TransactionsModule} : CRUD transactions, filtres, agrégations (totaux par catégorie)
+      \item \texttt{BudgetsModule} : CRUD enveloppes, calcul "reste à vivre", historiques
+      \item \texttt{CategoriesModule} : CRUD catégories (globales + personnalisées)
+      \item \texttt{ImportModule} : Parsing CSV, validation, détection doublons, rapports
+      \item \texttt{ExportModule} : Génération CSV/JSON, compression ZIP
+    \end{itemize}
+  \item \textbf{Services métier} : Logique de calcul isolée (testable unitairement) :
+    \begin{itemize}
+      \item \texttt{BudgetCalculatorService} : Calcul reste à vivre, pourcentages consommation enveloppes
+      \item \texttt{TransactionAggregatorService} : Agrégations (sommes par catégorie, évolutions mensuelles)
+    \end{itemize}
+  \item \textbf{Guards \& Interceptors} : Contrôle d'accès (JWT guard, Role guard), transformation réponses, gestion erreurs globales
+  \item \textbf{Rate limiting} : Throttler NestJS (10 req/sec par IP, 100 req/min par utilisateur)
+  \item \textbf{Logs} : Winston avec niveaux (error, warn, info, debug), rotation quotidienne, format JSON pour parsing
+\end{itemize}
+
+\subsubsection{Couche Données (Base de données)}
+
+\begin{itemize}
+  \item \textbf{Schémas Prisma} : Modèles typés (User, Transaction, Budget, Category, AuditLog)
+  \item \textbf{Relations} : Foreign keys avec \texttt{ON DELETE CASCADE} (suppression utilisateur $\rightarrow$ purge transactions)
+  \item \textbf{Index de performance} :
+    \begin{itemize}
+      \item \texttt{CREATE INDEX idx\_transactions\_user\_date ON transactions(user\_id, date DESC)}
+      \item \texttt{CREATE INDEX idx\_transactions\_category ON transactions(category\_id)}
+      \item \texttt{CREATE INDEX idx\_budgets\_user ON budgets(user\_id)}
+    \end{itemize}
+  \item \textbf{Migrations versionnées} : Prisma Migrate (\texttt{prisma migrate dev}, \texttt{prisma migrate deploy})
+  \item \textbf{Seeds} : Données de test (15 catégories prédéfinies, 2 utilisateurs démo, 50 transactions)
+  \item \textbf{Sauvegardes} : pg\_dump quotidien (rétention 30j), restauration testée mensuellement
+\end{itemize}
+
+\section{Choix Technologiques et Alternatives}
+
+\subsection{Tableau comparatif des choix}
+
+\begin{center}
+\scriptsize
+\begin{tabular}{|p{2.5cm}|p{2.5cm}|p{3cm}|p{5.5cm}|}
+\hline
+\textbf{Composant} & \textbf{Choix} & \textbf{Alternative} & \textbf{Raison du choix} \\
+\hline
+\textbf{Back-end} & NestJS & Express.js & Structure modulaire (DI), décorateurs, tests facilités, support TypeScript natif, CLI puissant \\
+\hline
+\textbf{Front-end} & Next.js & React pur (Vite) & Routage/SSR intégrés, optimisation images, App Router (RSC), SEO, performances, DX supérieure \\
+\hline
+\textbf{Base de données} & PostgreSQL & MongoDB & Données transactionnelles relationnelles (ACID), agrégations SQL complexes, contraintes d'intégrité, maturité \\
+\hline
+\textbf{ORM} & Prisma & TypeORM & Schémas typés auto-générés, migrations déclaratives, Prisma Studio (GUI), performances (requêtes optimisées) \\
+\hline
+\textbf{Cache/Queue (v2)} & Redis & RabbitMQ & Simplicité d'usage, TTL natifs, incréments atomiques (compteurs), pub/sub pour notifications \\
+\hline
+\textbf{Graphiques} & Recharts & Chart.js & Intégration React fluide (composants déclaratifs), personnalisation facile, bundle size raisonnable \\
+\hline
+\textbf{Validation} & Zod & Yup, Joi & Inférence TypeScript automatique, schémas composables, performances (parsing rapide), partage front/back \\
+\hline
+\textbf{State management} & Zustand & Redux Toolkit & Simplicité (sans boilerplate), devtools intégrés, API minimale, performances (re-renders optimisés) \\
+\hline
+\textbf{Tests E2E} & Playwright & Cypress & Support multi-navigateurs natif (Chrome, Firefox, Safari), parallélisation, debugging puissant \\
+\hline
+\textbf{CI/CD} & GitHub Actions & GitLab CI & Gratuit pour repos publics, workflows YAML simples, marketplace d'actions, intégration GitHub native \\
+\hline
+\textbf{Hébergement front} & Vercel & Netlify & Optimisations Next.js natives, edge functions, analytics intégrés, DX (déploiement auto sur push) \\
+\hline
+\textbf{Hébergement back/DB} & OVH (VPS) & AWS, Google Cloud & Coûts maîtrisés (20€/mois), souveraineté données (RGPD EU), support français \\
+\hline
+\end{tabular}
+\end{center}
+
+\subsection{Justifications détaillées (choix critiques)}
+
+\subsubsection{PostgreSQL vs MongoDB}
+
+\textbf{Pourquoi PostgreSQL ?}
+\begin{itemize}
+  \item \textbf{Données transactionnelles} : Les transactions financières nécessitent des garanties ACID (Atomicity, Consistency, Isolation, Durability). PostgreSQL excelle sur ces propriétés.
+  \item \textbf{Relations complexes} : Modèle relationnel adapté aux liens User $\leftrightarrow$ Transaction $\leftrightarrow$ Category $\leftrightarrow$ Budget.
+  \item \textbf{Agrégations SQL} : Calculs complexes (sommes par catégorie, évolutions temporelles) plus performants en SQL qu'en aggregation pipeline MongoDB.
+  \item \textbf{Intégrité référentielle} : Foreign keys avec \texttt{ON DELETE CASCADE} garantissent la cohérence (suppression utilisateur $\rightarrow$ purge automatique transactions).
+\end{itemize}
+
+\textbf{MongoDB écarté car} :
+\begin{itemize}
+  \item Denormalisation nécessaire (duplication données) pour performances $\rightarrow$ risque incohérences
+  \item Transactions multi-documents complexes (support depuis v4.0 mais moins mature)
+  \item Pas de garantie ACID stricte par défaut
+\end{itemize}
+
+\subsubsection{NestJS vs Express.js}
+
+\textbf{Pourquoi NestJS ?}
+\begin{itemize}
+  \item \textbf{Architecture modulaire} : Découpage clair par domaines métier (AuthModule, TransactionsModule, etc.), réutilisabilité, maintenabilité
+  \item \textbf{Injection de dépendances (DI)} : Testabilité maximale (mocks faciles), couplage faible entre composants
+  \item \textbf{Décorateurs TypeScript} : Code déclaratif lisible (\texttt{@Get()}, \texttt{@UseGuards()}, \texttt{@Body()})
+  \item \textbf{Écosystème riche} : Passport (auth), Swagger (doc auto), class-validator (validation), throttler (rate limiting)
+  \item \textbf{Standards} : Conformité aux design patterns (Repository, Service, Controller), onboarding facilité pour nouveaux développeurs
+\end{itemize}
+
+\textbf{Express.js écarté car} :
+\begin{itemize}
+  \item Minimaliste $\rightarrow$ nécessite configuration manuelle (routing, validation, error handling)
+  \item Pas de structure imposée $\rightarrow$ divergences architecture entre développeurs
+  \item Tests plus complexes (moins d'abstractions pour DI/mocks)
+\end{itemize}
+
+\subsubsection{Next.js vs React pur (Vite)}
+
+\textbf{Pourquoi Next.js ?}
+\begin{itemize}
+  \item \textbf{Routage intégré} : App Router avec layouts, loading states, error boundaries (pas de react-router à configurer)
+  \item \textbf{SSR/SSG} : Server-Side Rendering pour SEO (page d'accueil publique), Static Site Generation pour performances
+  \item \textbf{Optimisations automatiques} : Images (next/image), fonts (next/font), code splitting, tree shaking
+  \item \textbf{API Routes} : Endpoints API co-localisés (utile pour webhooks, génération PDFs en v2)
+  \item \textbf{DX supérieure} : Fast Refresh, TypeScript out-of-the-box, devtools intégrés
+\end{itemize}
+
+\textbf{React pur (Vite) écarté car} :
+\begin{itemize}
+  \item Configuration manuelle : routage, bundling, optimisations images
+  \item Pas de SSR natif (nécessite framework custom ou Remix/Astro)
+  \item SEO limité (CSR uniquement sauf configuration complexe)
+\end{itemize}
+
+\section{Contraintes, Risques et Mitigations}
 
 \subsection{Matrice des risques}
 
 \begin{center}
-\tiny
-\begin{tabular}{|p{3cm}|c|c|p{6cm}|}
+\scriptsize
+\begin{tabular}{|p{4cm}|c|c|p{7cm}|}
 \hline
-\textbf{Risque} & \textbf{Impact} & \textbf{Prob.} & \textbf{Mitigation} \\
+\textbf{Risque/Contrainte} & \textbf{Impact} & \textbf{Prob.} & \textbf{Mitigation} \\
 \hline
-Retard développement & Moyen & Élevée & Sprints 2 sem., buffer 20\,\%, priorité P1 stricte \\
+Retard développement back-end & Moyen & Élevée & Sprints courts (2 sem.), feature flags (déploiement progressif), priorité P1 stricte, buffer 20\,\% planning \\
 \hline
-Failles sécurité JWT/SQL & Élevé & Moyen & Revue code PR, npm audit, Snyk, checklist OWASP \\
+Failles sécurité (JWT/SQL injection) & Élevé & Moyen & Revue de code obligatoire (PR), tests automatisés (Snyk, npm audit), linters (ESLint security rules), checklist OWASP Top 10 \\
 \hline
-Timeout import CSV & Moyen & Moyen & Batchs 500 lignes, transactions DB atomiques \\
+Charge import CSV (timeout) & Moyen & Moyen & Traitement par batchs (500 lignes), transactions DB atomiques, worker asynchrone (Bull/Redis en v2), index DB optimisés \\
 \hline
-Perte données DB & Élevé & Faible & pg\_dump quotidien, tests restauration mensuels \\
+Complexité responsive (breakpoints) & Moyen & Moyen & Design mobile-first (Tailwind), tests sur appareils réels (BrowserStack), composants adaptatifs (useMediaQuery) \\
 \hline
-RGPD non respectée & Élevé & Faible & Endpoints dédiés export/suppression, logs audit \\
+Dépendance hébergeur cloud & Faible & Faible & Abstraction infra (Docker), variables env (12-factor app), sauvegardes externes (S3/Backblaze), documentation déploiement \\
+\hline
+Dépassement budget hébergement & Faible & Moyen & Monitoring coûts (alerts OVH), optimisation requêtes (cache Redis v2), rate limiting, scaling horizontal différé (v2) \\
+\hline
+Perte de données (crash DB) & Élevé & Faible & Sauvegardes quotidiennes (pg\_dump), réplication (read replica en v2), tests de restauration mensuels, transactions ACID \\
+\hline
+Conformité RGPD non respectée & Élevé & Faible & Checklist RGPD exhaustive, endpoints dédiés (export/suppression), logs audit, revue juridique (DPO consulté), doc politique confidentialité \\
 \hline
 \end{tabular}
 \end{center}
 
-\textbf{Plan contingence sécurité} : H+0 (API hors ligne), H+2 (patch staging), H+4 (déploiement prod), H+6 (audit Snyk), J+7 (post-mortem).
+\subsection{Plan de contingence (risques critiques)}
 
-\subsection{Validation utilisateur}
+\subsubsection{Failles de sécurité découvertes en production}
 
-\textbf{Échantillon} : 3--5 testeurs (Léa étudiante 18--25 ans, Marc père 35--45 ans, Senior 60+ ans), recrutement réseau + compensation 20€.
+\textbf{Scénario} : Vulnérabilité critique détectée (ex : JWT mal signé, SQL injection possible).
 
-\textbf{Protocole} : Session 45 min (intro 5 min, think-aloud 30 min, débriefing 10 min), questionnaire SUS (10 questions Likert), mesures objectives (temps, erreurs, taux réussite).
+\textbf{Plan d'action} :
+\begin{enumerate}
+  \item \textbf{Immédiat (H+0)} : Mise hors ligne temporaire de l'API (page maintenance), notification utilisateurs par email
+  \item \textbf{H+2} : Patch de sécurité développé et testé sur environnement staging
+  \item \textbf{H+4} : Déploiement du patch en production, tests de non-régression
+  \item \textbf{H+6} : Remise en ligne, audit de sécurité complet (Snyk, SonarQube), communication transparente (changelog)
+  \item \textbf{J+7} : Post-mortem rédigé, mesures préventives ajoutées (nouveaux tests, revue processus)
+\end{enumerate}
 
-\textbf{Critères validation} : SUS $\geq 75$, temps scénario 1 $< 2$ min, scénario 2 $< 30$s, scénario 3 $< 1$ min, réussite sans aide $\geq 90\,\%$, erreurs $< 5\,\%$.
+\subsubsection{Perte totale de la base de données}
 
-\textbf{Traçabilité} : Compte-rendu par session, matrice sévérité $\times$ fréquence, issues GitHub étiquette \texttt{usability}, retests après corrections.
+\textbf{Scénario} : Crash serveur OVH, corruption base PostgreSQL irréparable.
 
-\subsection{KPIs produit par fonctionnalité}
+\textbf{Plan d'action} :
+\begin{enumerate}
+  \item \textbf{Immédiat} : Basculement sur dernière sauvegarde pg\_dump (< 24h de perte)
+  \item \textbf{H+1} : Restauration sur nouveau serveur (VPS de secours pré-configuré)
+  \item \textbf{H+2} : Vérification intégrité données (checksums, requêtes de validation)
+  \item \textbf{H+4} : Remise en production, notification utilisateurs (perte potentielle dernières 24h)
+  \item \textbf{J+1} : Migration vers réplication maître-esclave (éviter scénario futur)
+\end{enumerate}
+
+\section{Scénarios d'Usage Prioritaires (P1)}
+
+\subsection{Scénario 1 : Création du compte et première connexion}
+
+\subsubsection{Préconditions}
+\begin{itemize}
+  \item Utilisateur non inscrit, navigateur moderne (Chrome 120+, Firefox 120+, Safari 17+)
+  \item Accès internet stable
+  \item Email valide et accessible
+\end{itemize}
+
+\subsubsection{Étapes du scénario}
+\begin{enumerate}
+  \item Utilisateur accède à \texttt{https://mysmartbudget.com/auth/register}
+  \item Remplit formulaire : nom, prénom, email, mot de passe (12+ caractères, 1 maj, 1 min, 1 chiffre, 1 spécial), confirmation mot de passe
+  \item Coche case "J'accepte la politique de confidentialité" (consentement RGPD)
+  \item Clique sur "Créer mon compte"
+  \item Système valide les données, hache le mot de passe (bcrypt cost 12), crée l'utilisateur en base
+  \item Redirection automatique vers \texttt{/dashboard} avec token JWT (expiration 24h)
+  \item Dashboard affiche message de bienvenue : "Bienvenue [Prénom] ! Ajoutez votre première transaction"
+\end{enumerate}
+
+\subsubsection{Postconditions}
+\begin{itemize}
+  \item Utilisateur authentifié avec session active (token JWT valide)
+  \item Profil créé en base avec rôle "Utilisateur"
+  \item 15 catégories prédéfinies associées automatiquement au compte
+  \item Log audit : inscription enregistrée (IP, timestamp)
+\end{itemize}
+
+\subsubsection{Variantes et exceptions}
+\begin{itemize}
+  \item \textbf{Email déjà utilisé} : Message d'erreur "Cet email est déjà associé à un compte. Connectez-vous ou réinitialisez votre mot de passe."
+  \item \textbf{Mot de passe faible} : Validation temps réel avec indicateur de force (rouge/orange/vert), blocage soumission si critères non respectés
+  \item \textbf{Erreur réseau} : Message "Impossible de créer le compte. Vérifiez votre connexion et réessayez." + retry automatique après 3s
+\end{itemize}
+
+\subsubsection{Critères de succès}
+\begin{itemize}
+  \item Temps total du parcours : $< 2$ min (P95)
+  \item Taux de réussite : $\geq 95\,\%$ (hors erreurs utilisateur : email doublon, mot de passe faible)
+  \item Taux d'activation : $\geq 80\,\%$ (compte créé $\rightarrow$ 1\textsuperscript{re} connexion dans 7j)
+\end{itemize}
+
+\subsection{Scénario 2 : Ajout d'une transaction et affectation à une enveloppe}
+
+\subsubsection{Préconditions}
+\begin{itemize}
+  \item Utilisateur connecté
+  \item Au moins 1 enveloppe créée (ex : "Alimentation" avec plafond 400€/mois)
+  \item Catégorie "Courses" existante
+\end{itemize}
+
+\subsubsection{Étapes du scénario}
+\begin{enumerate}
+  \item Utilisateur navigue vers \texttt{/transactions}
+  \item Clique sur bouton "+ Nouvelle transaction"
+  \item Remplit formulaire modal :
+    \begin{itemize}
+      \item Date : aujourd'hui (pré-rempli, modifiable)
+      \item Montant : 35.50€
+      \item Type : Dépense (sélecteur radio)
+      \item Catégorie : "Courses" (dropdown)
+      \item Enveloppe : "Alimentation" (dropdown filtré par catégorie, optionnel)
+      \item Libellé : "Supermarché Carrefour" (optionnel)
+    \end{itemize}
+  \item Clique sur "Enregistrer"
+  \item Système valide les données, enregistre la transaction en base (< 500ms)
+  \item Mise à jour temps réel :
+    \begin{itemize}
+      \item Liste des transactions : nouvelle ligne ajoutée en haut (tri date DESC)
+      \item Enveloppe "Alimentation" : consommation passe de 150€ à 185.50€ (46\,\% du plafond, indicateur vert)
+      \item Dashboard (si ouvert) : KPI "Dépenses du mois" incrémenté de 35.50€
+    \end{itemize}
+  \item Message de succès (toast vert) : "Transaction ajoutée avec succès"
+\end{enumerate}
+
+\subsubsection{Postconditions}
+\begin{itemize}
+  \item Transaction persistée en base avec \texttt{created\_at = NOW()}
+  \item Enveloppe "Alimentation" mise à jour (consommation, pourcentage)
+  \item Historique modifiable (bouton "Éditer" visible sur la ligne)
+\end{itemize}
+
+\subsubsection{Variantes et exceptions}
+\begin{itemize}
+  \item \textbf{Montant négatif ou invalide} : Validation temps réel, champ bordure rouge, message "Le montant doit être positif"
+  \item \textbf{Date future} : Avertissement "Êtes-vous sûr ? La date est dans le futur" + confirmation requise
+  \item \textbf{Enveloppe dépassée} : Si ajout dépasse 100\,\% du plafond, modal d'alerte : "Attention, cette transaction fait dépasser votre enveloppe Alimentation de 15€. Continuer ?" (boutons Oui/Non)
+  \item \textbf{Erreur serveur (500)} : Message "Impossible d'enregistrer la transaction. Réessayez." + retry automatique
+\end{itemize}
+
+\subsubsection{Critères de succès}
+\begin{itemize}
+  \item Temps ajout transaction : $< 30$s (P95, incluant saisie utilisateur)
+  \item Latence API \texttt{POST /transactions} : $< 500$ms (P95)
+  \item Taux d'erreur validation : $< 5\,\%$ (erreurs utilisateur normales : montant invalide, etc.)
+  \item Cohérence données : 0 écart entre montant saisi et montant enregistré
+\end{itemize}
+
+\subsection{Scénario 3 : Consultation du dashboard et interprétation des indicateurs}
+
+\subsubsection{Préconditions}
+\begin{itemize}
+  \item Utilisateur connecté avec historique de transactions (minimum 10 transactions sur 2 mois)
+  \item Au moins 2 enveloppes créées
+\end{itemize}
+
+\subsubsection{Étapes du scénario}
+\begin{enumerate}
+  \item Utilisateur navigue vers \texttt{/dashboard}
+  \item Chargement de la page (< 2s P95) :
+    \begin{itemize}
+      \item Affichage immédiat du skeleton (cartes grises pulsantes)
+      \item Requêtes API parallèles : \texttt{GET /transactions/summary}, \texttt{GET /budgets/summary}
+      \item Rendu progressif : KPIs $\rightarrow$ graphiques
+    \end{itemize}
+  \item KPIs affichés (cartes en haut de page) :
+    \begin{itemize}
+      \item Solde total : 1\,245€ (icône porte-monnaie, couleur verte si positif)
+      \item Dépenses du mois : 890€ (icône flèche bas, couleur rouge)
+      \item Revenus du mois : 2\,100€ (icône flèche haut, couleur verte)
+      \item Reste à vivre : 355€ (icône tirelire, couleur orange si < 20\,\% revenus)
+    \end{itemize}
+  \item Graphiques interactifs (section centrale) :
+    \begin{itemize}
+      \item Camembert : Répartition dépenses par catégorie (top 10, "Autres" agrégé), survol affiche montant exact + pourcentage
+      \item Courbe : Évolution dépenses/revenus sur 12 derniers mois (2 lignes, légende interactive), zoom/pan désactivé par défaut
+    \end{itemize}
+  \item Filtres temporels (haut de page) :
+    \begin{itemize}
+      \item Boutons radio : "Mois en cours" (sélectionné par défaut), "Trimestre", "Année", "Personnalisé"
+      \item Si "Personnalisé" : datepickers (début/fin), bouton "Appliquer"
+    \end{itemize}
+  \item Utilisateur clique sur "Trimestre" :
+    \begin{itemize}
+      \item Rechargement des données (< 1s), graphiques mis à jour
+      \item KPIs recalculés sur Q4 2025 (octobre--décembre)
+    \end{itemize}
+  \item Section enveloppes (bas de page) :
+    \begin{itemize}
+      \item Liste des enveloppes avec barres de progression :
+        \begin{itemize}
+          \item "Alimentation" : 385€/400€ (96\,\%, barre orange, icône ⚠️)
+          \item "Loisirs" : 120€/300€ (40\,\%, barre verte, icône ✓)
+          \item "Transport" : 210€/200€ (105\,\%, barre rouge, icône ❌, texte "Dépassement de 10€")
+        \end{itemize}
+    \end{itemize}
+\end{enumerate}
+
+\subsubsection{Postconditions}
+\begin{itemize}
+  \item Utilisateur a une vision claire de sa situation financière
+  \item Identification visuelle immédiate des enveloppes problématiques (orange/rouge)
+  \item Données consultées sans modification (lecture seule)
+\end{itemize}
+
+\subsubsection{Variantes et exceptions}
+\begin{itemize}
+  \item \textbf{Aucune transaction} : Message centré "Vous n'avez pas encore de transactions. Ajoutez-en une pour voir vos statistiques." + bouton CTA "+ Ajouter une transaction"
+  \item \textbf{Erreur chargement graphiques} : Fallback texte "Impossible de charger les graphiques. Réessayez." + bouton reload
+  \item \textbf{Période personnalisée invalide} : Si date début > date fin, message d'erreur "La date de début doit être antérieure à la date de fin"
+\end{itemize}
+
+\subsubsection{Critères de succès}
+\begin{itemize}
+  \item Time-to-Render (TTR) : $< 2$s (P95, mesure Lighthouse)
+  \item Taux d'usage hebdomadaire : $> 60\,\%$ des utilisateurs actifs consultent le dashboard au moins 1 fois/semaine
+  \item Compréhension des indicateurs : Score SUS $\geq 75$ (question "Je comprends facilement ma situation financière")
+\end{itemize}
+
+\section{Plan de Validation Utilisateur}
+
+\subsection{Méthodologie de test}
+
+\subsubsection{Échantillon de testeurs}
 
 \begin{center}
-\tiny
-\begin{tabular}{|p{2.5cm}|p{4.5cm}|p{4cm}|}
+\begin{tabular}{|p{3cm}|p{4cm}|p{6.5cm}|}
 \hline
-\textbf{Feature} & \textbf{Indicateur} & \textbf{Objectif (3 mois)} \\
+\textbf{Profil} & \textbf{Critères de sélection} & \textbf{Objectifs de test} \\
 \hline
-Auth & Taux activation 7j / Rétention J+30 & $\geq 80\,\%$ / $\geq 40\,\%$ \\
+Étudiante (Léa) & 18--25 ans, budget serré (< 1000€/mois), usage smartphone prioritaire & Validation scénario 1 et 2, ergonomie mobile, import CSV \\
 \hline
-Transactions & Latence P95 / \# transactions/sem. & $< 500$ms / $\geq 5$ \\
+Père de famille (Marc) & 35--45 ans, revenus 3000--5000€/mois, gestion enveloppes multiples & Validation scénario 2 et 3, dashboard complexe, export CSV \\
 \hline
-Enveloppes & \% users $\geq 3$ enveloppes / \% dépassées & $\geq 60\,\%$ / $< 20\,\%$ \\
-\hline
-Import CSV & Taux import réussi / \% adoption & $> 95\,\%$ / $\geq 30\,\%$ \\
-\hline
-Dashboard & TTR P95 / Usage hebdo & $< 2$s / $> 60\,\%$ \\
-\hline
-Export & \% adoption trimestre & $\geq 20\,\%$ \\
+Senior & 60+ ans, faible appétence numérique, besoin simplicité & Accessibilité (taille texte, contrastes), navigation intuitive \\
 \hline
 \end{tabular}
 \end{center}
 
-\textbf{Instrumentation} : GA4 (événements \texttt{user\_signup}, \texttt{transaction\_created}), Next.js Analytics (Web Vitals), Sentry (erreurs), Winston (logs JSON), Metabase (BI PostgreSQL).
+\textbf{Nombre de testeurs} : 3--5 personnes (1--2 par profil), recrutement via réseau personnel, associations locales, offre de compensation symbolique (20€ chèque-cadeau Amazon).
 
-\section{Roadmap et responsabilités}
+\subsubsection{Protocole de test}
 
-\subsection{Planning milestones}
+\begin{enumerate}
+  \item \textbf{Session modérée individuelle (45 min)} :
+    \begin{itemize}
+      \item Introduction (5 min) : Contexte projet, consentement enregistrement (audio/écran), rappel liberté d'abandon
+      \item Think-aloud (30 min) : Testeur verbalise ses actions/pensées pendant 3 scénarios P1
+      \item Débriefing (10 min) : Questions ouvertes ("Qu'avez-vous aimé/détesté ?", "Recommanderiez-vous l'appli ?")
+    \end{itemize}
+  \item \textbf{Questionnaire SUS (5 min)} : 10 questions échelle Likert (1--5), calcul score global (0--100)
+  \item \textbf{Mesures objectives} :
+    \begin{itemize}
+      \item Temps d'accomplissement par tâche (chronomètre)
+      \item Nombre d'erreurs (clics incorrects, chemins abandonnés)
+      \item Taux de réussite (tâche complétée sans aide / avec aide / échouée)
+    \end{itemize}
+\end{enumerate}
+
+\subsection{Critères de validation}
+
+\begin{center}
+\begin{tabular}{|p{4.5cm}|p{4cm}|p{5cm}|}
+\hline
+\textbf{Métrique} & \textbf{Seuil acceptable} & \textbf{Seuil cible} \\
+\hline
+Score SUS global & $\geq 68$ (moyenne industrie) & $\geq 75$ (bon) \\
+\hline
+Temps scénario 1 (création compte) & $< 3$ min (P95) & $< 2$ min \\
+\hline
+Temps scénario 2 (ajout transaction) & $< 1$ min (P95) & $< 30$s \\
+\hline
+Temps scénario 3 (consultation dashboard) & $< 2$ min (P95) & $< 1$ min \\
+\hline
+Taux de réussite sans aide & $\geq 80\,\%$ & $\geq 90\,\%$ \\
+\hline
+Taux d'erreur (clics incorrects) & $< 10\,\%$ & $< 5\,\%$ \\
+\hline
+Recommandation (NPS) & Score $\geq 0$ (neutre) & Score $\geq 50$ (excellent) \\
+\hline
+\end{tabular}
+\end{center}
+
+\subsection{Traçabilité et itération}
+
+\begin{itemize}
+  \item \textbf{Documentation} : Compte-rendu par session (verbatims, captures écran, enregistrements), synthèse globale (problèmes récurrents, recommandations)
+  \item \textbf{Priorisation problèmes} : Matrice sévérité (bloquant/majeur/mineur) $\times$ fréquence (tous/majorité/rare)
+  \item \textbf{Issues GitHub} : 1 issue par problème identifié, étiquette \texttt{usability}, assignation sprint suivant si priorité élevée
+  \item \textbf{Retests} : Après corrections majeures, nouvelle session abrégée (15 min, focus problèmes corrigés) avec 1--2 testeurs
+\end{itemize}
+
+\section{Mesure de l'Impact par Fonctionnalité (KPIs)}
+
+\subsection{Tableau des KPIs produit}
 
 \begin{center}
 \scriptsize
-\begin{tabular}{|p{2cm}|p{2cm}|p{8cm}|}
+\begin{tabular}{|p{3cm}|p{5.5cm}|p{5cm}|}
 \hline
-\textbf{Version} & \textbf{Période} & \textbf{Jalons principaux} \\
+\textbf{Feature} & \textbf{Indicateur} & \textbf{Objectif v1.0 (3 mois post-lancement)} \\
 \hline
-\textbf{v1.0 MVP} & Nov--Jan 2026 & \textbf{M0 (Nov)} : Schémas Prisma (MCD/MLD/MPD), Auth JWT, CI/CD GitHub Actions. \textbf{M1 (Déc)} : Transactions/Enveloppes CRUD, Import CSV. \textbf{M2 (Jan)} : Dashboard Recharts, tests E2E, déploiement staging, tests utilisateurs, corrections bugs. \\
+\textbf{Auth} & Taux d'activation (compte créé $\rightarrow$ 1\textsuperscript{re} connexion 7j) & $\geq 80\,\%$ \\
+ & Taux de rétention J+30 & $\geq 40\,\%$ \\
+ & Temps moyen inscription & $< 2$ min (P95) \\
 \hline
-v1.1 & Fév 2026 & Import CSV robuste (encodages, dates), KPIs GA4/Metabase, optimisations perfs \\
+\textbf{Transactions} & Latence création P95 & $< 500$ms \\
+ & \# transactions/semaine par utilisateur actif & $\geq 5$ (moyenne) \\
+ & Taux d'édition (transactions modifiées / créées) & $< 10\,\%$ (qualité saisie initiale) \\
 \hline
-v2.0 & Avr 2026 & Agrégation bancaire POC, notifications push, cache Redis, queue Bull \\
+\textbf{Enveloppes} & \% utilisateurs avec $\geq 3$ enveloppes actives & $\geq 60\,\%$ \\
+ & \% enveloppes dépassées/mois (moyenne utilisateurs) & $< 20\,\%$ (efficacité budgétaire) \\
+ & Temps moyen création enveloppe & $< 1$ min \\
+\hline
+\textbf{Import CSV} & Taux d'import réussi (fichiers valides) & $> 95\,\%$ \\
+ & Temps import moyen (10k lignes) & $< 20$s \\
+ & \% utilisateurs ayant importé $\geq 1$ fichier & $\geq 30\,\%$ (adoption fonctionnalité) \\
+\hline
+\textbf{Dashboard} & Time-to-Render (TTR) P95 & $< 2$s \\
+ & Taux d'usage hebdomadaire (visites dashboard/semaine) & $> 60\,\%$ \\
+ & Taux de rebond (quitte immédiatement) & $< 30\,\%$ \\
+ & Durée session moyenne & $> 3$ min (engagement) \\
+\hline
+\textbf{Export} & \% utilisateurs ayant exporté données (trimestre 1) & $\geq 20\,\%$ \\
+ & Temps génération export (10k transactions) & $< 5$s \\
 \hline
 \end{tabular}
 \end{center}
 
-\textbf{Dépendances critiques} : M0$\rightarrow$M1 (schémas DB finalisés, validation J+7), M1$\rightarrow$M2 (tests fichiers CSV réels 10 banques), M2$\rightarrow$Livraison (buffer 2 sem., feature flags).
+\subsection{Instrumentation technique}
 
-\subsection{Traçabilité et DoD}
+\begin{itemize}
+  \item \textbf{Analytics} : Google Analytics 4 (GA4) + événements personnalisés :
+    \begin{itemize}
+      \item \texttt{user\_signup}, \texttt{user\_login}, \texttt{transaction\_created}, \texttt{envelope\_created}, \texttt{csv\_imported}, \texttt{data\_exported}
+    \end{itemize}
+  \item \textbf{Performance} : Web Vitals (LCP, FID, CLS) via Next.js Analytics, alertes si dégradation $> 10\,\%$
+  \item \textbf{Erreurs} : Sentry (monitoring erreurs front/back), agrégation par type, notification Slack si erreur critique
+  \item \textbf{Logs métier} : Winston (back-end), logs structurés JSON :
+    \begin{itemize}
+      \item \texttt{\{action: "transaction\_created", userId, amount, category, timestamp\}}
+    \end{itemize}
+  \item \textbf{Dashboard interne} : Metabase (BI tool open-source) connecté à PostgreSQL, requêtes SQL pour KPIs temps réel
+\end{itemize}
 
-\textbf{Backlog GitHub Projects} : Kanban (Backlog, Todo, In Progress, In Review, Done), issues template \texttt{[US-XX]}, étiquettes P1/P2/P3 + module, milestones alignés roadmap.
+\section{Définition du MVP (Rappel Synthétique)}
 
-\textbf{Definition of Done} : (1) Critères acceptation validés, (2) Tests passants (unitaires $\geq 60\,\%$, E2E, 3 navigateurs), (3) Doc API Swagger + README, (4) PR revue + CI/CD validé, (5) Déploiement staging, (6) 0 régression.
+Le \textbf{MVP v1.0} comprend les 5 modules essentiels suivants :
 
-\textbf{RACI} : Porteur projet = R+A (conception, dev, tests, doc), Jury CDA = A (validation jalons), Testeurs = C (validation utilisateurs).
+\begin{enumerate}
+  \item \textbf{Authentification \& Sessions} : Inscription, connexion JWT, réinitialisation mot de passe, suppression compte (RGPD)
+  \item \textbf{Transactions Manuelles} : CRUD complet, catégorisation (15 catégories + perso), filtres/recherche, pagination
+  \item \textbf{Enveloppes Budgétaires} : CRUD enveloppes, plafonds mensuels, calcul "reste à vivre", indicateurs visuels (vert/orange/rouge), historique 12 mois
+  \item \textbf{Dashboard Synthétique} : 4 KPIs (solde, dépenses, revenus, reste à vivre), 2 graphiques (camembert catégories, courbe évolution), filtres temporels (mois/trim./année)
+  \item \textbf{Import/Export CSV} : Import transactions (format gabarit, validation, doublons, rapport), export CSV/JSON (portabilité RGPD)
+\end{enumerate}
+
+\textbf{Chaque module} est couvert par :
+\begin{itemize}
+  \item Critères d'acceptation mesurables (DoD)
+  \item Tests automatisés (unitaires + E2E, couverture $\geq 60\,\%$)
+  \item Documentation technique (API Swagger, README)
+\end{itemize}
+
+\section{Roadmap Jalonnée (Milestones et Dates Estimées)}
+
+\subsection{Planning détaillé par version}
+
+\begin{center}
+\scriptsize
+\begin{tabular}{|p{2.5cm}|p{2.5cm}|p{8.5cm}|}
+\hline
+\textbf{Version} & \textbf{Période cible} & \textbf{Jalons / Livrables principaux} \\
+\hline
+\textbf{v1.0 (MVP)} & Nov. 2025 -- Jan. 2026 & \textbf{M0 (Nov. 2025)} : Schémas Prisma finalisés (MCD/MLD/MPD), API Auth opérationnelle (JWT, bcrypt), CI/CD GitHub Actions configuré \\
+ & & \textbf{M1 (Déc. 2025)} : Modules Transactions \& Enveloppes complets (CRUD, tests), Import CSV fonctionnel (validation, rapport) \\
+ & & \textbf{M2 (Jan. 2026)} : Dashboard avec graphiques Recharts, tests E2E Playwright (scénarios P1), déploiement staging (Vercel + OVH), tests utilisateurs (3--5 personnes), corrections bugs critiques \\
+\hline
+\textbf{v1.1} & Février 2026 & Import CSV robuste (encodages multiples, formats dates flexibles), amélioration UX (feedback utilisateurs), premiers KPIs en prod (GA4, Metabase), optimisation performances (lazy loading, pagination) \\
+\hline
+\textbf{v2.0} & Avril 2026 & Agrégation bancaire POC (Budget Insight API, 3 banques pilotes), notifications push (dépassement enveloppes, objectifs atteints), cache Redis (sessions, compteurs), queue Bull (imports asynchrones), optimisation perfs (P95 dashboard $< 1$s), tests charge (Gatling, 1000 users concurrents) \\
+\hline
+\end{tabular}
+\end{center}
+
+\subsection{Dépendances critiques et risques planning}
+
+\begin{itemize}
+  \item \textbf{M0 $\rightarrow$ M1} : Blocage si schémas DB non finalisés (refactoring coûteux ensuite). \textit{Mitigation} : Validation schémas avec pair programming, revue architecture J+7.
+  \item \textbf{M1 $\rightarrow$ M2} : Import CSV complexe (formats variés, doublons). \textit{Mitigation} : Spécifications détaillées dès M0, tests avec fichiers réels (10 banques françaises).
+  \item \textbf{M2 $\rightarrow$ Livraison} : Tests utilisateurs révèlent bugs majeurs. \textit{Mitigation} : Buffer 2 semaines post-M2, feature flags (rollback rapide si nécessaire).
+\end{itemize}
+
+\section{Traçabilité et Responsabilités}
+
+\subsection{Gestion du backlog (GitHub Projects)}
+
+\begin{itemize}
+  \item \textbf{Organisation} : Backlog centralisé dans GitHub Projects (vue Kanban), colonnes : Backlog, Todo, In Progress, In Review, Done
+  \item \textbf{Issues} : 1 issue par user story ou bug, template standardisé :
+    \begin{itemize}
+      \item Titre : \texttt{[US-XX] Description courte} ou \texttt{[BUG] Description}
+      \item Corps : User story (As a..., I want..., So that...), critères d'acceptation (liste à cocher), effort estimé (points), priorité (P1/P2/P3)
+      \item Étiquettes : \texttt{P1}/\texttt{P2}/\texttt{P3}, \texttt{bug}, \texttt{usability}, \texttt{security}, \texttt{performance}, module (\texttt{auth}, \texttt{transactions}, etc.)
+    \end{itemize}
+  \item \textbf{Milestones} : Alignés à la roadmap (M0, M1, M2, v1.1, v2.0), échéances fermes, % complétion visible
+  \item \textbf{Assignation} : Toutes les issues assignées (porteur de projet en v1, équipe en v2+)
+\end{itemize}
+
+\subsection{Definition of Done (DoD) globale}
+
+Une fonctionnalité est considérée \textbf{terminée} (Done) si et seulement si :
+
+\begin{enumerate}
+  \item \textbf{Critères d'acceptation respectés} : Tous les éléments de la checklist user story validés
+  \item \textbf{Tests passants} :
+    \begin{itemize}
+      \item Tests unitaires : couverture $\geq 60\,\%$ du code ajouté/modifié (Jest)
+      \item Tests E2E : scénario principal fonctionnel (Playwright)
+      \item Tests manuels : vérification visuelle sur 3 navigateurs (Chrome, Firefox, Safari) et 2 tailles (mobile 375px, desktop 1920px)
+    \end{itemize}
+  \item \textbf{Documentation mise à jour} :
+    \begin{itemize}
+      \item API : Swagger/OpenAPI (décorateurs NestJS auto-générés)
+      \item Code : Commentaires JSDoc pour fonctions complexes, README module si nécessaire
+      \item Utilisateur : Section FAQ/Help Center mise à jour (si nouvelle fonctionnalité majeure)
+    \end{itemize}
+  \item \textbf{Revue de code effectuée} :
+    \begin{itemize}
+      \item Pull Request (PR) sur GitHub avec description détaillée (contexte, changements, tests)
+      \item Revue par pair (ou auto-revue avec checklist si solo) : lisibilité, sécurité, performances
+      \item CI/CD validé : linters (ESLint, Prettier), tests automatisés, build réussi
+    \end{itemize}
+  \item \textbf{Déployé sur environnement staging} : Validation en conditions réelles (base de données de test, données anonymisées)
+  \item \textbf{Pas de régression} : Tests de non-régression (automatisés + manuels) sur fonctionnalités existantes
+\end{enumerate}
+
+\subsection{Responsabilités (RACI)}
+
+\begin{center}
+\scriptsize
+\begin{tabular}{|p{4.5cm}|c|c|c|c|}
+\hline
+\textbf{Activité} & \textbf{R} & \textbf{A} & \textbf{C} & \textbf{I} \\
+\hline
+Conception architecture & Porteur & Porteur & Jury (optionnel) & --- \\
+\hline
+Développement front-end & Porteur & Porteur & --- & --- \\
+\hline
+Développement back-end & Porteur & Porteur & --- & --- \\
+\hline
+Modélisation base de données & Porteur & Porteur & Jury (optionnel) & --- \\
+\hline
+Tests utilisateurs & Porteur & Porteur & Testeurs & --- \\
+\hline
+Rédaction documentation & Porteur & Porteur & --- & Jury \\
+\hline
+Déploiement production & Porteur & Porteur & --- & Hébergeur \\
+\hline
+Validation jalons & Porteur & Jury CDA & Porteur & --- \\
+\hline
+\end{tabular}
+\end{center}
+
+\textbf{Légende RACI} :
+\begin{itemize}
+  \item \textbf{R (Responsible)} : Réalise l'activité
+  \item \textbf{A (Accountable)} : Approuve/valide l'activité (responsable final)
+  \item \textbf{C (Consulted)} : Consulté pour avis/expertise
+  \item \textbf{I (Informed)} : Informé des résultats
+\end{itemize}

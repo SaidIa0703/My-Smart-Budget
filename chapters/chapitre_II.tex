@@ -1,0 +1,322 @@
+\chapter{Cadrage et Cahier des Charges}
+
+\section{Objectifs du projet}
+
+\subsection{Objectifs métier et bénéfices attendus}
+
+\textbf{My Smart Budget} vise à simplifier la gestion budgétaire personnelle pour étudiants, jeunes actifs et familles via une interface automatisée offrant une vision temps réel de la situation financière.
+
+\begin{center}
+\small
+\begin{tabular}{|p{3.5cm}|p{4cm}|p{2.5cm}|p{3cm}|}
+\hline
+\textbf{Bénéfice} & \textbf{Indicateur} & \textbf{Objectif} & \textbf{Justification} \\
+\hline
+Gain de temps & Temps saisie mensuelle & $< 15$ min & Import CSV automatisé \\
+\hline
+Visibilité financière & Temps accès dashboard & $< 5$s & Décision rapide \\
+\hline
+Éducation financière & \% utilisateurs atteignant objectifs & $\geq 60\,\%$ (3 mois) & Enveloppes budgétaires \\
+\hline
+Accessibilité & Taux adoption par persona & $\geq 70\,\%$ & Interface intuitive \\
+\hline
+\end{tabular}
+\end{center}
+
+\subsection{Objectifs techniques}
+
+Architecture \textbf{3-tiers} : Next.js 14/React 18 (Front), NestJS 10/Node.js 20 (Back), PostgreSQL 15 via Prisma 5 (DB).
+
+\begin{center}
+\scriptsize
+\begin{tabular}{|l|p{3cm}|p{2cm}|p{4.5cm}|}
+\hline
+\textbf{Critère} & \textbf{Métrique} & \textbf{Objectif} & \textbf{Justification} \\
+\hline
+Performance & TTR dashboard / Latence API & $< 2$s / $< 500$ms & UX fluide, réactivité CRUD \\
+\hline
+Sécurité & JWT + bcrypt ($\geq 12$) / HTTPS TLS 1.3 & 0 faille critique & Protection RGPD, OWASP Top 10 \\
+\hline
+Maintenabilité & Couverture tests / Migrations & $\geq 60\,\%$ / Versionnées & Réduction bugs, évolutivité \\
+\hline
+Scalabilité & Architecture / Cache & Stateless + Docker / Redis v2 & 100 $\rightarrow$ 10k users \\
+\hline
+Fiabilité & Disponibilité / Sauvegardes & $99{,}5\,\%$ / Quotidiennes & RPO $< 24$h, RTO $< 4$h \\
+\hline
+\end{tabular}
+\end{center}
+
+\subsection{Objectifs pédagogiques (CDA Niveau 6)}
+
+\begin{center}
+\small
+\begin{tabular}{|p{4cm}|p{4.5cm}|p{5cm}|}
+\hline
+\textbf{Bloc CDA} & \textbf{Compétences} & \textbf{Livrables} \\
+\hline
+Composants d'interface & Design System, React, WCAG 2.1 AA & Pages Auth/Dashboard, formulaires \\
+\hline
+Persistance données & MCD/MLD/MPD, Prisma, migrations & Schémas DB, scripts SQL \\
+\hline
+Application multicouche & 3-tiers, API REST, NestJS & Doc architecture, Swagger, tests E2E \\
+\hline
+\end{tabular}
+\end{center}
+
+\textbf{Méthodologie} : Sprints 2 semaines, backlog GitHub, CI/CD.
+
+\section{Priorisation MoSCoW et Périmètre MVP}
+
+\subsection{Matrice de priorisation}
+
+\begin{center}
+\scriptsize
+\begin{tabular}{|p{2cm}|p{3.5cm}|p{4.5cm}|p{2cm}|}
+\hline
+\textbf{Priorité} & \textbf{Fonctionnalité} & \textbf{Justification métier} & \textbf{Effort} \\
+\hline
+\textbf{Must Have} & Auth JWT + sessions & Sécurité RGPD, prérequis légal & 5j \\
+\hline
+\textbf{Must Have} & Transactions CRUD & Cœur fonctionnel suivi budgétaire & 8j \\
+\hline
+\textbf{Must Have} & Enveloppes budgétaires & Différenciateur vs tableurs & 6j \\
+\hline
+\textbf{Must Have} & Dashboard (KPIs + graphiques) & Visibilité immédiate, décision & 10j \\
+\hline
+\textbf{Should Have} & Import/Export CSV & Gain temps $\times$10, conformité RGPD Art. 20 & 5j + 3j \\
+\hline
+\textbf{Could Have} & Notifications dépassement & Valeur ajoutée, prévention & 4j \\
+\hline
+\textbf{Won't Have v1} & Agrégation bancaire DSP2 / OCR / IA & Complexité, coût, dataset insuffisant & v2.0+ \\
+\hline
+\end{tabular}
+\end{center}
+
+\subsection{Périmètre MVP v1.0}
+
+\textbf{9 modules inclus} : (1) Auth JWT, (2) Profil utilisateur, (3) 15 catégories + perso, (4) Enveloppes avec plafonds mensuels, (5) Transactions CRUD + filtres, (6) Import CSV avec validation, (7) Dashboard 4 KPIs + 2 graphiques, (8) Export CSV/JSON, (9) Droits Utilisateur/Admin.
+
+\textbf{Exclusions v1} : Agrégation bancaire, OCR, IA, multi-devises, partage budgets, app mobile native.
+
+\textbf{Contraintes d'acceptation} : TTR dashboard P95 $< 2$s (Lighthouse), API taux erreur $< 1\,\%$, disponibilité $99{,}5\,\%$ (UptimeRobot), 0 vulnérabilité critique (Snyk).
+
+\section{Personae et parties prenantes}
+
+\subsection{Personae cibles}
+
+\textbf{Persona 1 : Léa, 23 ans, Étudiante} --- 800€/mois, Lyon. \textit{Objectifs} : Éviter découverts (frais 8€), reste à vivre 30€/semaine. \textit{Douleurs} : Oublie 40\,\% achats, fin de mois difficile. \textit{Succès attendu} : Visualiser reste à vivre en 1 clic ($< 5$s), alerte avant épuisement enveloppe, réduire saisie 2h $\rightarrow$ 15 min.
+
+\textbf{Persona 2 : Marc, 38 ans, Père famille} --- 4500€/mois, Paris. \textit{Objectifs} : Répartir budget 8 enveloppes (courses 600€, loisirs 300€), anticiper pics (rentrée +800€). \textit{Douleurs} : Manque visibilité catégories, dépassements +20\,\% loisirs. \textit{Succès attendu} : Respecter 90\,\% plafonds, export PDF mensuel.
+
+\subsection{Matrice parties prenantes}
+
+\begin{center}
+\scriptsize
+\begin{tabular}{|p{2.5cm}|p{2cm}|c|c|p{5cm}|}
+\hline
+\textbf{Acteur} & \textbf{Rôle} & \textbf{Influence} & \textbf{Intérêt} & \textbf{Stratégie} \\
+\hline
+Porteur projet & Dev CDA & Forte & Fort & \textbf{Gérer étroitement} : validation hebdo jalons \\
+\hline
+Jury CDA & Évaluateurs & Forte & Fort & \textbf{Gérer étroitement} : conformité référentiel \\
+\hline
+Utilisateurs testeurs & Validation MVP & Faible & Fort & \textbf{Tenir informés} : changelog, feedback loops \\
+\hline
+Hébergeur OVH/Vercel & Infra & Moyenne & Faible & \textbf{Maintenir satisfait} : monitoring SLA \\
+\hline
+\end{tabular}
+\end{center}
+
+\section{User Stories et critères d'acceptation}
+
+\subsection{Récapitulatif des User Stories}
+
+\begin{center}
+\scriptsize
+\begin{tabular}{|c|c|p{5.5cm}|c|c|}
+\hline
+\textbf{ID} & \textbf{P} & \textbf{User Story} & \textbf{Valeur} & \textbf{Effort} \\
+\hline
+US-01 & P1 & Créer compte et se connecter & Prérequis RGPD & 5 \\
+\hline
+US-02 & P1 & CRUD transactions + catégorisation & Cœur fonctionnel & 8 \\
+\hline
+US-03 & P1 & Créer enveloppes + reste à vivre & Différenciateur & 8 \\
+\hline
+US-04 & P2 & Importer CSV transactions & Gain temps x10 & 5 \\
+\hline
+US-05 & P2 & Dashboard graphiques + KPIs & Décision rapide & 13 \\
+\hline
+US-06 & P2 & Exporter CSV/JSON & RGPD Art. 20 & 3 \\
+\hline
+US-07 & P3 & Notification 80\,\% plafond & Prévention & 5 \\
+\hline
+US-08 & P3 & Backoffice admin stats & Pilotage produit & 8 \\
+\hline
+\end{tabular}
+\end{center}
+
+\subsection{Exemples de critères d'acceptation (DoD)}
+
+\subsubsection{US-01 : Authentification}
+
+\textbf{Fonctionnel} : Email unique RFC 5322, mot de passe $\geq 12$ car (1 maj/min/chiffre/spécial), JWT HS256 exp 24h, redirection \texttt{/dashboard}, anti-brute force (3 tentatives $\rightarrow$ 5 min).
+
+\textbf{Technique} : Tests unitaires (5 cas), E2E (inscription $\rightarrow$ connexion), latence \texttt{/register} $< 800$ms P95, logs audit (IP, 90j).
+
+\textbf{Mesurable} : 100\,\% connexions valides réussissent, 0 JWT expiré accepté, taux activation $\geq 80\,\%$ (7j).
+
+\subsubsection{US-05 : Dashboard}
+
+\textbf{Fonctionnel} : 4 KPIs (solde, dépenses, revenus, reste à vivre), camembert top 10 catégories, courbe évolution 12 mois, filtres temporels (mois/trim./année/perso), responsive (400/768/1024px).
+
+\textbf{Technique} : Recharts, agrégations SQL + index \texttt{date}, cache memoization TTL 1h, tests E2E graphiques.
+
+\textbf{Mesurable} : TTR $< 2$s P95 (Lighthouse), usage hebdo $> 60\,\%$ (GA4), 0 erreur console (Chrome 120+, Firefox 120+, Safari 17+).
+
+\textit{Note : Détails US-02, US-03, US-04, US-06 en Annexe A.}
+
+\section{Architecture et choix techniques}
+
+\subsection{Architecture 3-tiers}
+
+\textbf{Client Web} (navigateur) : Interface Next.js 14, validation Zod, state Zustand, WCAG 2.1 AA. \textbf{API REST} (NestJS/Node.js) : Logique métier, JWT auth, rate limiting (10 req/sec), logs Winston. \textbf{Base PostgreSQL} : Schémas Prisma, contraintes FK, index performances, sauvegardes pg\_dump quotidiennes.
+
+\textbf{Déploiement} : Docker Compose (v1), GitHub Actions CI/CD, Vercel (front) + OVH VPS (back/DB).
+
+\subsection{Justification choix technologiques}
+
+\begin{center}
+\tiny
+\begin{tabular}{|p{2cm}|p{2cm}|p{2cm}|p{5cm}|}
+\hline
+\textbf{Composant} & \textbf{Choix} & \textbf{Alternative} & \textbf{Raison} \\
+\hline
+Back-end & NestJS & Express.js & DI modulaire, décorateurs, tests facilités, CLI \\
+\hline
+Front-end & Next.js & Vite & SSR/SSG, routage App Router, optimisations auto \\
+\hline
+Base données & PostgreSQL & MongoDB & ACID transactions financières, agrégations SQL, FK \\
+\hline
+ORM & Prisma & TypeORM & Types auto-générés, migrations déclaratives, Prisma Studio \\
+\hline
+Validation & Zod & Yup & Inférence TypeScript, partage front/back \\
+\hline
+Tests E2E & Playwright & Cypress & Multi-navigateurs, parallélisation \\
+\hline
+Hébergement & Vercel + OVH & AWS & Coûts 20€/mois, souveraineté RGPD EU \\
+\hline
+\end{tabular}
+\end{center}
+
+\textbf{PostgreSQL vs MongoDB} : Données transactionnelles nécessitent ACID strict. Modèle relationnel adapté User $\leftrightarrow$ Transaction $\leftrightarrow$ Category $\leftrightarrow$ Budget. Agrégations SQL plus performantes. Foreign keys \texttt{ON DELETE CASCADE} garantissent cohérence.
+
+\subsection{Sécurité et RGPD}
+
+\begin{center}
+\scriptsize
+\begin{tabular}{|p{3cm}|p{4.5cm}|p{5cm}|}
+\hline
+\textbf{Mesure} & \textbf{Implémentation} & \textbf{Justification} \\
+\hline
+Auth & JWT HS256 256 bits exp 24h & Stateless, scalable, standard \\
+\hline
+Mots de passe & Bcrypt cost 12 & Résistance brute-force ($2^{12}$ iter $\approx 250$ms) \\
+\hline
+HTTPS & TLS 1.3 (Let's Encrypt) & Chiffrement transit, anti-MITM \\
+\hline
+\end{tabular}
+\end{center}
+
+\textbf{Matrice Rôles/Permissions} : Utilisateur (ses transactions/enveloppes, export RGPD), Admin (backoffice stats, catégories globales, suppression comptes), Invité (aucun accès).
+
+\textbf{Conformité RGPD} : Droit à l'oubli (endpoint \texttt{DELETE /users/:id}, soft delete 30j), portabilité (endpoint \texttt{GET /export/all} JSON, $< 5$s), journalisation (table \texttt{audit\_logs}, 90j).
+
+\section{Risques, validation et suivi}
+
+\subsection{Matrice des risques}
+
+\begin{center}
+\tiny
+\begin{tabular}{|p{3cm}|c|c|p{6cm}|}
+\hline
+\textbf{Risque} & \textbf{Impact} & \textbf{Prob.} & \textbf{Mitigation} \\
+\hline
+Retard développement & Moyen & Élevée & Sprints 2 sem., buffer 20\,\%, priorité P1 stricte \\
+\hline
+Failles sécurité JWT/SQL & Élevé & Moyen & Revue code PR, npm audit, Snyk, checklist OWASP \\
+\hline
+Timeout import CSV & Moyen & Moyen & Batchs 500 lignes, transactions DB atomiques \\
+\hline
+Perte données DB & Élevé & Faible & pg\_dump quotidien, tests restauration mensuels \\
+\hline
+RGPD non respectée & Élevé & Faible & Endpoints dédiés export/suppression, logs audit \\
+\hline
+\end{tabular}
+\end{center}
+
+\textbf{Plan contingence sécurité} : H+0 (API hors ligne), H+2 (patch staging), H+4 (déploiement prod), H+6 (audit Snyk), J+7 (post-mortem).
+
+\subsection{Validation utilisateur}
+
+\textbf{Échantillon} : 3--5 testeurs (Léa étudiante 18--25 ans, Marc père 35--45 ans, Senior 60+ ans), recrutement réseau + compensation 20€.
+
+\textbf{Protocole} : Session 45 min (intro 5 min, think-aloud 30 min, débriefing 10 min), questionnaire SUS (10 questions Likert), mesures objectives (temps, erreurs, taux réussite).
+
+\textbf{Critères validation} : SUS $\geq 75$, temps scénario 1 $< 2$ min, scénario 2 $< 30$s, scénario 3 $< 1$ min, réussite sans aide $\geq 90\,\%$, erreurs $< 5\,\%$.
+
+\textbf{Traçabilité} : Compte-rendu par session, matrice sévérité $\times$ fréquence, issues GitHub étiquette \texttt{usability}, retests après corrections.
+
+\subsection{KPIs produit par fonctionnalité}
+
+\begin{center}
+\tiny
+\begin{tabular}{|p{2.5cm}|p{4.5cm}|p{4cm}|}
+\hline
+\textbf{Feature} & \textbf{Indicateur} & \textbf{Objectif (3 mois)} \\
+\hline
+Auth & Taux activation 7j / Rétention J+30 & $\geq 80\,\%$ / $\geq 40\,\%$ \\
+\hline
+Transactions & Latence P95 / \# transactions/sem. & $< 500$ms / $\geq 5$ \\
+\hline
+Enveloppes & \% users $\geq 3$ enveloppes / \% dépassées & $\geq 60\,\%$ / $< 20\,\%$ \\
+\hline
+Import CSV & Taux import réussi / \% adoption & $> 95\,\%$ / $\geq 30\,\%$ \\
+\hline
+Dashboard & TTR P95 / Usage hebdo & $< 2$s / $> 60\,\%$ \\
+\hline
+Export & \% adoption trimestre & $\geq 20\,\%$ \\
+\hline
+\end{tabular}
+\end{center}
+
+\textbf{Instrumentation} : GA4 (événements \texttt{user\_signup}, \texttt{transaction\_created}), Next.js Analytics (Web Vitals), Sentry (erreurs), Winston (logs JSON), Metabase (BI PostgreSQL).
+
+\section{Roadmap et responsabilités}
+
+\subsection{Planning milestones}
+
+\begin{center}
+\scriptsize
+\begin{tabular}{|p{2cm}|p{2cm}|p{8cm}|}
+\hline
+\textbf{Version} & \textbf{Période} & \textbf{Jalons principaux} \\
+\hline
+\textbf{v1.0 MVP} & Nov--Jan 2026 & \textbf{M0 (Nov)} : Schémas Prisma (MCD/MLD/MPD), Auth JWT, CI/CD GitHub Actions. \textbf{M1 (Déc)} : Transactions/Enveloppes CRUD, Import CSV. \textbf{M2 (Jan)} : Dashboard Recharts, tests E2E, déploiement staging, tests utilisateurs, corrections bugs. \\
+\hline
+v1.1 & Fév 2026 & Import CSV robuste (encodages, dates), KPIs GA4/Metabase, optimisations perfs \\
+\hline
+v2.0 & Avr 2026 & Agrégation bancaire POC, notifications push, cache Redis, queue Bull \\
+\hline
+\end{tabular}
+\end{center}
+
+\textbf{Dépendances critiques} : M0$\rightarrow$M1 (schémas DB finalisés, validation J+7), M1$\rightarrow$M2 (tests fichiers CSV réels 10 banques), M2$\rightarrow$Livraison (buffer 2 sem., feature flags).
+
+\subsection{Traçabilité et DoD}
+
+\textbf{Backlog GitHub Projects} : Kanban (Backlog, Todo, In Progress, In Review, Done), issues template \texttt{[US-XX]}, étiquettes P1/P2/P3 + module, milestones alignés roadmap.
+
+\textbf{Definition of Done} : (1) Critères acceptation validés, (2) Tests passants (unitaires $\geq 60\,\%$, E2E, 3 navigateurs), (3) Doc API Swagger + README, (4) PR revue + CI/CD validé, (5) Déploiement staging, (6) 0 régression.
+
+\textbf{RACI} : Porteur projet = R+A (conception, dev, tests, doc), Jury CDA = A (validation jalons), Testeurs = C (validation utilisateurs).

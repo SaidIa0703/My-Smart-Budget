@@ -1,0 +1,15 @@
+@startuml
+node "Client" {
+  [Navigateur Web (React.js)]
+}
+
+node "Serveur Render" {
+  [API Node.js (Express)]
+  [Conteneur Docker]
+}
+
+database "MongoDB Atlas" as DB
+
+[Navigateur Web (React.js)] --> [API Node.js (Express)] : Requêtes HTTPS (REST)
+[API Node.js (Express)] --> DB : Opérations CRUD
+@enduml

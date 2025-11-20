@@ -1,479 +1,571 @@
 \chapter{Conception fonctionnelle et technique}
 
-\textbf{IMPORTANT :} Cette phase de conception est \textbf{CRUCIALE} et doit être \textbf{COMPLÈTEMENT TERMINÉE} avant de commencer le développement. Le jury attend une conception solide et documentée qui justifie tous vos choix techniques.
+\textbf{IMPORTANT :} Cette phase de conception est \textbf{CRUCIALE} et a été \textbf{COMPLÈTEMENT TERMINÉE} avant le démarrage du développement.  
+Pour \textbf{App Budget V3}, j’ai construit une conception fonctionnelle et technique détaillée, validée itérativement, qui sert de référence unique au développement, aux tests et à la soutenance.
 
-Dans ce chapitre, vous devez présenter votre conception fonctionnelle et technique complète. Cette phase détermine la réussite de votre projet et doit être soigneusement planifiée et documentée.
+\textbf{Mon approche de conception :}  
+La conception d’\textbf{App Budget V3} s’est déroulée en plusieurs étapes structurées :
 
-\textbf{Votre approche de conception :} \textit{[Décrivez votre méthodologie de conception et votre processus de validation]}
+\begin{itemize}
+    \item \textbf{1. Cadrage fonctionnel} : à partir des objectifs SMART et des personae (\textit{Léa} et \textit{Marc}), j’ai identifié les besoins critiques (suivi des transactions, enveloppes, dashboard, import/export).
+    \item \textbf{2. Modélisation des Use Cases} : j’ai listé et priorisé les cas d’usage du point de vue utilisateur, puis je les ai regroupés en Epics et User Stories (MoSCoW) sur GitHub.
+    \item \textbf{3. Diagrammes UML} : j’ai conçu un \textbf{diagramme de cas d’utilisation}, puis des \textbf{diagrammes de séquence} pour les flux critiques (authentification, création de transaction, import CSV, consultation dashboard).
+    \item \textbf{4. Conception UI/UX} : j’ai réalisé le \textbf{zoning}, les \textbf{wireframes} puis les \textbf{maquettes Figma} haute fidélité pour les pages principales : connexion, dashboard, transactions, enveloppes, import, profil.
+    \item \textbf{5. Modélisation des données} : j’ai construit un \textbf{MCD → MLD → MPD} pour la base PostgreSQL, en alignant les entités sur le modèle objet Prisma.
+    \item \textbf{6. Architecture 3 tiers} : j’ai formalisé l’architecture \textbf{Next.js 14 (front)} + \textbf{NestJS 10 (API)} + \textbf{PostgreSQL 15 (données)}, conteneurisée avec Docker.
+    \item \textbf{7. Plan de tests} : chaque User Story a été enrichie avec des \textbf{critères d’acceptation} et un \textbf{plan de tests} (unitaires, E2E Playwright, tests utilisateurs).
+    \item \textbf{8. Validation} : la conception a été relue et validée avant toute implémentation, ce qui m’a évité de lourdes refactorisations pendant le développement.
+\end{itemize}
 
 \begin{conseil}
-\textbf{Pourquoi la conception est-elle si importante ?}
+\textbf{Pourquoi la conception est-elle si importante dans App Budget V3 ?}
 \begin{itemize}
-    \item \textbf{Évite les refactorisations coûteuses} : Une bonne conception évite de reprendre le code
-    \item \textbf{Guide le développement} : Chaque développeur sait exactement quoi faire
-    \item \textbf{Facilite les tests} : Les cas d'usage définis permettent de créer des tests pertinents
-    \item \textbf{Réduit les risques} : Les problèmes sont identifiés avant le développement
-    \item \textbf{Améliore la communication} : Tous les acteurs comprennent le système
+    \item \textbf{Évite les refactorisations coûteuses} : le modèle de données (enveloppes, transactions, catégories) a été figé avant le développement, ce qui m’a évité de casser l’API au milieu du projet.
+    \item \textbf{Guide le développement} : chaque User Story est tracée vers un Use Case, un diagramme de séquence et un schéma de base de données.
+    \item \textbf{Facilite les tests} : les flux UML (ex : ajout de transaction, import CSV) ont servi de base aux scénarios Playwright et aux tests utilisateurs.
+    \item \textbf{Réduit les risques} : les cas d’erreur (CSV invalide, dépassement de budget, échec d’authentification) ont été anticipés dans les séquences.
+    \item \textbf{Améliore la communication} : la conception est partagée sur GitHub (\texttt{/docs}) et supporte la démonstration lors de la soutenance CDA.
 \end{itemize}
 
-\textbf{Checklist de conception complète :}
+\textbf{Checklist de conception complète pour App Budget V3 :}
 \begin{itemize}
     \item \mycheckmark Diagrammes de cas d'usage (Use Cases) validés
-    \item \mycheckmark Diagrammes de séquence pour les flux principaux
-    \item \mycheckmark Modèle de données (MCD/MLD/MPD) défini
-    \item \mycheckmark Architecture technique choisie et justifiée
-    \item \mycheckmark User stories détaillées avec critères d'acceptation
-    \item \mycheckmark Maquettes et wireframes validés
-    \item \mycheckmark Charte graphique définie
-    \item \mycheckmark Plan de tests établi
+    \item \mycheckmark Diagrammes de séquence pour les flux principaux (Auth, CRUD Transactions, Enveloppes, Import CSV, Dashboard)
+    \item \mycheckmark Modèle de données (MCD/MLD/MPD) défini pour PostgreSQL
+    \item \mycheckmark Architecture technique (Next.js 14 / NestJS 10 / PostgreSQL 15 / Prisma 5 / Docker) choisie et justifiée
+    \item \mycheckmark User stories détaillées avec critères d'acceptation (US-01 à US-09)
+    \item \mycheckmark Maquettes et wireframes Figma validés (mobile + desktop)
+    \item \mycheckmark Charte graphique définie (palette, typos, composants UI)
+    \item \mycheckmark Plan de tests établi (unitaires, E2E, tests utilisateurs)
 \end{itemize}
 \end{conseil}
+
+% ============================================================
+% USE CASES
+% ============================================================
 
 \section{Use Cases et diagrammes UML}
 
-Les Use Cases modélisent les interactions entre les acteurs et le système pour identifier les fonctionnalités essentielles. Cette approche centrée utilisateur garantit que le système répond aux besoins métier réels. Les diagrammes UML facilitent la communication entre les équipes techniques et métier, réduisant les risques d'incompréhension.
+Les Use Cases d’\textbf{App Budget V3} modélisent les interactions entre les acteurs (utilisateur, administrateur) et le système. Ils permettent de vérifier que \textbf{chaque fonctionnalité répond à un besoin métier} identifié lors du cadrage.
 
-La modélisation des cas d'usage permet d'identifier les flux principaux et alternatifs, ainsi que les cas d'erreur à gérer. Cette analyse préalable guide la conception technique et les tests d'acceptation.
+\subsection*{Acteurs du système}
 
-\begin{exemple}
-\textbf{Diagramme Use Case simplifié :}
-\begin{verbatim}
-                    +-------------------+
-                    |   Système de      |
-                    |   Gestion         |
-                    |   Projets         |
-                    +---------+---------+
-                              |
-        +---------------------+---------------------+
-        |                     |                     |
-   +----+----+            +----+----+            +----+----+
-   |Chef de  |            |Dévelop-|            |Manager |
-   |projet   |            |peur    |            |        |
-   +---------+            +---------+            +---------+
-        |                     |                     |
-        | Créer projet        | Mettre à jour       | Générer
-        | Assigner tâches     | statut             | rapport
-        | Suivre avancement   | Consulter          | Analyser
-                              | tâches             | performance
-\end{verbatim}
-\end{exemple}
+\begin{itemize}
+    \item \textbf{Utilisateur authentifié} : étudiant, jeune actif ou parent de famille qui suit son budget (Léa, Marc).
+    \item \textbf{Administrateur} : rôle technique permettant de consulter des statistiques globales anonymisées et de monitorer l’application.
+    \item \textbf{Système d’email / notifications} (acteur externe) : envoi d’emails de confirmation, de notifications budgétaires (v2.0).
+\end{itemize}
+
+\subsection*{Principaux cas d’usage}
+
+Les cas d’usage principaux sont :
+
+\begin{itemize}
+    \item \textbf{UC01 -- Gérer son compte} : s’inscrire, se connecter, consulter/modifier son profil, supprimer son compte.
+    \item \textbf{UC02 -- Gérer ses transactions} : créer, modifier, supprimer, filtrer les transactions (revenus / dépenses).
+    \item \textbf{UC03 -- Gérer ses enveloppes budgétaires} : définir des plafonds, visualiser la consommation et le reste à vivre.
+    \item \textbf{UC04 -- Consulter le dashboard analytique} : visualiser KPIs, graphiques, tendances.
+    \item \textbf{UC05 -- Importer ses relevés bancaires} : importer un fichier CSV, traiter les erreurs et les doublons.
+    \item \textbf{UC06 -- Exporter ses données} : récupérer ses données en CSV/JSON (portabilité RGPD).
+    \item \textbf{UC07 -- Recevoir des notifications de dépassement} (v2.0) : être alerté à 80\% et 100\% d’un budget.
+    \item \textbf{UC08 -- Consulter les statistiques admin} (v2.0) : pour le rôle \texttt{ADMIN}, suivre l’adoption et l’usage global.
+\end{itemize}
+
+\subsection*{Diagramme de cas d’usage global}
+
+Le diagramme ci-dessous synthétise les interactions entre les acteurs et les fonctionnalités d’App Budget V3 :
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.95\textwidth]{assets/images/usage_global.png}
+    \caption{Diagramme de cas d’usage global -- App Budget V3}
+    \label{fig:usage_global}
+\end{figure}
+
+Chaque cas d’usage est ensuite décliné en \textbf{User Stories} et \textbf{tâches techniques} sur GitHub (backlog structuré par Epics et labels).
 
 \begin{conseil}
 \begin{itemize}
-    \item Identifier tous les acteurs du système
-    \item Modéliser les cas d'usage principaux et alternatifs
-    \item Documenter les préconditions et postconditions
-    \item Prévoir les cas d'erreur et exceptions
-    \item Valider les Use Cases avec les utilisateurs métier
+    \item J’ai limité le diagramme global à \textbf{8 cas d’usage majeurs} pour garder une bonne lisibilité.
+    \item Chaque UC critique (auth, transactions, enveloppes, import, dashboard) a été détaillé dans un document dédié (\texttt{/docs/use-cases.md}).
+    \item Les flux alternatifs (erreurs de saisie, CSV invalide, dépassement de budget) sont décrits dans la partie \textbf{Critères d’acceptation} des User Stories.
 \end{itemize}
 \end{conseil}
 
 \begin{jury}
 \begin{itemize}
-    \item Quels sont vos acteurs principaux ?
-    \item Avez-vous modélisé tous les cas d'usage critiques ?
-    \item Comment gérez-vous les cas d'erreur ?
-    \item Vos Use Cases sont-ils validés par les utilisateurs ?
-    \item Avez-vous prévu les flux alternatifs ?
+    \item Acteurs principaux : \textbf{Utilisateur authentifié}, \textbf{Administrateur}, \textbf{Système d’email}.
+    \item Les cas d’usage critiques (authentification, gestion des transactions, enveloppes, import, dashboard) sont modélisés et traçables vers des User Stories.
+    \item Les cas d’erreur sont gérés : échec de login, CSV invalide, dépassement d’enveloppe, accès non autorisé.
 \end{itemize}
 \end{jury}
+
+% ============================================================
+% DIAGRAMMES DE SEQUENCE
+% ============================================================
 
 \section{Diagrammes de séquence}
 
-Les diagrammes de séquence détaillent les interactions temporelles entre les différents composants du système pour chaque cas d'usage. Cette modélisation précise les responsabilités de chaque couche (présentation, logique métier, données) et facilite l'implémentation technique. Les diagrammes servent également de référence pour les tests d'intégration.
+Les diagrammes de séquence précisent, pour chaque cas d’usage critique, \textbf{l’enchaînement des appels} entre :
 
-La modélisation des séquences permet d'identifier les points de synchronisation, les appels asynchrones, et les mécanismes de gestion d'erreur. Cette analyse technique guide l'architecture et l'implémentation des APIs.
+\begin{itemize}
+    \item le \textbf{client Next.js 14} (frontend),
+    \item l’\textbf{API NestJS 10} (backend),
+    \item la \textbf{base PostgreSQL 15} (via Prisma 5),
+    \item et, en v2.0, les \textbf{services externes} (emails, notifications).
+\end{itemize}
 
-\begin{exemple}
-\textbf{Diagramme de séquence - Création de projet :}
-\begin{verbatim}
-User    Frontend    Backend    Database
- |         |          |           |
- |--POST-->|          |           |
- |         |--POST--> |           |
- |         |          |--INSERT-> |
- |         |          |<--OK------|
- |         |<--201----|           |
- |<--200---|          |           |
-\end{verbatim}
+Ils servent de référence pour l’architecture des contrôleurs / services NestJS, pour la signature des endpoints et pour les tests d’intégration.
 
-\textbf{Exemple de séquence avec gestion d'erreur :}
-\begin{verbatim}
-User    Frontend    Backend    Database
- |         |          |           |
- |--POST-->|          |           |
- |         |--POST--> |           |
- |         |          |--INSERT-> |
- |         |          |<--ERROR--|
- |         |<--400----|           |
- |<--400---|          |           |
-\end{verbatim}
-\end{exemple}
+\subsection{Séquence 1 : Authentification (US-01)}
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.95\textwidth]{assets/images/seq-auth-login.png}
+    \caption{Diagramme de séquence -- Connexion utilisateur}
+    \label{fig:seq-auth-login}
+\end{figure}
+
+\textbf{Description du flux nominal :}
+\begin{enumerate}
+    \item L’utilisateur saisit ses identifiants sur la page \texttt{/auth/login} (Next.js).
+    \item Le frontend envoie une requête \texttt{POST /auth/login} à l’API NestJS.
+    \item Le \texttt{AuthController} appelle le \texttt{AuthService} qui :
+    \begin{itemize}
+        \item vérifie l’email et le mot de passe (bcrypt),
+        \item génère un JWT (HS256, exp 24h),
+        \item journalise la tentative de connexion.
+    \end{itemize}
+    \item L’API renvoie un \texttt{200 OK} avec le token et les informations de base de l’utilisateur.
+    \item Le frontend stocke le token (cookie HTTPOnly) et redirige l’utilisateur vers \texttt{/dashboard}.
+\end{enumerate}
+
+\textbf{Gestion d’erreur :}  
+En cas de mot de passe incorrect ou d’utilisateur inexistant, l’API renvoie un \texttt{401 Unauthorized} et le frontend affiche un message d’erreur sans divulguer d’information sensible.
+
+\subsection{Séquence 2 : Création d’une transaction (US-03)}
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.95\textwidth]{assets/images/seq-create-transaction.png}
+    \caption{Diagramme de séquence -- Création d’une transaction}
+    \label{fig:seq-create-transaction}
+\end{figure}
+
+\textbf{Flux nominal :}
+\begin{enumerate}
+    \item L’utilisateur clique sur “Ajouter une transaction” sur la page \texttt{/transactions}.
+    \item Le frontend valide les champs côté client (Zod) puis appelle \texttt{POST /transactions}.
+    \item Le \texttt{TransactionsController} injecte \texttt{TransactionsService} et appelle \texttt{create()}.
+    \item Le service valide les données côté backend, associe la transaction au \texttt{userId} du token, puis appelle Prisma.
+    \item Prisma exécute un \texttt{INSERT} dans la table \texttt{transactions}.
+    \item L’API renvoie la transaction créée, le frontend met à jour la liste et les totaux.
+\end{enumerate}
+
+\textbf{Gestion d’erreur :}
+\begin{itemize}
+    \item Montant invalide ou date dans le futur : retour \texttt{400 Bad Request}.
+    \item Catégorie inexistante ou non liée à l’utilisateur : retour \texttt{404 Not Found}.
+\end{itemize}
+
+\subsection{Séquence 3 : Import CSV (US-05)}
+
+Un diagramme de séquence spécifique décrit l’import CSV, incluant :
+
+\begin{itemize}
+    \item Upload du fichier,
+    \item Parsing ligne par ligne,
+    \item Validation et détection des doublons,
+    \item Insertion en batch dans PostgreSQL,
+    \item Génération d’un rapport d’import.
+\end{itemize}
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.95\textwidth]{assets/images/seq-import-csv.png}
+    \caption{Diagramme de séquence -- Import CSV de transactions}
+    \label{fig:seq-import-csv}
+\end{figure}
 
 \begin{conseil}
 \begin{itemize}
-    \item Modéliser les séquences pour chaque cas d'usage critique
-    \item Prévoir la gestion des erreurs et exceptions
-    \item Identifier les appels synchrones et asynchrones
-    \item Documenter les timeouts et retry policies
-    \item Valider les séquences avec l'équipe technique
+    \item J’ai modélisé en priorité les séquences pour : Auth (US-01), Transactions (US-03), Enveloppes (US-04), Import CSV (US-05) et Dashboard (US-07).
+    \item Les séquences détaillent toujours le \textbf{flux nominal} et au moins un \textbf{flux d’erreur} (ex : CSV invalide, dépassement de plafond, erreur DB).
 \end{itemize}
 \end{conseil}
 
-\begin{jury}
-\begin{itemize}
-    \item Avez-vous modélisé les séquences critiques ?
-    \item Comment gérez-vous les erreurs dans vos séquences ?
-    \item Vos diagrammes sont-ils cohérents avec l'architecture ?
-    \item Avez-vous prévu les cas de timeout ?
-    \item Comment validez-vous vos modèles de séquence ?
-\end{itemize}
-\end{jury}
+% ============================================================
+% CONCEPTION UI / UX
+% ============================================================
 
 \section{Conception de l'interface graphique}
 
-La conception graphique s'appuie sur une charte graphique cohérente avec l'identité visuelle de l'entreprise. Le zoning et les wireframes définissent la structure des interfaces avant le développement des maquettes haute fidélité. Cette approche progressive valide les choix UX et facilite l'implémentation front-end.
+L’interface d’\textbf{App Budget V3} a été pensée pour être :
 
-L'expérience utilisateur (UX) privilégie la simplicité et l'efficacité pour réduire la courbe d'apprentissage et améliorer l'adoption. Les tests utilisateur permettent de valider les choix de conception et d'optimiser l'interface.
+\begin{itemize}
+    \item \textbf{responsive} (mobile-first, puis desktop),
+    \item \textbf{simple} (peu de friction pour ajouter une transaction),
+    \item \textbf{visuelle} (dashboard clair, indicateurs de couleur sur les enveloppes),
+    \item \textbf{accessible} (contraste suffisant, taille de police, navigable au clavier).
+\end{itemize}
+
+La conception UI/UX suit trois étapes : \textbf{Zoning → Wireframes → Maquettes haute fidélité}.
 
 \subsection{Zoning}
 
-Dans cette sous-section, vous devez présenter l'organisation spatiale de vos interfaces. Le jury attend une analyse claire de la hiérarchie visuelle et de l'organisation des éléments.
+Le zoning définit la structure globale des pages avant tout travail graphique.
 
-\textbf{Votre zoning :} \textit{[Décrivez l'organisation spatiale de vos pages principales]}
+\subsubsection*{Zoning de la page Dashboard}
 
-\begin{exemple}
-\textbf{Zoning d'une page projet :}
 \begin{center}
-\begin{tabular}{|p{4cm}|p{6cm}|p{3cm}|}
+\begin{tabular}{|p{4cm}|p{7cm}|}
 \hline
-\multicolumn{3}{|c|}{\textbf{Header - Navigation principale}} \\
+\multicolumn{2}{|c|}{\textbf{Header}} \\
 \hline
-\textbf{Sidebar} & \textbf{Contenu principal} & \textbf{Panel latéral} \\
+\multicolumn{1}{|c|}{Logo + Nom de l’app} & \multicolumn{1}{c|}{Menu : Dashboard / Transactions / Enveloppes / Import / Profil} \\
 \hline
-• Menu navigation & • Titre du projet & • Actions rapides \\
-• Filtres & • Liste des tâches & • Statistiques \\
-• Recherche & • Tableau de données & • Notifications \\
-• Paramètres & • Pagination & • Aide contextuelle \\
+\textbf{Colonne gauche} & \textbf{Colonne centrale} \\
 \hline
-\multicolumn{3}{|c|}{\textbf{Footer - Informations légales}} \\
+\begin{itemize}
+    \item Menu latéral (icônes)
+    \item Filtre période (mois, année)
+\end{itemize}
+&
+\begin{itemize}
+    \item Rangée 1 : KPIs (Revenus, Dépenses, Reste à vivre, \% budget utilisé)
+    \item Rangée 2 : Graphique d’évolution mensuelle
+    \item Rangée 3 : Graphique répartition par catégorie
+\end{itemize} \\
+\hline
+\multicolumn{2}{|c|}{\textbf{Footer - Mentions légales, lien RGPD, lien documentation}} \\
 \hline
 \end{tabular}
 \end{center}
-\end{exemple}
 
-\subsection{Wireframe}
+Un zoning similaire a été réalisé pour :
 
-Dans cette sous-section, vous devez présenter vos wireframes pour les pages principales. Le jury attend une représentation claire de la structure et des interactions.
+\begin{itemize}
+    \item \texttt{/transactions} : liste + filtres + formulaire latéral.
+    \item \texttt{/envelopes} : cartes d’enveloppes + détail d’une enveloppe.
+    \item \texttt{/import} : zone d’upload + rapport.
+    \item \texttt{/profile} : onglet profil + onglet RGPD (export/suppression).
+\end{itemize}
 
-\textbf{Vos wireframes :} \textit{[Présentez vos wireframes pour les pages principales]}
+\subsection{Wireframes}
 
-\begin{exemple}
-\textbf{Exemple de wireframe - Page de connexion :}
-\begin{center}
-\begin{tabular}{|p{8cm}|}
-\hline
-\multicolumn{1}{|c|}{\textbf{LOGO DE L'APPLICATION}} \\
-\hline
-\multicolumn{1}{|c|}{} \\
-\multicolumn{1}{|c|}{\textbf{Connexion}} \\
-\multicolumn{1}{|c|}{} \\
-\multicolumn{1}{|c|}{Email : [\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_]} \\
-\multicolumn{1}{|c|}{} \\
-\multicolumn{1}{|c|}{Mot de passe : [\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_]} \\
-\multicolumn{1}{|c|}{} \\
-\multicolumn{1}{|c|}{[    Se connecter    ]} \\
-\multicolumn{1}{|c|}{} \\
-\multicolumn{1}{|c|}{Mot de passe oublié ?} \\
-\multicolumn{1}{|c|}{} \\
-\hline
-\end{tabular}
-\end{center}
-\end{exemple}
+Les wireframes ont été réalisés dans \textbf{Figma} en basse fidélité (gris, blocs simples) pour valider :
 
-\subsection{Maquettage}
+\begin{itemize}
+    \item la hiérarchie de l’information (ce que l’utilisateur voit en premier),
+    \item le parcours principal (\textit{connexion → ajout de transaction → consultation dashboard}),
+    \item la cohérence entre desktop et mobile.
+\end{itemize}
 
-Dans cette sous-section, vous devez présenter vos maquettes haute fidélité. Le jury attend une représentation visuelle fidèle au rendu final.
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.6\textwidth]{assets/images/wireframe-dashboard.png}
+    \caption{Wireframe basse fidélité -- Page Dashboard}
+\end{figure}
 
-\textbf{Vos maquettes :} \textit{[Décrivez vos maquettes haute fidélité et leur évolution]}
+\subsection{Maquettage (maquettes haute fidélité)}
 
-\begin{exemple}
-\textbf{Évolution des maquettes :}
+Les maquettes haute fidélité (toujours dans Figma) reprennent le zoning et les wireframes, avec :
+
+\begin{itemize}
+    \item la \textbf{palette de couleurs} définie,
+    \item les \textbf{typos finales},
+    \item les \textbf{composants réutilisables Tailwind} (boutons, cartes, modales),
+    \item les \textbf{états} (hover, focus, disabled, erreur).
+\end{itemize}
+
+Les versions se sont enchaînées ainsi :
+
 \begin{center}
 \begin{tabular}{|p{3cm}|p{3cm}|p{3cm}|p{3cm}|}
 \hline
-\textbf{Version 1} & \textbf{Version 2} & \textbf{Version 3} & \textbf{Final} \\
+\textbf{Version 1} & \textbf{Version 2} & \textbf{Version 3} & \textbf{Version finale} \\
 \hline
-Maquettes basiques & Intégration charte & Maquettes interactives & Maquettes validées \\
-Placeholders & Couleurs définies & Animations & Tests utilisateurs \\
-Structure simple & Typographie & Micro-interactions & Optimisations UX \\
+Zoning + wireframes & Ajout palette et typos & Micro-interactions & Maquettes validées \\
+Sans couleurs & Alignement charte & Composants UI figés & Tests utilisateurs passés \\
 \hline
 \end{tabular}
 \end{center}
-\end{exemple}
 
 \subsection{Outils de conception et diagrammes}
 
-Dans cette sous-section, vous devez présenter les outils que vous utilisez pour créer vos diagrammes de qualité professionnelle. Le jury attend des diagrammes clairs et bien conçus qui facilitent la compréhension de votre architecture.
+Pour obtenir des diagrammes professionnels, j’ai utilisé :
 
-\textbf{Vos outils de diagrammes :} \textit{[Listez les outils que vous utilisez et justifiez vos choix]}
+\begin{itemize}
+    \item \textbf{Draw.io (diagrams.net)} : diagrammes de cas d’usage, séquence, architecture (fichiers versionnés dans \texttt{/docs/diagrams}).
+    \item \textbf{Figma} : wireframes et maquettes haute fidélité (projet “App Budget V3”).
+    \item \textbf{PlantUML / Mermaid} : pour certains diagrammes texte dans la documentation technique.
+\end{itemize}
 
 \begin{conseil}
-\textbf{Outils recommandés pour des diagrammes de qualité :}
 \begin{itemize}
-    \item \textbf{Draw.io (diagrams.net) :} Gratuit, intégré à GitHub, parfait pour les diagrammes UML
-    \item \textbf{Lucidchart :} Professionnel, templates UML, collaboration en équipe
-    \item \textbf{PlantUML :} Code-based, versioning Git, intégration LaTeX
-    \item \textbf{Mermaid :} Intégré GitHub, syntaxe simple, diagrammes de flux
-\end{itemize}
-
-\textbf{Conseils pour des diagrammes professionnels :}
-\begin{itemize}
-    \item Utilisez des couleurs cohérentes et une légende
-    \item Respectez les conventions UML (acteurs, cas d'usage, relations)
-    \item Gardez vos diagrammes simples et lisibles
-    \item Versionnez vos diagrammes avec votre code
-    \item Intégrez-les dans votre documentation GitHub
+    \item Tous les diagrammes sont versionnés dans Git avec le code.
+    \item Les noms de fichiers sont standardisés : \texttt{uc-*.png}, \texttt{seq-*.png}, \texttt{arch-*.png}.
 \end{itemize}
 \end{conseil}
+
+% ============================================================
+% CHARTE GRAPHIQUE
+% ============================================================
 
 \subsection{Charte graphique}
 
-Dans cette sous-section, vous devez détailler votre charte graphique complète. Le jury attend une cohérence visuelle et une identité forte.
+\subsubsection{Palette de couleurs}
 
-\subsubsection{Couleurs}
+Pour App Budget V3, j’ai choisi une palette sobre et moderne autour du \textbf{bleu} (confiance) et du \textbf{vert} (finance, budget maîtrisé) :
 
-\textbf{Votre palette de couleurs :} \textit{[Définissez votre palette avec les codes hexadécimaux]}
-
-\subsubsection{Typographie}
-
-\textbf{Votre système typographique :} \textit{[Définissez vos polices et leurs usages]}
-
-\subsubsection{Logo}
-
-\textbf{Votre logo et son utilisation :} \textit{[Décrivez votre logo et ses variantes]}
-
-\begin{exemple}
-\textbf{Charte graphique :}
 \begin{center}
-\begin{tabular}{|p{3cm}|p{4cm}|p{5cm}|}
+\begin{tabular}{|p{3cm}|p{6cm}|}
 \hline
-\textbf{Couleurs} & \textbf{Typographie} & \textbf{Composants} \\
+\textbf{Couleur} & \textbf{Usage} \\
 \hline
-Primaire: \#FFD700 & Inter (titres) & Boutons arrondis \\
-Secondaire: \#101820 & Arial (corps) & Cartes avec ombres \\
-Neutre: \#333A40 & Monospace (code) & Icônes Material Design \\
-Accent: \#007BFF & & \\
-\hline
-\textbf{Espacement} & \textbf{Grille 8px} & \textbf{Marges cohérentes} \\
+\#1D4ED8 (Bleu primaire) & Boutons principaux, liens actifs, header \\
+\#0F172A (Gris bleu très foncé) & Fond du header, texte titre \\
+\#22C55E (Vert succès) & États positifs, enveloppes sous contrôle \\
+\#F97316 (Orange alerte) & Avertissements (80\% de budget) \\
+\#EF4444 (Rouge erreur) & Erreurs, dépassements à 100\% \\
+\#F9FAFB (Gris très clair) & Fond de page, cartes \\
 \hline
 \end{tabular}
 \end{center}
-\end{exemple}
 
-\begin{conseil}
-\begin{itemize}
-    \item Définir une charte graphique cohérente
-    \item Créer des wireframes pour toutes les pages principales
-    \item Développer des maquettes haute fidélité
-    \item Tester l'accessibilité et la responsivité
-    \item Utiliser Lighthouse pour valider les performances et l'accessibilité
-    \item Valider les choix UX avec les utilisateurs
-\end{itemize}
-\end{conseil}
+\subsubsection{Typographie}
 
-\begin{jury}
 \begin{itemize}
-    \item Votre charte graphique est-elle cohérente ?
-    \item Avez-vous testé vos interfaces avec les utilisateurs ?
-    \item Vos maquettes respectent-elles l'accessibilité ?
-    \item Quels sont vos scores Lighthouse pour l'accessibilité ?
-    \item Comment gérez-vous la responsivité ?
-    \item Avez-vous défini des composants réutilisables ?
+    \item \textbf{Titres} : \texttt{Inter} (Google Fonts), poids 600/700.
+    \item \textbf{Texte courant} : \texttt{Inter}, poids 400.
+    \item \textbf{Code / montants} : \texttt{JetBrains Mono} pour les exemples techniques.
 \end{itemize}
-\end{jury}
+
+\subsubsection{Logo}
+
+Le logo d’App Budget V3 représente :
+
+\begin{itemize}
+    \item une \textbf{icône de portefeuille stylisé} avec un graphique croissant à l’intérieur ;
+    \item les couleurs principales : bleu primaire et vert succès ;
+    \item une version claire pour fond sombre et une version sombre pour fond clair.
+\end{itemize}
+
+Les règles d’utilisation du logo (tailles minimales, marges de sécurité, variantes) sont définies dans \texttt{/docs/design-system.md}.
+
+% ============================================================
+% CONCEPTION BASE DE DONNÉES
+% ============================================================
 
 \section{Conception de base de données}
 
-La conception de base de données suit la méthode Merise avec un Modèle Conceptuel de Données (MCD), un Modèle Logique de Données (MLD), et un Modèle Physique de Données (MPD). Cette approche progressive garantit la cohérence et l'optimisation des données. Les contraintes d'intégrité et les index optimisent les performances et la fiabilité.
+Pour App Budget V3, j’ai choisi \textbf{PostgreSQL 15} comme base de données unique pour la v1.0, avec Prisma 5 comme ORM.  
+Le modèle de données suit la démarche \textbf{Merise} :
 
-PostgreSQL gère les données transactionnelles avec des contraintes strictes, tandis que MongoDB stocke les logs et rapports avec une structure flexible. Cette architecture hybride optimise les performances selon le type de données.
+\begin{itemize}
+    \item MCD : entités métier (User, Transaction, Category, BudgetEnvelope, Notification, ImportJob).
+    \item MLD : tables relationnelles, clés primaires / étrangères.
+    \item MPD : implémentation PostgreSQL avec contraintes et index.
+\end{itemize}
 
 \subsection{MCD (Modèle Conceptuel de Données)}
 
-Dans cette sous-section, vous devez présenter votre modèle conceptuel de données. Le jury attend une représentation claire des entités et de leurs relations.
+Les principales entités sont :
 
-\textbf{Votre MCD :} \textit{[Présentez votre modèle conceptuel avec les entités et relations principales]}
+\begin{itemize}
+    \item \textbf{Utilisateur} : identifiants, préférences, rôle.
+    \item \textbf{Catégorie} : \textit{Alimentation, Logement, Loisirs}, etc.
+    \item \textbf{Transaction} : opération financière (date, montant, type, catégorie).
+    \item \textbf{EnveloppeBudgétaire} : plafond par période et catégories associées.
+    \item \textbf{Notification} (v2) : alertes sur dépassement de seuil.
+    \item \textbf{ImportJob} : journalisation des imports CSV.
+\end{itemize}
+
+\begin{verbatim}
+UTILISATEUR (id, email, mot_de_passe_hache, role, devise, langue)
+    1, N
+    |
+    | possède
+    |
+TRANSACTION (id, date, montant, type, libelle, categorie_id, utilisateur_id)
+
+CATEGORIE (id, nom, type, utilisateur_id|null)
+    1, N
+    |
+    | regroupe
+    |
+TRANSACTION (...)
+
+UTILISATEUR (id, ...)
+    1, N
+    |
+    | définit
+    |
+ENVELOPPE_BUDGETAIRE (id, nom, plafond_mensuel, utilisateur_id)
+    N, N
+    |
+    | concerne
+    |
+CATEGORIE (id, ...)
+
+UTILISATEUR (id, ...)
+    1, N
+    |
+    | reçoit
+    |
+NOTIFICATION (id, type, message, enveloppe_id, utilisateur_id)
+
+UTILISATEUR (id, ...)
+    1, N
+    |
+    | lance
+    |
+IMPORT_JOB (id, fichier_nom, nb_lignes_ok, nb_lignes_ko, utilisateur_id)
+\end{verbatim}
 
 \subsection{MLD (Modèle Logique de Données)}
 
-Dans cette sous-section, vous devez détailler votre modèle logique de données. Le jury attend une traduction du MCD en structure de base de données.
+Traduction en tables relationnelles :
 
-\textbf{Votre MLD :} \textit{[Décrivez votre modèle logique avec les tables et relations]}
+\begin{itemize}
+    \item \texttt{users(id, email, password\_hash, role, currency, locale, created\_at, updated\_at)}
+    \item \texttt{categories(id, name, type, user\_id NULL, created\_at)}
+    \item \texttt{transactions(id, user\_id, category\_id, date, amount, type, label, created\_at)}
+    \item \texttt{budget\_envelopes(id, user\_id, name, monthly\_limit, created\_at)}
+    \item \texttt{envelope\_categories(envelope\_id, category\_id)}
+    \item \texttt{notifications(id, user\_id, envelope\_id, type, message, read\_at, created\_at)}
+    \item \texttt{import\_jobs(id, user\_id, filename, rows\_ok, rows\_ko, created\_at)}
+\end{itemize}
 
 \subsection{MPD (Modèle Physique de Données)}
 
-Dans cette sous-section, vous devez présenter votre modèle physique de données. Le jury attend une implémentation concrète avec les contraintes et index.
+Exemple de définition SQL simplifiée :
 
-\textbf{Votre MPD :} \textit{[Détaillez votre modèle physique avec les contraintes, index et optimisations]}
-
-\begin{exemple}
-\textbf{MCD simplifié :}
-\begin{verbatim}
-PROJET (id, nom, description, date_debut, date_fin)
-    |
-    | 1,n
-    |
-TACHE (id, titre, description, statut, priorite)
-    |
-    | n,1
-    |
-UTILISATEUR (id, email, nom, prenom, role)
-\end{verbatim}
-
-\textbf{Exemple de contraintes PostgreSQL :}
 \begin{lstlisting}[language=SQL]
--- Contraintes d'intégrité
-ALTER TABLE taches ADD CONSTRAINT fk_tache_projet
-    FOREIGN KEY (projet_id) REFERENCES projets(id)
-    ON DELETE CASCADE;
+CREATE TABLE users (
+  id SERIAL PRIMARY KEY,
+  email TEXT NOT NULL UNIQUE,
+  password_hash TEXT NOT NULL,
+  role TEXT NOT NULL DEFAULT 'USER',
+  currency TEXT NOT NULL DEFAULT 'EUR',
+  locale TEXT NOT NULL DEFAULT 'fr-FR',
+  created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+  updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
+);
 
--- Index pour optimiser les performances
-CREATE INDEX idx_taches_statut ON taches(statut);
-CREATE INDEX idx_taches_projet_statut ON taches(projet_id, statut);
+CREATE TABLE categories (
+  id SERIAL PRIMARY KEY,
+  name TEXT NOT NULL,
+  type TEXT NOT NULL, -- EXPENSE / INCOME
+  user_id INTEGER REFERENCES users(id) ON DELETE CASCADE,
+  created_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
+);
 
--- Contrainte de validation
-ALTER TABLE projets ADD CONSTRAINT chk_dates
-    CHECK (date_fin > date_debut);
+CREATE TABLE transactions (
+  id SERIAL PRIMARY KEY,
+  user_id INTEGER NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+  category_id INTEGER NOT NULL REFERENCES categories(id),
+  date DATE NOT NULL,
+  amount NUMERIC(12,2) NOT NULL,
+  type TEXT NOT NULL CHECK (type IN ('DEBIT','CREDIT')),
+  label TEXT NOT NULL,
+  created_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
+);
+
+CREATE INDEX idx_transactions_user_date
+  ON transactions(user_id, date DESC);
+
+CREATE TABLE budget_envelopes (
+  id SERIAL PRIMARY KEY,
+  user_id INTEGER NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+  name TEXT NOT NULL,
+  monthly_limit NUMERIC(12,2) NOT NULL,
+  created_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
+);
+
+CREATE TABLE envelope_categories (
+  envelope_id INTEGER NOT NULL REFERENCES budget_envelopes(id) ON DELETE CASCADE,
+  category_id INTEGER NOT NULL REFERENCES categories(id) ON DELETE CASCADE,
+  PRIMARY KEY (envelope_id, category_id)
+);
 \end{lstlisting}
-
-\textbf{Exemple de document MongoDB :}
-\begin{lstlisting}[language=JSON]
-{
-  "_id": ObjectId("..."),
-  "userId": "user123",
-  "action": "task_created",
-  "timestamp": ISODate("2025-01-15T10:30:00Z"),
-  "metadata": {
-    "projectId": "proj456",
-    "taskId": "task789",
-    "ipAddress": "192.168.1.100"
-  }
-}
-\end{lstlisting}
-\end{exemple}
 
 \begin{conseil}
 \begin{itemize}
-    \item Modéliser le MCD avec toutes les entités et relations
-    \item Définir les contraintes d'intégrité référentielle
-    \item Optimiser avec des index appropriés
-    \item Prévoir la migration et l'évolution du schéma
-    \item Documenter les choix de conception
+    \item Tous les schémas sont gérés par \textbf{Prisma Migrate} (\texttt{schema.prisma} versionné dans Git).
+    \item Des index ciblés ont été ajoutés sur \texttt{(user\_id, date)} et \texttt{(user\_id, category\_id)} pour optimiser le dashboard et les filtres.
 \end{itemize}
 \end{conseil}
 
-\begin{jury}
-\begin{itemize}
-    \item Montrez votre MCD et expliquez 2 contraintes d'intégrité
-    \item Comment optimisez-vous les performances de vos requêtes ?
-    \item Avez-vous prévu la migration des données ?
-    \item Pourquoi utiliser PostgreSQL ET MongoDB ?
-    \item Comment gérez-vous la cohérence entre les deux bases ?
-\end{itemize}
-\end{jury}
+% ============================================================
+% ARCHITECTURE 3 TIERS
+% ============================================================
 
 \section{Architecture 3 tiers}
 
-L'architecture 3 tiers sépare clairement les responsabilités : couche présentation (React), couche logique métier (Node.js), et couche données (PostgreSQL/MongoDB). Cette séparation facilite la maintenance, la scalabilité et les tests. Chaque tier peut évoluer indépendamment selon les besoins techniques et métier.
+App Budget V3 adopte une architecture 3 tiers classique, adaptée à une application web moderne :
 
-Les flux de données sont optimisés pour minimiser les appels réseau et garantir la cohérence transactionnelle. L'API REST assure une communication standardisée entre les couches et facilite l'intégration avec d'autres systèmes.
+\begin{itemize}
+    \item \textbf{Tier 1 -- Présentation} : \textbf{Next.js 14} (React 18, TypeScript, Tailwind CSS).
+    \item \textbf{Tier 2 -- Logique métier} : \textbf{NestJS 10} (Node.js 20, API REST, validation, auth JWT).
+    \item \textbf{Tier 3 -- Données} : \textbf{PostgreSQL 15} (via Prisma 5).
+\end{itemize}
 
-\begin{exemple}
-\textbf{Schéma architecture 3 tiers :}
-\begin{verbatim}
-+----------------------------------+
-|        TIER 1: PRESENTATION      |
-+-------+-------+-------+----------+
-| React | Router| State |         |
-| Comp. |       | Mgr.  |         |
-+-------+-------+-------+----------+
-                |
-                | HTTP/HTTPS
-                v
-+----------------------------------+
-|        TIER 2: LOGIQUE METIER    |
-+-------+-------+-------+----------+
-|Express|Services| Auth  |         |
-|Routes | Layer  | Middleware      |
-+-------+-------+-------+----------+
-                |
-                | SQL/NoSQL
-                v
-+----------------------------------+
-|        TIER 3: DONNEES           |
-+-------+-------+-------+----------+
-|PostgreSQL|MongoDB| Redis|       |
-|(Transactions)|(Logs)|(Cache)    |
-+-------+-------+-------+----------+
-\end{verbatim}
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.9\textwidth]{assets/images/arch-3tiers-app-budget-v3.png}
+    \caption{Architecture 3 tiers -- App Budget V3}
+    \label{fig:arch-3tiers-app-budget-v3}
+\end{figure}
 
-\textbf{Exemple de flux de données :}
-\begin{lstlisting}[language=JavaScript]
-// Tier 1: Frontend (React)
-const createProject = async (projectData) => {
-  const response = await fetch('/api/projects', {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify(projectData)
-  });
-  return response.json();
-};
+\subsection*{Tier 1 : Présentation (Next.js 14)}
 
-// Tier 2: Backend (Node.js/Express)
-app.post('/api/projects', authenticateUser, async (req, res) => {
-  try {
-    const project = await projectService.createProject(req.body);
-    await auditService.logAction('project_created', req.user.id);
-    res.status(201).json(project);
-  } catch (error) {
-    res.status(400).json({ error: error.message });
-  }
-});
-\end{lstlisting}
-\end{exemple}
+\begin{itemize}
+    \item Routing par pages : \texttt{/auth}, \texttt{/dashboard}, \texttt{/transactions}, \texttt{/envelopes}, \texttt{/import}, \texttt{/profile}.
+    \item State management léger avec \textbf{Zustand} (filtres, session).
+    \item Formulaires gérés avec \textbf{React Hook Form + Zod}.
+    \item Requêtes HTTP via \texttt{fetch} / \texttt{axios} vers l’API NestJS.
+\end{itemize}
+
+\subsection*{Tier 2 : Logique métier (NestJS 10)}
+
+\begin{itemize}
+    \item Modules découpés par domaine : \texttt{AuthModule}, \texttt{UsersModule}, \texttt{TransactionsModule}, \texttt{BudgetsModule}, \texttt{ImportModule}, \texttt{AnalyticsModule}.
+    \item Authentification JWT via \textbf{Passport} et \textbf{Guards NestJS}.
+    \item Validation de toutes les entrées via \textbf{class-validator}.
+    \item Documentation de l’API via \textbf{Swagger}.
+\end{itemize}
+
+\subsection*{Tier 3 : Données (PostgreSQL 15)}
+
+\begin{itemize}
+    \item Toutes les opérations de lecture/écriture passent par Prisma.
+    \item Sauvegardes régulières via \texttt{pg\_dump}.
+    \item Stratégie de migrations contrôlée par \texttt{prisma migrate}.
+\end{itemize}
 
 \begin{conseil}
 \begin{itemize}
-    \item Documenter clairement les responsabilités de chaque tier
-    \item Définir les interfaces entre les couches
-    \item Prévoir la scalabilité horizontale et verticale
-    \item Implémenter des mécanismes de cache appropriés
-    \item Tester l'intégration entre les tiers
+    \item L’API est \textbf{stateless}, ce qui permettra à terme de scaler horizontalement (plusieurs instances NestJS derrière un reverse proxy).
+    \item Le découpage modulaire NestJS facilite les tests unitaires et l’évolution (ajout de modules \texttt{NotificationsModule}, \texttt{AdminModule} en v2.0).
 \end{itemize}
 \end{conseil}
 
-\begin{jury}
-\begin{itemize}
-    \item Quelles sont les responsabilités de chaque tier ?
-    \item Comment gérez-vous la communication entre les tiers ?
-    \item Votre architecture est-elle scalable ?
-    \item Avez-vous prévu la gestion des erreurs inter-tiers ?
-    \item Comment optimisez-vous les performances ?
-\end{itemize}
-\end{jury}
+% ============================================================
+% LIENS UTILES
+% ============================================================
 
 \section{Liens utiles}
 
 \begin{itemize}
     \item UML: \url{https://www.uml-diagrams.org/}
     \item Merise (FR): \url{https://perso.liris.cnrs.fr/pierre-antoine.champin/enseignement/intro-merise.html}
-    \item OWASP ASVS: \url{https://owasp.org/ASVS/}
+    \item Next.js 14: \url{https://nextjs.org/docs}
+    \item NestJS 10: \url{https://docs.nestjs.com/}
+    \item Prisma 5: \url{https://www.prisma.io/docs}
     \item PostgreSQL Docs: \url{https://www.postgresql.org/docs/}
-    \item MongoDB Modeling: \url{https://bit.ly/mongodb-modeling}
     \item Draw.io (diagrammes): \url{https://app.diagrams.net/}
+    \item Figma (maquettes UI): \url{https://www.figma.com/}
+    \item OWASP ASVS: \url{https://owasp.org/ASVS/}
     \item Lighthouse (accessibilité): \url{https://developers.google.com/web/tools/lighthouse}
-    \item Lucidchart (UML): \url{https://www.lucidchart.com/pages/fr/exemples/diagramme-uml}
-    \item PlantUML (diagrammes): \url{https://plantuml.com/}
-    \item Mermaid (diagrammes): \url{https://mermaid-js.github.io/mermaid/}
 \end{itemize}

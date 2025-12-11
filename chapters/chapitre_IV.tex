@@ -9,7 +9,7 @@ La conception d’\textbf{App Budget V3} s’est déroulée en plusieurs étapes
 \begin{itemize}
     \item \textbf{1. Cadrage fonctionnel} : à partir des objectifs SMART et des personae (\textit{Léa} et \textit{Marc}), j’ai identifié les besoins critiques (suivi des transactions, enveloppes, dashboard, import/export).
     \item \textbf{2. Modélisation des Use Cases} : j’ai listé et priorisé les cas d’usage du point de vue utilisateur, puis je les ai regroupés en Epics et User Stories (MoSCoW) sur GitHub.
-    \item \textbf{3. Diagrammes UML} : j’ai conçu un \textbf{diagramme de cas d’utilisation}, puis des \textbf{diagrammes de séquence} pour les flux critiques (authentification, création de transaction, import CSV, consultation dashboard).
+    \item \textbf{3. Diagrammes UML} : j’ai conçu un \textbf{diagramme de cas d’utilisation}, un \textbf{diagramme de classes détaillé}, puis des \textbf{diagrammes de séquence} pour les flux critiques (authentification, création de transaction, import CSV, consultation dashboard).
     \item \textbf{4. Conception UI/UX} : j’ai réalisé le \textbf{zoning}, les \textbf{wireframes} puis les \textbf{maquettes Figma} haute fidélité pour les pages principales : connexion, dashboard, transactions, enveloppes, import, profil.
     \item \textbf{5. Modélisation des données} : j’ai construit un \textbf{MCD → MLD → MPD} pour la base PostgreSQL, en alignant les entités sur le modèle objet Prisma.
     \item \textbf{6. Architecture 3 tiers} : j’ai formalisé l’architecture \textbf{Next.js 14 (front)} + \textbf{NestJS 10 (API)} + \textbf{PostgreSQL 15 (données)}, conteneurisée avec Docker.
@@ -30,6 +30,7 @@ La conception d’\textbf{App Budget V3} s’est déroulée en plusieurs étapes
 \textbf{Checklist de conception complète pour App Budget V3 :}
 \begin{itemize}
     \item \mycheckmark Diagrammes de cas d'usage (Use Cases) validés
+    \item \mycheckmark Diagramme de classes UML complet (attributs typés, cardinalités, associations nommées)
     \item \mycheckmark Diagrammes de séquence pour les flux principaux (Auth, CRUD Transactions, Enveloppes, Import CSV, Dashboard)
     \item \mycheckmark Modèle de données (MCD/MLD/MPD) défini pour PostgreSQL
     \item \mycheckmark Architecture technique (Next.js 14 / NestJS 10 / PostgreSQL 15 / Prisma 5 / Docker) choisie et justifiée
@@ -87,7 +88,7 @@ Chaque cas d’usage est ensuite décliné en \textbf{User Stories} et \textbf{t
 \begin{conseil}
 \begin{itemize}
     \item J’ai limité le diagramme global à \textbf{8 cas d’usage majeurs} pour garder une bonne lisibilité.
-    \item Chaque UC critique (auth, transactions, enveloppes, import, dashboard) a été détaillé dans un document dédié (\texttt{/docs/use-cases.md}).
+    \item Chaque UC critique (auth, transactions, enveloppes, import, dashboard) a été détaillé dans un document dédié (\texttt{/docs/use-cases.md}) avec scénario nominal et scénarios alternatifs (erreurs).
     \item Les flux alternatifs (erreurs de saisie, CSV invalide, dépassement de budget) sont décrits dans la partie \textbf{Critères d’acceptation} des User Stories.
 \end{itemize}
 \end{conseil}
@@ -99,6 +100,59 @@ Chaque cas d’usage est ensuite décliné en \textbf{User Stories} et \textbf{t
     \item Les cas d’erreur sont gérés : échec de login, CSV invalide, dépassement d’enveloppe, accès non autorisé.
 \end{itemize}
 \end{jury}
+
+% ============================================================
+% DIAGRAMME DE CLASSES UML
+% ============================================================
+
+\section{Diagramme de classes UML}
+
+En complément des cas d’usage, un \textbf{diagramme de classes UML complet} a été réalisé pour App Budget V3.  
+Il décrit :
+
+\begin{itemize}
+    \item les \textbf{classes métier principales} (\texttt{User}, \texttt{Transaction}, \texttt{Category}, \texttt{BudgetEnvelope}, \texttt{Notification}, \texttt{ImportJob}) ;
+    \item les \textbf{attributs} et leurs \textbf{types} (email~: \texttt{string}, amount~: \texttt{decimal}, createdAt~: \texttt{DateTime}, etc.) ;
+    \item les \textbf{cardinalités} entre classes (\texttt{User} 1..* \texttt{Transaction}, \texttt{User} 1..* \texttt{BudgetEnvelope}, \texttt{BudgetEnvelope} *..* \texttt{Category}, etc.) ;
+    \item les \textbf{associations nommées} (ex : \og possède \fg{}, \og regroupe \fg{}, \og déclenche \fg{}) ;
+    \item l’alignement avec les \textbf{modèles Prisma} utilisés dans le code.
+\end{itemize}
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.95\textwidth]{assets/images/class-diagram-app-budget-v3.png}
+    \caption{Diagramme de classes UML -- App Budget V3 (attributs, types, cardinalités)}
+    \label{fig:class-diagram-app-budget-v3}
+\end{figure}
+
+\begin{tcolorbox}[colback=blue!5!white,colframe=blue!60!black,title=\textbf{Lien UML $\leftrightarrow$ Prisma}]
+\small
+Chaque classe UML est mappée à un modèle Prisma, par exemple :
+
+\begin{verbatim}
+class User {
+  + id: number
+  + email: string
+  + passwordHash: string
+  + role: UserRole
+  + currency: string
+  + locale: string
+}
+
+model User {
+  id           Int       @id @default(autoincrement())
+  email        String    @unique
+  passwordHash String
+  role         UserRole  @default(USER)
+  currency     String    @default("EUR")
+  locale       String    @default("fr-FR")
+  transactions Transaction[]
+  envelopes    BudgetEnvelope[]
+}
+\end{verbatim}
+
+Ce mapping explicite garantit la cohérence entre la \textbf{conception UML}, le \textbf{code Prisma} et la \textbf{base PostgreSQL}.
+\end{tcolorbox}
 
 % ============================================================
 % DIAGRAMMES DE SEQUENCE
@@ -168,28 +222,27 @@ En cas de mot de passe incorrect ou d’utilisateur inexistant, l’API renvoie 
     \item Catégorie inexistante ou non liée à l’utilisateur : retour \texttt{404 Not Found}.
 \end{itemize}
 
-\subsection{Séquence 3 : Import CSV (US-05)}
-
-Un diagramme de séquence spécifique décrit l’import CSV, incluant :
-
-\begin{itemize}
-    \item Upload du fichier,
-    \item Parsing ligne par ligne,
-    \item Validation et détection des doublons,
-    \item Insertion en batch dans PostgreSQL,
-    \item Génération d’un rapport d’import.
-\end{itemize}
+\subsection{Séquence 3 : Déclenchement d’une alerte de budget (US-07, v2.0)}
 
 \begin{figure}[H]
     \centering
-    \includegraphics[width=0.95\textwidth]{assets/images/seq-import-csv.png}
-    \caption{Diagramme de séquence -- Import CSV de transactions}
-    \label{fig:seq-import-csv}
+    \includegraphics[width=0.95\textwidth]{assets/images/seq-budget-alert.png}
+    \caption{Diagramme de séquence -- Déclenchement d’une alerte de budget}
+    \label{fig:seq-budget-alert}
 \end{figure}
+
+\textbf{Flux nominal :}
+\begin{enumerate}
+    \item Un \textbf{cron job} planifié déclenche périodiquement le \texttt{BudgetAlertsService}.
+    \item Le service interroge PostgreSQL (via Prisma) pour récupérer les enveloppes et les montants consommés.
+    \item Pour chaque enveloppe, le service calcule le pourcentage consommé.
+    \item Si un seuil (70\,\%, 90\,\%, 100\,\%) est franchi, une \texttt{Notification} est créée en base.
+    \item Un service d’envoi (email / push) en v2.0 envoie l’alerte à l’utilisateur.
+\end{enumerate}
 
 \begin{conseil}
 \begin{itemize}
-    \item J’ai modélisé en priorité les séquences pour : Auth (US-01), Transactions (US-03), Enveloppes (US-04), Import CSV (US-05) et Dashboard (US-07).
+    \item J’ai modélisé en priorité les séquences pour : Auth (US-01), Transactions (US-03), Enveloppes (US-04), Import CSV (US-05) et Alertes (US-07).
     \item Les séquences détaillent toujours le \textbf{flux nominal} et au moins un \textbf{flux d’erreur} (ex : CSV invalide, dépassement de plafond, erreur DB).
 \end{itemize}
 \end{conseil}
@@ -267,6 +320,18 @@ Les wireframes ont été réalisés dans \textbf{Figma} en basse fidélité (gri
     \caption{Wireframe basse fidélité -- Page Dashboard}
 \end{figure}
 
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.6\textwidth]{assets/images/wireframe-transactions.png}
+    \caption{Wireframe basse fidélité -- Page Transactions}
+\end{figure}
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.6\textwidth]{assets/images/wireframe-add-transaction.png}
+    \caption{Wireframe basse fidélité -- Formulaire d’ajout de transaction}
+\end{figure}
+
 \subsection{Maquettage (maquettes haute fidélité)}
 
 Les maquettes haute fidélité (toujours dans Figma) reprennent le zoning et les wireframes, avec :
@@ -296,7 +361,7 @@ Sans couleurs & Alignement charte & Composants UI figés & Tests utilisateurs pa
 Pour obtenir des diagrammes professionnels, j’ai utilisé :
 
 \begin{itemize}
-    \item \textbf{Draw.io (diagrams.net)} : diagrammes de cas d’usage, séquence, architecture (fichiers versionnés dans \texttt{/docs/diagrams}).
+    \item \textbf{Draw.io (diagrams.net)} : diagrammes de cas d’usage, séquence, classes, architecture (fichiers versionnés dans \texttt{/docs/diagrams}).
     \item \textbf{Figma} : wireframes et maquettes haute fidélité (projet “App Budget V3”).
     \item \textbf{PlantUML / Mermaid} : pour certains diagrammes texte dans la documentation technique.
 \end{itemize}
@@ -304,7 +369,7 @@ Pour obtenir des diagrammes professionnels, j’ai utilisé :
 \begin{conseil}
 \begin{itemize}
     \item Tous les diagrammes sont versionnés dans Git avec le code.
-    \item Les noms de fichiers sont standardisés : \texttt{uc-*.png}, \texttt{seq-*.png}, \texttt{arch-*.png}.
+    \item Les noms de fichiers sont standardisés : \texttt{uc-*.png}, \texttt{class-*.png}, \texttt{seq-*.png}, \texttt{arch-*.png}.
 \end{itemize}
 \end{conseil}
 
@@ -381,47 +446,12 @@ Les principales entités sont :
     \item \textbf{ImportJob} : journalisation des imports CSV.
 \end{itemize}
 
-\begin{verbatim}
-UTILISATEUR (id, email, mot_de_passe_hache, role, devise, langue)
-    1, N
-    |
-    | possède
-    |
-TRANSACTION (id, date, montant, type, libelle, categorie_id, utilisateur_id)
-
-CATEGORIE (id, nom, type, utilisateur_id|null)
-    1, N
-    |
-    | regroupe
-    |
-TRANSACTION (...)
-
-UTILISATEUR (id, ...)
-    1, N
-    |
-    | définit
-    |
-ENVELOPPE_BUDGETAIRE (id, nom, plafond_mensuel, utilisateur_id)
-    N, N
-    |
-    | concerne
-    |
-CATEGORIE (id, ...)
-
-UTILISATEUR (id, ...)
-    1, N
-    |
-    | reçoit
-    |
-NOTIFICATION (id, type, message, enveloppe_id, utilisateur_id)
-
-UTILISATEUR (id, ...)
-    1, N
-    |
-    | lance
-    |
-IMPORT_JOB (id, fichier_nom, nb_lignes_ok, nb_lignes_ko, utilisateur_id)
-\end{verbatim}
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.95\textwidth]{assets/images/mcd-app-budget-v3.png}
+    \caption{MCD -- App Budget V3 (Merise)}
+    \label{fig:mcd-app-budget-v3}
+\end{figure}
 
 \subsection{MLD (Modèle Logique de Données)}
 
@@ -550,6 +580,60 @@ App Budget V3 adopte une architecture 3 tiers classique, adaptée à une applica
     \item Le découpage modulaire NestJS facilite les tests unitaires et l’évolution (ajout de modules \texttt{NotificationsModule}, \texttt{AdminModule} en v2.0).
 \end{itemize}
 \end{conseil}
+
+% ============================================================
+% COHERENCE GLOBALE UML -> API -> SERVICES -> BASE -> UI
+% ============================================================
+
+\section{Cohérence globale UML, API, services, base et interface}
+
+Une exigence forte du jury CDA est la \textbf{cohérence} entre :
+
+\begin{itemize}
+    \item la \textbf{conception UML} (Use Cases, classes, séquences),
+    \item les \textbf{endpoints d’API} NestJS,
+    \item les \textbf{services métiers},
+    \item le \textbf{schéma de base de données} PostgreSQL,
+    \item et l’\textbf{interface utilisateur} Next.js.
+\end{itemize}
+
+Le tableau suivant résume cette traçabilité pour quelques fonctionnalités clés :
+
+\begin{center}
+\begin{tabular}{|p{2.5cm}|p{2.5cm}|p{3cm}|p{3cm}|p{3cm}|}
+\hline
+\textbf{Use Case} & \textbf{Classe UML} & \textbf{Endpoint API} & \textbf{Table / Modèle} & \textbf{Écran UI} \\
+\hline
+UC01 Auth & \texttt{User} & \texttt{POST /auth/login} & \texttt{users} (Prisma: \texttt{User}) & \texttt{/auth/login} \\
+\hline
+UC02 Transactions & \texttt{Transaction} & \texttt{POST /transactions} & \texttt{transactions} (Prisma: \texttt{Transaction}) & \texttt{/transactions} (formulaire + liste) \\
+\hline
+UC03 Enveloppes & \texttt{BudgetEnvelope} & \texttt{GET /budgets} & \texttt{budget\_envelopes} (Prisma: \texttt{BudgetEnvelope}) & \texttt{/envelopes} \\
+\hline
+UC04 Dashboard & \texttt{Transaction}, \texttt{BudgetEnvelope} & \texttt{GET /analytics/summary} & requêtes d’agrégation sur \texttt{transactions}, \texttt{budget\_envelopes} & \texttt{/dashboard} (KPIs + graphiques) \\
+\hline
+UC05 Import CSV & \texttt{ImportJob} & \texttt{POST /import/csv} & \texttt{import\_jobs}, \texttt{transactions} & \texttt{/import} (upload + rapport) \\
+\hline
+UC07 Alertes & \texttt{Notification} & \texttt{GET /notifications} & \texttt{notifications} (Prisma: \texttt{Notification}) & \texttt{/notifications} (v2.0) \\
+\hline
+\end{tabular}
+\end{center}
+
+\begin{tcolorbox}[colback=green!5!white,colframe=green!60!black,title=\textbf{Traçabilité complète pour UC02 -- Transactions}]
+\small
+\begin{itemize}
+    \item \textbf{Use Case} : UC02 -- Gérer ses transactions (ajouter / modifier / supprimer).
+    \item \textbf{User Story} : US-03 \og En tant qu’utilisateur, je peux créer des transactions afin de suivre mes dépenses et revenus \fg{}.
+    \item \textbf{Classe UML} : \texttt{Transaction} (diagramme de classes).
+    \item \textbf{Séquence UML} : \textit{Séquence 2 -- Création d’une transaction} (figure~\ref{fig:seq-create-transaction}).
+    \item \textbf{Endpoint API} : \texttt{POST /transactions}, \texttt{PATCH /transactions/:id}, \texttt{DELETE /transactions/:id}.
+    \item \textbf{Modèle Prisma} : \texttt{model Transaction \{ ... \}}.
+    \item \textbf{Tables} : \texttt{transactions}, \texttt{categories}, \texttt{users}.
+    \item \textbf{Écran UI} : page \texttt{/transactions}, formulaire \og Ajouter une transaction \fg{}.
+\end{itemize}
+
+Cette traçabilité montre que la \textbf{conception UML n’est pas théorique}, mais bien utilisée comme fondation pour l’API, la base de données et l’interface.
+\end{tcolorbox}
 
 % ============================================================
 % LIENS UTILES

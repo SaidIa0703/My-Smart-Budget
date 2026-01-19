@@ -1,182 +1,172 @@
-\chapter{Conception et modélisation du projet App Budget V3}
+\chapter{Conception, Modélisation et Gestion de Projet}
 
 \section{Introduction}
 
-Après la phase de planification et d’organisation présentée dans le chapitre précédent, la conception du projet \textbf{App Budget V3} a constitué une étape essentielle avant le développement.  
-Cette phase a permis de structurer le projet, d’identifier les entités principales, de clarifier les interactions entre les différents composants, et de garantir la cohérence technique globale du système.  
+Après la phase de cadrage et de définition des besoins, la conception du projet \textbf{App Budget V3} a constitué une étape charnière avant le lancement des développements. Cette phase a permis de structurer l'architecture logicielle, de modéliser les données et de définir les processus de collaboration.
 
-La conception n’est pas seulement un travail préparatoire : elle représente le fondement sur lequel repose l’ensemble du développement.  
-C’est à ce stade que sont définies les bases logiques, fonctionnelles et techniques de l’application, afin d’assurer une implémentation fluide, évolutive et maintenable.
+L'objectif n'était pas seulement de produire une documentation théorique, mais de bâtir les fondations d'une application \textbf{robuste, évolutive et maintenable}. Pour ce faire, j'ai combiné une approche de modélisation standardisée (UML) avec une méthodologie de gestion de projet Agile (Scrum/Kanban) rigoureuse.
 
-Pour ce faire, j’ai utilisé la méthode de modélisation \textbf{UML (Unified Modeling Language)}, permettant de représenter graphiquement les structures et comportements du système.  
-Les différents diagrammes UML m’ont aidé à mieux visualiser les interactions entre les utilisateurs, les modules fonctionnels et la base de données, tout en favorisant une communication claire et cohérente.
+\section{Conception technique et Modélisation UML}
 
-\section{Objectifs de la conception UML}
+\subsection{Objectifs de la modélisation}
 
-La modélisation UML avait plusieurs objectifs concrets dans le cadre du développement d’App Budget V3 :
-
+L'utilisation du langage UML (Unified Modeling Language) répond à quatre besoins précis :
 \begin{itemize}
-    \item \textbf{Structurer les données et les fonctionnalités} avant la mise en œuvre technique.
-    \item \textbf{Anticiper les interactions et dépendances} entre les composants du système.
-    \item \textbf{Garantir la cohérence entre le besoin utilisateur et la logique du code.}
-    \item \textbf{Faciliter la maintenance et les évolutions futures} de l’application.
+    \item \textbf{Structurer} les données et les flux avant l'implémentation.
+    \item \textbf{Anticiper} les dépendances complexes entre les modules.
+    \item \textbf{Aligner} le code sur les besoins métier (Domain Driven Design).
+    \item \textbf{Faciliter} la maintenance future grâce à une documentation visuelle.
 \end{itemize}
 
-\section{Présentation du diagramme UML global}
+\subsection{Diagramme de Cas d'Utilisation Global}
 
-Le diagramme UML global ci-dessous illustre les principales entités de l’application, leurs relations et leurs rôles dans la gestion budgétaire.  
-Il met en évidence les modules clés : gestion des utilisateurs, budgets, transactions et alertes intelligentes.
+Le diagramme ci-dessous synthétise les interactions entre l'utilisateur et le système. Il met en évidence les périmètres fonctionnels clés : gestion de compte, opérations financières et pilotage budgétaire.
 
 \begin{figure}[H]
     \centering
     \includegraphics[width=0.95\textwidth]{assets/images/cas-utilisation.png}
-    \caption{Diagramme UML global du projet App Budget V3}
+    \caption{Diagramme de Cas d'Utilisation global — App Budget V3}
+    \label{fig:uml_global}
 \end{figure}
 
-\section{Description détaillée du modèle conceptuel}
+\subsection{Modèle Conceptuel de Données (Détail des Entités)}
 
-\subsection*{1. Module utilisateur}
+La structure des données repose sur trois modules interconnectés :
 
-\begin{itemize}
-    \item \textbf{User :} email, mot de passe chiffré (bcrypt), rôle, date de création.
-    \item \textbf{Profile :} devise, langue, catégories favorites, seuils personnalisés.
-    \item \textbf{Session :} connexion sécurisée via tokens JWT, avec rafraîchissement automatique.
-\end{itemize}
+\begin{description}
+    \item[1. Module Utilisateur] \hfill \\
+    Gère l'identité et les préférences.
+    \begin{itemize}
+        \item \textbf{User :} Email unique, mot de passe haché (Bcrypt), date d'inscription.
+        \item \textbf{Profile :} Préférences (Devise, Langue), seuils d'alerte personnalisés.
+        \item \textbf{Session :} Token JWT (Access + Refresh), expiration, IP.
+    \end{itemize}
+    
+    \item[2. Module Gestion Financière] \hfill \\
+    Cœur du système transactionnel.
+    \begin{itemize}
+        \item \textbf{Transaction :} Montant, date, type (Débit/Crédit), commentaire.
+        \item \textbf{Category :} Tag de classification (ex: Alimentation, Loyer) avec icône et couleur.
+        \item \textbf{Budget :} Enveloppe limite définie sur une période et une catégorie.
+    \end{itemize}
 
-\subsection*{2. Module gestion financière}
+    \item[3. Module Suivi et Alertes] \hfill \\
+    Logique proactive.
+    \begin{itemize}
+        \item \textbf{Alert :} Notification générée automatiquement aux seuils (70\%, 90\%, 100\%).
+        \item \textbf{Report :} Agrégat de données pour exports PDF/CSV.
+    \end{itemize}
+\end{description}
 
-\begin{itemize}
-    \item \textbf{Transaction :} chaque opération financière (revenu/dépense) avec montant, date, catégorie, commentaire.
-    \item \textbf{Category :} regroupement de transactions similaires (alimentation, logement, etc.).
-    \item \textbf{Budget :} montant maximum fixé sur une période (mensuelle, hebdomadaire, personnalisée).
-\end{itemize}
+\section{Architecture Technique}
 
-\subsection*{3. Module suivi et alertes}
-
-\begin{itemize}
-    \item \textbf{Alert :} déclenchement automatique à 70\,\%, 90\,\% et 100\,\% d’un budget.
-    \item \textbf{Dashboard :} visualisation graphique des dépenses, historiques et soldes.
-    \item \textbf{Report :} génération et export de rapports PDF/CSV.
-\end{itemize}
-
-\section{Architecture technique de l’application}
-
-Le projet repose sur une architecture \textbf{MVC (Model-View-Controller)} garantissant la séparation entre données, logique métier et présentation.
-
-\begin{itemize}
-    \item \textbf{Front-end :} React.js + Tailwind CSS.
-    \item \textbf{Back-end :} Node.js + Express.js.
-    \item \textbf{Base de données :} MongoDB pour sa flexibilité.
-    \item \textbf{Sécurité :} authentification JWT, chiffrement bcrypt, gestion stricte des rôles.
-    \item \textbf{Déploiement :} Docker + hébergement cloud (Render/AWS).
-\end{itemize}
+Le projet implémente le pattern architectural \textbf{MVC (Modèle-Vue-Contrôleur)} adapté au web moderne (API RESTful), garantissant une séparation stricte des responsabilités.
 
 \begin{figure}[H]
     \centering
     \includegraphics[width=0.9\textwidth]{assets/images/diagramme-packages.png}
-    \caption{Architecture technique du projet App Budget V3}
+    \caption{Architecture technique : Stack MERN et déploiement Docker}
+    \label{fig:architecture_tech}
 \end{figure}
 
-\section{Lien entre conception et développement}
+\begin{tcolorbox}[colback=blue!5!white,colframe=blue!60!black,title=\textbf{Transition Conception \textrightarrow{} Développement}]
+La modélisation a servi de guide direct pour l'implémentation :
+\begin{itemize}
+    \item Les \textbf{Entités UML} sont devenues des \textbf{Schémas Mongoose}.
+    \item Les \textbf{Cas d'utilisation} ont défini les routes de l'\textbf{API REST}.
+    \item Les \textbf{Relations} (1..n) ont dicté les stratégies de \textbf{population MongoDB}.
+\end{itemize}
+\end{tcolorbox}
 
-La modélisation UML a directement orienté la structure technique :
+\section{Méthodologie Agile et Conduite de Projet}
+
+\subsection{Adaptation de Scrum pour un projet individuel}
+
+J'ai adopté une approche \textbf{Scrum itérative}, organisée en \textbf{Sprints de 2 semaines}. Cette méthode permet de livrer de la valeur régulièrement tout en ajustant les priorités en fonction des retours (auto-feedback ou tests utilisateurs).
+
+\subsection{Rituels Agiles appliqués}
+
+Bien que travaillant seul, je me suis astreint à des rituels stricts pour maintenir le rythme :
 
 \begin{itemize}
-    \item Les entités UML ont été traduites en modèles \textbf{Mongoose}.
-    \item Les relations ont guidé les schémas MongoDB.
-    \item Les cas d’utilisation ont défini les \textbf{endpoints REST API}.
-    \item Le dashboard du front-end repose sur ces endpoints.
+    \item \textbf{Daily Meeting (10 min)} : Chaque matin, revue des tâches de la veille et définition des objectifs du jour.
+    \item \textbf{Sprint Planning (1h / 14j)} : Sélection des User Stories du backlog et découpage en tâches techniques.
+    \item \textbf{Sprint Review (30 min / 14j)} : Test fonctionnel des livrables ("Is it working?").
+    \item \textbf{Sprint Retrospective (30 min / 14j)} : Analyse du processus ("How to work better?").
 \end{itemize}
 
-\section{Méthodologie agile et conduite de projet}
-
-\subsection{Choix de la méthode agile}
-
-J’ai retenu une méthode \textbf{Scrum adaptée} au projet individuel : itérative, incrémentale et centrée sur la valeur livrée.  
-Les piliers de la méthode (planification, transparence, amélioration continue) sont conservés, avec des sprints de 2 semaines.
-
-\subsection{Rituels agiles}
-
-Chaque rituel a une \textbf{fréquence, une durée et un livrable associé} :
-
+\begin{tcolorbox}[colback=yellow!5!white,colframe=yellow!60!black,title=\textbf{Exemple concret : Sprint du 14/02/2025}]
+\textbf{Lors de la Sprint Review :}
+J'ai présenté la fonctionnalité \textit{"Import CSV"}. Un bug critique a été détecté sur le mapping des catégories.
 \begin{itemize}
-    \item \textbf{Daily Meeting (10 min chaque matin)} : suivi d’avancement, identification des blocages et ajustement du plan de la journée.
-    \item \textbf{Sprint Planning (1h tous les 14 jours)} : définition du périmètre de sprint, priorisation des issues selon la méthode MoSCoW et création des tâches associées dans GitHub Projects.
-    \item \textbf{Sprint Review (30 min)} : démonstration des fonctionnalités terminées, validation des critères d’acceptation et mise à jour du backlog produit.
-    \item \textbf{Sprint Retrospective (30 min)} : identification des axes d’amélioration, mise à jour du backlog d’amélioration continue et synthèse documentée.
+    \item[$\rightarrow$] \textbf{Action :} Création immédiate de l'issue \#37 \textit{"Fix CSV Category Mapping"} priorisée dans le Sprint suivant.
 \end{itemize}
 
-Chaque rituel est documenté dans le dossier \texttt{/docs/sprints} sur GitHub afin d’assurer une traçabilité complète du processus de développement.
-
-\subsubsection{Exemple concret de rituels appliqués}
-
+\textbf{Lors de la Rétrospective :}
+J'ai noté une hétérogénéité dans la description de mes Pull Requests.
 \begin{itemize}
-    \item \textbf{Sprint Review du 14/02/2025 :} présentation de la fonctionnalité d’\textit{import CSV}.  
-    Lors de cette revue, un bug a été identifié sur la gestion automatique des catégories importées.  
-    \textit{Décision prise :} création de l’issue \#37 \og Correction mapping catégories lors d’un import CSV \fg{} et planification dans le sprint suivant.
-    \item \textbf{Sprint Retrospective du 14/02/2025 :} constat d’un manque d’homogénéité dans les Pull Requests.  
-    \textit{Décision prise :} ajout d’un template de PR obligatoire (\texttt{.github/pull\_request\_template.md}) et création de la checklist \og Tests exécutés / Lint OK / Description claire \fg{}.
+    \item[$\rightarrow$] \textbf{Action :} Mise en place d'un template PR obligatoire (\texttt{.github/pull\_request\_template.md}) incluant une checklist de qualité.
 \end{itemize}
+\end{tcolorbox}
 
-Ces rituels garantissent un \textbf{suivi continu de l’avancement}, une \textbf{communication claire} et une \textbf{amélioration constante} du processus.  
-Leur régularité (daily meetings quotidiens et sprints bihebdomadaires) permet de maintenir un rythme soutenu tout en conservant la flexibilité nécessaire pour ajuster les priorités au fil du projet.
+\subsection{Métriques de suivi et Qualité (KPI)}
 
-\subsection{Métriques de suivi et amélioration continue}
-
-Les métriques sont automatisées dans GitHub Actions et suivies dans un fichier \texttt{metrics.md}.  
-Elles permettent de mesurer la progression, la stabilité et la qualité du code sur chaque sprint.
+Le suivi du projet est piloté par la donnée via le fichier \texttt{metrics.md}, mis à jour à chaque fin de sprint.
 
 \begin{center}
-\begin{tabular}{|l|p{6cm}|c|}
+\small
+\begin{tabular}{|l|p{5cm}|c|}
 \hline
 \textbf{Indicateur} & \textbf{Objectif} & \textbf{Fréquence} \\
 \hline
-Vélocité & $\geq 8$ issues clôturées / sprint & Bihebdo \\
-Taux de réussite CI/CD & 100\,\% sur \texttt{main} & Hebdo \\
-Taux d’erreurs post-merge & $< 5\,\%$ & Revue de sprint \\
-Temps de livraison moyen & $< 3$ jours / fonctionnalité & Hebdo \\
-Couverture de tests & 78\,\% sur Jest & Revue de sprint \\
+Vélocité & $\geq 8$ issues / sprint & Bi-hebdo \\
+\hline
+Qualité CI/CD & 100\% de succès sur \texttt{main} & Hebdo \\
+\hline
+Stabilité & $< 5\%$ de bugs post-merge & Sprint Review \\
+\hline
+Lead Time & $< 3$ jours / fonctionnalité & Hebdo \\
+\hline
+Code Coverage & $> 70\%$ (Backend Jest) & Sprint Review \\
 \hline
 \end{tabular}
 \end{center}
 
-\begin{tcolorbox}[colback=green!5!white,colframe=green!60!black,title=\textbf{Extrait réel du fichier \texttt{metrics.md}}]
-\small
+\begin{tcolorbox}[colback=green!5!white,colframe=green!60!black,title=\textbf{Extrait réel du rapport de Sprint 3}]
 \begin{verbatim}
-## Sprint 3 (du 01/02/2025 au 14/02/2025)
-
-- Velocity: 9 issues fermées (objectif ≥ 8) ✅
-- Average Lead Time: 2,4 jours / issue (objectif < 3) ✅
-- CI Success Rate (branche main): 100% (12/12 builds) ✅
-- Bugs post-merge: 1 bug mineur (issue #41) corrigé dans le sprint suivant
-- Test Coverage (backend Jest): 78% lignes, 71% branches
+## Sprint 3 (01/02/2025 - 14/02/2025)
+- Velocity: 9 issues fermées (Cible: 8) [OK]
+- Lead Time: 2.4 jours/issue [OK]
+- CI Success (main): 12/12 builds [OK]
+- Bugs Prod: 1 mineur (#41) corrigé en S4
+- Coverage Jest: 78% Lines / 71% Branches
 \end{verbatim}
 \end{tcolorbox}
 
 \begin{figure}[H]
     \centering
     \includegraphics[width=0.85\textwidth]{assets/images/github-velocity.png}
-    \caption{Graphique de vélocité GitHub Projects (issues clôturées par sprint)}
+    \caption{Graphique de vélocité GitHub Projects (Issues clôturées par Sprint)}
+    \label{fig:velocity}
 \end{figure}
 
-Ces métriques sont automatiquement mises à jour via GitHub Actions et les rapports de projet.  
-Elles couvrent les indicateurs clés exigés dans une démarche agile : la \textbf{vélocité} (issues fermées par sprint), le \textbf{temps moyen de livraison}, et le \textbf{taux d’erreurs corrigées}.  
-Elles garantissent une vision quantitative, transparente et continue de la qualité du développement, permettant d’ajuster le pilotage et les priorités de sprint en fonction des résultats mesurés.
+\subsection{Roadmap et Milestones}
 
-\subsection{Roadmap GitHub et milestones}
-
-La roadmap du projet App Budget V3 est organisée en quatre jalons principaux, correspondant à des livrables mesurables et datés.  
-Chaque jalon (milestone) est suivi et validé sur GitHub, avec des règles d’entrée (\textit{Definition of Ready}) et de sortie (\textit{Definition of Done}) clairement établies.
+Le projet est jalonné par 4 étapes majeures (Milestones GitHub), avec des critères d'entrée (DoR) et de sortie (DoD) stricts.
 
 \begin{center}
-\begin{tabular}{|l|c|p{7cm}|}
+\small
+\begin{tabular}{|l|c|p{6cm}|}
 \hline
-\textbf{Jalon / Version} & \textbf{Date cible} & \textbf{Objectifs principaux} \\
+\textbf{Jalon} & \textbf{Date Cible} & \textbf{Livrable Principal} \\
 \hline
-\textbf{POC (Proof of Concept)} & 05/10/2025 & Mise en place du backend Node.js, connexion MongoDB, première route API testée. \\
-\textbf{MVP (v1.0)} & 15/10/2025 & Authentification JWT, gestion des utilisateurs, CRUD Transactions, dashboard basique. \\
-\textbf{Bêta (v1.1)} & 30/10/2025 & Import CSV, alertes budgétaires, tests unitaires automatisés, CI/CD GitHub Actions. \\
-\textbf{Version finale (v2.0)} & 15/11/2025 & Agrégation bancaire, export PDF/CSV, optimisation des performances, documentation finale. \\
+\textbf{POC} & 05/10/2025 & Backend Node.js + Connexion DB. Première route API. \\
+\hline
+\textbf{MVP (v1.0)} & 15/10/2025 & Auth JWT, CRUD complet, Dashboard v1. \\
+\hline
+\textbf{Bêta (v1.1)} & 30/10/2025 & Import CSV, Alertes, CI/CD complet. \\
+\hline
+\textbf{Finale (v2.0)} & 15/11/2025 & Export PDF, Optimisations Perf, Documentation finale. \\
 \hline
 \end{tabular}
 \end{center}
@@ -184,166 +174,91 @@ Chaque jalon (milestone) est suivi et validé sur GitHub, avec des règles d’e
 \begin{figure}[H]
     \centering
     \includegraphics[width=0.85\textwidth]{assets/images/github-milestones.png}
-    \caption{Vue des milestones GitHub pour App Budget V3}
+    \caption{Suivi des Milestones sur GitHub}
+    \label{fig:milestones}
 \end{figure}
 
-\textbf{Règles d’entrée (Definition of Ready)} :
+\subsection{Planification et Burndown Chart}
+
+Les estimations reposent sur une complexité relative (Story Points), où \textbf{1 SP $\approx$ 1 jour homme}.
 \begin{itemize}
-    \item Les issues sont clairement décrites avec critères d’acceptation.
-    \item Les dépendances techniques sont identifiées et planifiées.
-    \item Le design fonctionnel ou l’UML correspondant est validé.
+    \item \textbf{Total Projet :} 21 Story Points (estimé).
+    \item \textbf{Vélocité moyenne :} 7 SP / sprint.
 \end{itemize}
-
-\textbf{Règles de sortie (Definition of Done)} :
-\begin{itemize}
-    \item Les fonctionnalités développées sont testées (unitaires + intégration).
-    \item Le code est revu et validé via Pull Request.
-    \item Les livrables sont documentés (README, changelog, métriques).
-    \item Le déploiement Docker est fonctionnel et vérifié.
-\end{itemize}
-
-Chaque milestone correspond ainsi à un \textbf{état livrable validé}, garantissant une progression maîtrisée entre les étapes du projet (POC $\rightarrow$ MVP $\rightarrow$ Bêta $\rightarrow$ Version finale).  
-Cette structuration permet une \textbf{traçabilité complète des versions} et facilite la démonstration d’avancement pour l’évaluation CDA.
-
-\subsection{Estimation du temps et burndown chart}
-
-Les estimations globales du projet ont d’abord été définies indépendamment des issues afin de dégager une vue d’ensemble du temps nécessaire par module.  
-Elles reposent sur une vélocité moyenne de 7 issues clôturées par sprint, avec 1 Story Point $\approx 1$ jour de travail.  
-
-\begin{center}
-\begin{tabular}{|l|c|c|}
-\hline
-\textbf{Feature} & \textbf{Durée estimée} & \textbf{Story Points} \\
-\hline
-Auth JWT & 3 j & 3 \\
-Transactions CRUD & 4 j & 4 \\
-Budgets & 4 j & 4 \\
-Dashboard & 5 j & 5 \\
-Import CSV & 3 j & 3 \\
-Tests / Documentation & 2 j & 2 \\
-\hline
-\textbf{Total} & \textbf{21 jours} & \textbf{21 SP} \\
-\hline
-\end{tabular}
-\end{center}
-
-Chaque issue du backlog GitHub est associée à un label de complexité :  
-\texttt{SP:1}, \texttt{SP:2}, \texttt{SP:3}, etc., permettant de suivre la charge globale sur le board.  
-Ces estimations sont affichées directement dans le projet GitHub via le module \textbf{Projects v2} et la vue \og Burndown Chart \fg{}.
 
 \begin{figure}[H]
     \centering
     \includegraphics[width=0.85\textwidth]{assets/images/burndown-sprint3.png}
-    \caption{Burndown chart réel du sprint 3 (story points restants par jour)}
+    \caption{Burndown Chart du Sprint 3 : Visualisation du travail restant jour par jour.}
+    \label{fig:burndown}
 \end{figure}
 
-Le burndown permet de visualiser la progression : la courbe descendante illustre les story points restants, garantissant une planification réaliste et une priorisation continue des tâches.
+\section{Traçabilité totale : De l'idée au code}
 
-\section{Traçabilité GitHub : User Stories, issues, branches, PR et CI/CD}
+J'ai mis en place une chaîne de traçabilité complète pour lier le besoin métier (User Story) à la réalisation technique.
 
-\subsection{Exemple de User Story complète reliée à GitHub}
+\subsection{Le flux de traçabilité (Workflow)}
 
-L’exemple ci-dessous illustre la \textbf{chaîne de traçabilité complète} pour la création de transactions :
-
-\begin{itemize}
-    \item \textbf{User Story :} US-03 \og En tant qu’utilisateur, je peux créer des transactions afin de suivre mes dépenses et revenus \fg{}.
-    \item \textbf{Issue GitHub associée :} \#12 \og [US-03] CRUD Transactions avec catégorisation \fg{}.
-    \item \textbf{Branche de développement :} \texttt{feature/us-03-transactions-crud}.
-    \item \textbf{Pull Request :} \#34 \og Implémentation CRUD Transactions + tests \fg{}.
-    \item \textbf{Tests associés :} \texttt{transaction.spec.js} (backend) et \texttt{TransactionsPage.test.jsx} (frontend).
-    \item \textbf{Pipeline CI :} workflow \texttt{ci-tests.yml} exécuté automatiquement à l’ouverture de la PR.
-\end{itemize}
+\begin{enumerate}
+    \item \textbf{User Story :} Définition du besoin (ex: US-03 "Créer transaction").
+    \item \textbf{Issue GitHub :} Création du ticket technique (\#12).
+    \item \textbf{Branche :} Création d'une branche dédiée (\texttt{feature/us-03...}).
+    \item \textbf{Pull Request :} Demande de fusion vers \texttt{main} (\#34).
+    \item \textbf{CI/CD :} Exécution automatique des tests (\texttt{ci-tests.yml}).
+\end{enumerate}
 
 \begin{center}
-\begin{tabular}{|p{3cm}|p{3cm}|p{3cm}|p{3cm}|p{3cm}|}
+\small
+\begin{tabular}{|p{2.5cm}|p{2cm}|p{4cm}|p{4cm}|}
 \hline
-\textbf{User Story} & \textbf{Issue GitHub} & \textbf{Branche} & \textbf{Pull Request} & \textbf{Tests / CI} \\
+\textbf{User Story} & \textbf{Issue} & \textbf{Branche \& PR} & \textbf{Tests \& CI} \\
 \hline
-US-01 Auth & \#7 & \texttt{feature/us-01-auth} & PR \#21 & \texttt{auth.spec.js}, CI \texttt{run-tests.yml} \\
+US-01 Auth & \#7 & \texttt{feat/auth} $\rightarrow$ PR\#21 & \texttt{auth.spec.js} \\
 \hline
-US-03 Transactions & \#12 & \texttt{feature/us-03-transactions-crud} & PR \#34 & \texttt{transaction.spec.js}, \texttt{ci-tests.yml} \\
+US-03 Transac. & \#12 & \texttt{feat/crud} $\rightarrow$ PR\#34 & \texttt{transaction.spec.js} \\
 \hline
-US-05 Dashboard & \#19 & \texttt{feature/us-05-dashboard} & PR \#48 & \texttt{dashboard.test.jsx}, \texttt{build-and-test.yml} \\
-\hline
-US-06 Import CSV & \#24 & \texttt{feature/us-06-import-csv} & PR \#55 & \texttt{import.spec.js}, \texttt{integration.yml} \\
+US-06 CSV & \#24 & \texttt{feat/csv} $\rightarrow$ PR\#55 & \texttt{import.spec.js} \\
 \hline
 \end{tabular}
 \end{center}
 
-\subsection{Preuves visuelles GitHub}
+\subsection{Preuves visuelles de l'organisation GitHub}
 
 \begin{figure}[H]
     \centering
     \includegraphics[width=0.9\textwidth]{assets/images/github-kanban-board.png}
-    \caption{Tableau Kanban GitHub Projects : colonnes Backlog, To Do, In Progress, In Review, Done}
+    \caption{Tableau Kanban : Vue globale de l'avancement}
+    \label{fig:kanban}
 \end{figure}
 
 \begin{figure}[H]
     \centering
     \includegraphics[width=0.9\textwidth]{assets/images/github-issue-estimation.png}
-    \caption{Issue GitHub avec estimation (label \texttt{SP:3}) et lien vers la User Story}
+    \caption{Issue détaillée avec estimation (SP) et critères d'acceptation}
+    \label{fig:issue}
 \end{figure}
 
 \begin{figure}[H]
     \centering
     \includegraphics[width=0.9\textwidth]{assets/images/github-pr.png}
-    \caption{Exemple de Pull Request (\#34) : description, checklist, revue de code et statut des checks CI}
+    \caption{Pull Request validée avec Checklist et Revue de code}
+    \label{fig:pr}
 \end{figure}
 
 \begin{figure}[H]
     \centering
     \includegraphics[width=0.9\textwidth]{assets/images/github-actions-success.png}
-    \caption{Action GitHub Actions réussie (\texttt{ci-tests.yml}) sur la branche \texttt{main}}
+    \caption{Pipeline CI/CD : Tests passés avec succès avant merge}
+    \label{fig:ci_cd}
 \end{figure}
 
-Ces captures d’écran démontrent que la méthodologie agile, les estimations, les liens User Stories $\rightarrow$ issues $\rightarrow$ branches $\rightarrow$ PR $\rightarrow$ tests, ainsi que les pipelines CI/CD, ne sont pas uniquement théoriques mais réellement appliqués dans le projet.
+\section{Conclusion du chapitre}
 
-\section{Tableau Kanban GitHub (exemple synthétique)}
-
-En complément des captures GitHub, le tableau ci-dessous présente un exemple de répartition des tâches sur le Kanban :
-
-\begin{center}
-\begin{tabular}{|p{4cm}|p{4cm}|p{4cm}|}
-\hline
-\textbf{To Do} & \textbf{In Progress} & \textbf{Done} \\
-\hline
-Auth JWT (\#1) & CRUD Transactions (\#5) & Init repo \\
-Budgets (\#6) & Dashboard (\#9) & Docs README \\
-Import CSV (\#12) & Tests unitaires (\#14) & Docker config \\
-UI Dashboard & CI/CD GitHub Actions & Maquette Figma \\
-\hline
-\end{tabular}
-\end{center}
-
-\section{Traces de projet et documentation associée}
-
-Afin d’apporter des preuves concrètes de la gestion de projet, plusieurs fichiers de suivi sont versionnés dans le dépôt :
-
+Cette phase de conception et d'organisation a permis de :
 \begin{itemize}
-    \item \texttt{/docs/sprints/sprint-1.md} : synthèse du sprint~1 (objectifs, tâches réalisées, blocages, décisions).
-    \item \texttt{/docs/sprints/sprint-3.md} : détail de la Review et de la Rétrospective du 14/02/2025.
-    \item \texttt{/docs/metrics.md} : historique des métriques par sprint (vélocité, temps moyen de livraison, bugs, couverture de tests).
-    \item \texttt{/docs/ci/results-main.txt} : export des résultats de build et tests sur la branche \texttt{main}.
+    \item \textbf{Sécuriser le développement} grâce à une architecture validée (UML/MVC).
+    \item \textbf{Garantir la qualité} par l'application rigoureuse des processus Agiles.
+    \item \textbf{Prouver le professionnalisme} via une traçabilité complète sur GitHub.
 \end{itemize}
 
-Ces fichiers constituent des \textbf{artefacts de preuve} montrant que la démarche agile et le suivi de la qualité sont bien appliqués dans la durée.
-
-\section{Bénéfices de la conception UML et de la gestion agile}
-
-\begin{itemize}
-    \item \textbf{Cohérence :} conception UML alignée sur les objectifs métier et techniques.
-    \item \textbf{Agilité :} pilotage structuré, rituels réguliers, métriques suivies.
-    \item \textbf{Traçabilité :} lien complet entre stories, issues, PR, tests et pipelines CI/CD.
-    \item \textbf{Professionnalisme :} roadmap claire, artefacts GitHub réels, qualité mesurée.
-\end{itemize}
-
-\section{Liens utiles}
-
-\begin{itemize}
-    \item UML Basics : \url{https://www.uml-diagrams.org/}
-    \item MVC Pattern : \url{https://developer.mozilla.org/en-US/docs/Glossary/MVC}
-    \item Node.js + Express : \url{https://expressjs.com/}
-    \item MongoDB + Mongoose : \url{https://mongoosejs.com/}
-    \item Docker : \url{https://docs.docker.com/}
-    \item GitHub Projects : \url{https://docs.github.com/en/issues/planning-and-tracking-with-projects}
-\end{itemize}
+Les fondations étant posées, le chapitre suivant détaillera la réalisation technique et le développement de l'application.

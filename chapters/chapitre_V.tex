@@ -1,1074 +1,279 @@
-\chapter{Architecture 3 tiers - My Smart Budget}
+\chapter{Réalisation technique et Implémentation}
 
-\section{Architecture 3 tiers de My Smart Budget}
+\section{Mise en œuvre de l'architecture 3-tiers}
 
-Dans cette section, je présente l'architecture 3 tiers de My Smart Budget, une application de gestion de budget personnel permettant aux utilisateurs de suivre leurs dépenses, gérer leurs budgets et analyser leurs habitudes financières.
+Ce chapitre détaille la phase de réalisation de l'application \textbf{My Smart Budget}. Il présente la traduction des choix architecturaux (vus au chapitre précédent) en code fonctionnel, en respectant la séparation stricte des trois couches : Présentation (React), Métier (Node.js/Express) et Données (PostgreSQL/MongoDB).
 
-\textbf{Architecture de My Smart Budget :} L'application suit une architecture 3 tiers stricte séparant la présentation (React), la logique métier (Node.js/Express) et les données (PostgreSQL/MongoDB).
+\subsection{Vue d'ensemble de la stack}
 
-\subsection{Couche Présentation - Interface de Gestion Budgétaire}
+L'implémentation repose sur une stack moderne et robuste, choisie pour sa flexibilité et sa performance :
 
-La couche présentation de My Smart Budget offre une interface intuitive pour la gestion des finances personnelles avec des tableaux de bord interactifs et des visualisations de données.
-
-\textbf{Stack Frontend My Smart Budget :}
-
-\begin{exemple}
-\textbf{Technologies de présentation :}
 \begin{itemize}
-    \item \textbf{Framework :} React 18 avec TypeScript pour la sécurité des types
-    \item \textbf{État :} Redux Toolkit pour gérer l'état des budgets et transactions
-    \item \textbf{Routing :} React Router v6 pour la navigation entre modules
-    \item \textbf{UI :} Material-UI + Chart.js pour les graphiques financiers
-    \item \textbf{HTTP :} Axios avec intercepteurs pour l'authentification JWT
-    \item \textbf{Validation :} Yup pour valider les montants et formulaires
+    \item \textbf{Tier 1 (Client) :} React 18 + TypeScript + Redux Toolkit.
+    \item \textbf{Tier 2 (Serveur) :} Node.js + Express.js (API REST).
+    \item \textbf{Tier 3 (Données) :} PostgreSQL (Transactionnel) + MongoDB (Logs/Analytics).
 \end{itemize}
 
-\textbf{Structure des composants My Smart Budget :}
+\begin{figure}[H]
+    \centering
+    % Placeholder pour ton schéma d'architecture
+    \includegraphics[width=0.9\textwidth]{assets/images/architecture_3_tiers.png}
+    \caption{Flux de données implémenté dans l'architecture 3-tiers}
+    \label{fig:arch_impl}
+\end{figure}
+
+\section{Couche Présentation (Frontend)}
+
+L'interface utilisateur a été développée avec une approche par composants, garantissant la réutilisabilité et la maintenabilité du code.
+
+\subsection{Structure et Composants}
+
+L'arborescence du projet Frontend reflète le découpage fonctionnel de l'application :
+
+\begin{exemple}
+\textbf{Organisation du code source (src/) :}
 \begin{verbatim}
 src/
 +-- components/
-|   +-- common/
-|   |   +-- AmountInput.tsx        # Saisie de montants
-|   |   +-- DateRangePicker.tsx    # Sélection de périodes
-|   |   +-- CurrencyDisplay.tsx    # Affichage formaté
-|   +-- dashboard/
-|   |   +-- BudgetOverview.tsx     # Vue d'ensemble des budgets
-|   |   +-- ExpenseChart.tsx       # Graphiques de dépenses
-|   |   +-- AlertsPanel.tsx        # Alertes de dépassement
-|   +-- transactions/
-|   |   +-- TransactionList.tsx    # Liste des transactions
-|   |   +-- TransactionForm.tsx    # Ajout/édition
-|   |   +-- CategorySelector.tsx   # Sélection catégories
-|   +-- budgets/
-|   |   +-- BudgetCard.tsx         # Carte de budget
-|   |   +-- BudgetProgress.tsx     # Barre de progression
-|   |   +-- BudgetCreator.tsx      # Création de budget
-|   +-- reports/
-|       +-- MonthlyReport.tsx      # Rapport mensuel
-|       +-- CategoryAnalysis.tsx   # Analyse par catégorie
-|       +-- TrendsChart.tsx        # Tendances de dépenses
-+-- hooks/
-|   +-- useTransactions.ts         # Hook pour transactions
-|   +-- useBudgetAlerts.ts        # Hook pour alertes
-|   +-- useCurrency.ts            # Hook pour conversion
-+-- services/
-|   +-- budgetService.ts          # API des budgets
-|   +-- transactionService.ts     # API des transactions
-|   +-- analyticsService.ts       # API des analyses
+|   +-- common/            # Composants UI génériques (Input, Button...)
+|   +-- dashboard/         # Widgets (Charts, KPIs)
+|   +-- transactions/      # Listes et Formulaires CRUD
+|   +-- budgets/           # Gestion des enveloppes
++-- hooks/                 # Logique réutilisable (Custom Hooks)
+|   +-- useTransactions.ts
+|   +-- useBudgetAlerts.ts
++-- store/                 # Gestion d'état global (Redux)
++-- services/              # Appels API (Axios)
 \end{verbatim}
 \end{exemple}
 
-\subsection{Couche Logique Métier - Gestion Financière}
+\subsection{Implémentation des formulaires complexes}
 
-La couche métier de My Smart Budget implémente toute la logique de calcul budgétaire, de catégorisation automatique et d'analyse des dépenses.
+La gestion des transactions nécessite une validation rigoureuse côté client pour garantir l'intégrité des données avant l'envoi au serveur.
 
-\textbf{Architecture Backend My Smart Budget :}
+\begin{lstlisting}[language=JavaScript, caption={Composant TransactionForm avec validation et UX}]
+const TransactionForm = ({ onSubmit, categories, budget }) => {
+  const [formData, setFormData] = useState({
+    amount: '',
+    category: '',
+    date: new Date()
+  });
+  
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    
+    // 1. Validation locale
+    if (parseFloat(formData.amount) <= 0) {
+      setError('Le montant doit être positif');
+      return;
+    }
+    
+    // 2. Vérification proactive du budget (UX)
+    if (budget && parseFloat(formData.amount) > budget.remaining) {
+      const confirm = await showConfirmDialog(
+        'Attention : Dépassement de budget',
+        `Cette dépense va excéder votre plafond de ${
+          parseFloat(formData.amount) - budget.remaining
+        }€. Continuer ?`
+      );
+      if (!confirm) return;
+    }
+    
+    // 3. Soumission
+    await onSubmit(formData);
+  };
 
-\subsubsection{Controllers - Gestion des Requêtes Financières}
+  return (
+    <form onSubmit={handleSubmit} aria-label="Ajouter une transaction">
+      {/* Champs de formulaire Material-UI avec validation */}
+      <TextField
+        label="Montant"
+        type="number"
+        value={formData.amount}
+        onChange={handleChange}
+        InputProps={{ startAdornment: <InputAdornment position="start">€</InputAdornment> }}
+      />
+      {/* ... Selecteur de catégorie ... */}
+      <Button type="submit" variant="contained">Enregistrer</Button>
+    </form>
+  );
+};
+\end{lstlisting}
 
-\textbf{Contrôleurs de My Smart Budget :}
+\begin{conseil}
+\textbf{Bonnes pratiques Frontend appliquées :}
+\begin{itemize}
+    \item Utilisation de \textbf{React Hook Form} pour la gestion performante des formulaires.
+    \item Typage strict avec \textbf{TypeScript} (Interfaces pour Props et State).
+    \item Séparation de la logique (Hooks) et de la vue (Components).
+\end{itemize}
+\end{conseil}
+
+\section{Couche Logique Métier (Backend)}
+
+Le serveur API, développé avec Express.js, centralise la logique métier. Il agit comme chef d'orchestre entre le client et les bases de données.
+
+\subsection{Contrôleurs (Controllers)}
+
+Les contrôleurs gèrent les requêtes HTTP, valident les entrées et délèguent le traitement aux services.
 
 \begin{exemple}
-\textbf{TransactionController - Gestion des transactions :}
+\textbf{TransactionController.js — Traitement d'une création :}
 \begin{lstlisting}[language=JavaScript]
-// TransactionController.js
 class TransactionController {
   async createTransaction(req, res) {
     try {
-      const { amount, category, description, date, type } = req.body;
+      const { amount, category, date, type } = req.body;
+      const userId = req.user.id; // Extrait du JWT
       
-      // Validation du montant et du type
-      if (amount <= 0) {
-        return res.status(400).json({ 
-          error: 'Le montant doit être positif' 
-        });
-      }
-      
-      // Création de la transaction
+      // 1. Appel au Service Métier
       const transaction = await this.transactionService.create({
-        userId: req.user.id,
-        amount,
-        category,
-        description,
-        date: date || new Date(),
-        type // 'income' ou 'expense'
+        userId, amount, category, date, type
       });
       
-      // Vérification du budget associé
-      await this.budgetService.checkBudgetAlert(
-        req.user.id, 
-        category, 
-        new Date()
-      );
+      // 2. Déclenchement asynchrone des vérifications
+      // On n'attend pas la fin pour répondre au client (Performance)
+      this.budgetService.checkBudgetAlert(userId, category, new Date())
+        .catch(err => console.error('Alert Error:', err));
       
       res.status(201).json(transaction);
     } catch (error) {
       res.status(400).json({ error: error.message });
     }
   }
-  
-  async getMonthlyTransactions(req, res) {
-    const { month, year } = req.params;
-    const transactions = await this.transactionService
-      .getByMonth(req.user.id, month, year);
-    
-    const summary = await this.analyticsService
-      .calculateMonthlySummary(transactions);
-    
-    res.json({ transactions, summary });
-  }
 }
 \end{lstlisting}
 \end{exemple}
 
-\subsubsection{Services - Logique Métier Financière}
+\subsection{Services Métier}
 
-\textbf{Services de My Smart Budget :}
+C'est ici que réside l'intelligence de l'application (calculs, règles de gestion).
 
 \begin{exemple}
-\textbf{BudgetService - Gestion des budgets :}
+\textbf{BudgetService.js — Logique d'alerte :}
 \begin{lstlisting}[language=JavaScript]
-// BudgetService.js
 class BudgetService {
-  async createBudget(userId, budgetData) {
-    // Validation des règles métier
-    if (budgetData.amount <= 0) {
-      throw new Error('Le montant du budget doit être positif');
-    }
-    
-    // Vérification qu'un budget n'existe pas déjà
-    const existingBudget = await this.budgetRepository
-      .findByUserAndCategory(userId, budgetData.category, budgetData.period);
-    
-    if (existingBudget) {
-      throw new Error('Un budget existe déjà pour cette catégorie');
-    }
-    
-    // Création du budget avec calculs initiaux
-    const budget = await this.budgetRepository.create({
-      ...budgetData,
-      userId,
-      spent: 0,
-      remaining: budgetData.amount,
-      alertThreshold: budgetData.alertThreshold || 80 // 80% par défaut
-    });
-    
-    // Configuration des alertes automatiques
-    await this.notificationService.setupBudgetAlerts(budget);
-    
-    return budget;
-  }
-  
-  async checkBudgetAlert(userId, category, date) {
-    const budget = await this.budgetRepository
-      .findActiveByCategory(userId, category, date);
-    
+  async checkBudgetAlert(userId, categoryId, date) {
+    // Récupération du budget actif
+    const budget = await this.budgetRepo.findActive(userId, categoryId, date);
     if (!budget) return;
     
-    // Calcul du montant dépensé
-    const spent = await this.transactionRepository
-      .sumByCategory(userId, category, budget.startDate, budget.endDate);
+    // Calcul de la consommation en temps réel
+    const spent = await this.transactionRepo.sumByCategory(
+      userId, categoryId, budget.startDate, budget.endDate
+    );
     
-    const percentageUsed = (spent / budget.amount) * 100;
+    const percentage = (spent / budget.amount) * 100;
     
-    // Envoi d'alerte si dépassement du seuil
-    if (percentageUsed >= budget.alertThreshold) {
-      await this.notificationService.sendBudgetAlert({
+    // Règle métier : Alerte si seuil dépassé
+    if (percentage >= budget.alertThreshold) {
+      await this.notificationService.send({
         userId,
-        budget,
-        percentageUsed,
-        remaining: budget.amount - spent
+        type: 'BUDGET_WARNING',
+        message: `Attention, vous avez consommé ${percentage.toFixed(1)}% de votre budget ${budget.name}.`
       });
     }
-    
-    // Mise à jour du budget
-    await this.budgetRepository.updateSpent(budget.id, spent);
   }
 }
 \end{lstlisting}
 \end{exemple}
 
-\begin{exemple}
-\textbf{AnalyticsService - Analyses financières :}
-\begin{lstlisting}[language=JavaScript]
-// AnalyticsService.js
-class AnalyticsService {
-  async generateMonthlyReport(userId, month, year) {
-    // Récupération des données
-    const transactions = await this.transactionRepository
-      .getByMonth(userId, month, year);
-    
-    const budgets = await this.budgetRepository
-      .getByMonth(userId, month, year);
-    
-    // Calculs des métriques
-    const metrics = {
-      totalIncome: this.calculateTotalByType(transactions, 'income'),
-      totalExpenses: this.calculateTotalByType(transactions, 'expense'),
-      savingsRate: 0,
-      categoryBreakdown: this.groupByCategory(transactions),
-      budgetAdherence: this.calculateBudgetAdherence(budgets, transactions),
-      trends: await this.calculateTrends(userId, month, year)
-    };
-    
-    metrics.savingsRate = ((metrics.totalIncome - metrics.totalExpenses) 
-      / metrics.totalIncome) * 100;
-    
-    // Génération des insights
-    const insights = await this.generateInsights(metrics, transactions);
-    
-    return {
-      period: { month, year },
-      metrics,
-      insights,
-      recommendations: this.generateRecommendations(metrics)
-    };
-  }
-  
-  generateRecommendations(metrics) {
-    const recommendations = [];
-    
-    if (metrics.savingsRate < 20) {
-      recommendations.push({
-        type: 'savings',
-        priority: 'high',
-        message: 'Votre taux d\'épargne est inférieur à 20%',
-        suggestion: 'Essayez de réduire vos dépenses non essentielles'
-      });
-    }
-    
-    // Analyse des catégories dépassant le budget
-    metrics.categoryBreakdown.forEach(category => {
-      if (category.percentageOfBudget > 100) {
-        recommendations.push({
-          type: 'overspending',
-          category: category.name,
-          priority: 'medium',
-          message: `Dépassement de budget dans ${category.name}`,
-          suggestion: `Réduisez de ${category.overspent}€ ce mois-ci`
-        });
-      }
-    });
-    
-    return recommendations;
-  }
-}
-\end{lstlisting}
-\end{exemple}
+\section{Couche Données (Data Layer)}
 
-\subsubsection{Repositories - Accès aux Données Financières}
+L'application utilise une stratégie de persistance hybride (Polyglot Persistence) pour optimiser les performances et la traçabilité.
 
-\textbf{Repositories de My Smart Budget :}
+\subsection{Modélisation Relationnelle (PostgreSQL)}
 
-\begin{exemple}
-\textbf{TransactionRepository - Accès aux transactions :}
-\begin{lstlisting}[language=JavaScript]
-// TransactionRepository.js
-class TransactionRepository {
-  async create(transactionData) {
-    return await prisma.transaction.create({
-      data: {
-        amount: transactionData.amount,
-        type: transactionData.type,
-        category: transactionData.category,
-        description: transactionData.description,
-        date: transactionData.date,
-        userId: transactionData.userId,
-        isRecurring: transactionData.isRecurring || false
-      },
-      include: {
-        category: true,
-        tags: true
-      }
-    });
-  }
-  
-  async getByMonth(userId, month, year) {
-    const startDate = new Date(year, month - 1, 1);
-    const endDate = new Date(year, month, 0);
-    
-    return await prisma.transaction.findMany({
-      where: {
-        userId,
-        date: {
-          gte: startDate,
-          lte: endDate
-        }
-      },
-      orderBy: { date: 'desc' },
-      include: {
-        category: true,
-        tags: true
-      }
-    });
-  }
-  
-  async sumByCategory(userId, categoryId, startDate, endDate) {
-    const result = await prisma.transaction.aggregate({
-      where: {
-        userId,
-        categoryId,
-        type: 'expense',
-        date: {
-          gte: startDate,
-          lte: endDate
-        }
-      },
-      _sum: {
-        amount: true
-      }
-    });
-    
-    return result._sum.amount || 0;
-  }
-}
-\end{lstlisting}
-\end{exemple}
+Les données critiques (Transactions, Budgets) nécessitent une intégrité référentielle forte (ACID).
 
-\subsection{Couche Données - Stockage des Données Financières}
-
-My Smart Budget utilise une architecture de données hybride optimisée pour les données financières.
-
-\textbf{Architecture de données My Smart Budget :}
-
-\begin{exemple}
-\textbf{Structure des données :}
-\begin{itemize}
-    \item \textbf{PostgreSQL :} Données transactionnelles (transactions, budgets, comptes)
-    \item \textbf{MongoDB :} Logs d'audit, rapports générés, historique d'analyses
-    \item \textbf{Redis :} Cache des calculs, sessions, taux de change
-    \item \textbf{ORM :} Prisma pour PostgreSQL avec migrations versionnées
-\end{itemize}
-
-\textbf{Modèle de données PostgreSQL :}
-\begin{lstlisting}[language=SQL]
--- Table des transactions
+\begin{lstlisting}[language=SQL, caption={Schéma SQL des transactions}]
 CREATE TABLE transactions (
   id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
   user_id UUID NOT NULL REFERENCES users(id),
-  amount DECIMAL(10,2) NOT NULL,
+  amount DECIMAL(10,2) NOT NULL, -- DECIMAL pour la précision monétaire
   type VARCHAR(10) CHECK (type IN ('income', 'expense')),
   category_id UUID REFERENCES categories(id),
-  description TEXT,
   date TIMESTAMP NOT NULL,
-  is_recurring BOOLEAN DEFAULT FALSE,
-  recurring_pattern JSONB,
-  tags TEXT[],
-  created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-  updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
-);
-
--- Table des budgets
-CREATE TABLE budgets (
-  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
-  user_id UUID NOT NULL REFERENCES users(id),
-  category_id UUID REFERENCES categories(id),
-  amount DECIMAL(10,2) NOT NULL,
-  period VARCHAR(20) CHECK (period IN ('monthly', 'weekly', 'yearly')),
-  start_date DATE NOT NULL,
-  end_date DATE NOT NULL,
-  alert_threshold INTEGER DEFAULT 80,
-  is_active BOOLEAN DEFAULT TRUE,
   created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 
--- Index pour optimiser les requêtes
+-- Index pour optimiser le Dashboard (filtrage par date)
 CREATE INDEX idx_transactions_user_date ON transactions(user_id, date DESC);
-CREATE INDEX idx_transactions_category ON transactions(category_id, date);
-CREATE INDEX idx_budgets_user_active ON budgets(user_id, is_active);
 \end{lstlisting}
-\end{exemple}
 
-\begin{exemple}
-\textbf{MongoDB pour les analytics :}
-\begin{lstlisting}[language=JavaScript]
-// Collection des rapports mensuels
+\subsection{Modélisation Documentaire (MongoDB)}
+
+MongoDB est utilisé pour stocker les logs d'audit et les rapports analytiques, dont la structure peut évoluer.
+
+\begin{lstlisting}[language=JavaScript, caption={Schéma Mongoose pour les rapports}]
 const monthlyReportSchema = {
   userId: ObjectId,
-  period: {
-    month: Number,
-    year: Number
-  },
+  period: { month: Number, year: Number },
   metrics: {
-    totalIncome: Number,
     totalExpenses: Number,
     savingsRate: Number,
-    categoryBreakdown: [{
-      categoryId: String,
-      categoryName: String,
-      amount: Number,
-      percentage: Number,
-      trend: String // 'up', 'down', 'stable'
-    }],
-    dailySpending: [{
-      date: Date,
-      amount: Number
+    categoryBreakdown: [{ 
+      categoryName: String, 
+      amount: Number, 
+      percentage: Number 
     }]
   },
-  insights: [{
-    type: String,
-    severity: String,
-    message: String,
-    data: Object
-  }],
-  generatedAt: Date,
-  version: String
-};
-
-// Pipeline d'agrégation pour les tendances
-const spendingTrendsPipeline = [
-  {
-    $match: {
-      userId: userId,
-      'period.year': year
-    }
-  },
-  {
-    $group: {
-      _id: '$period.month',
-      totalExpenses: { $first: '$metrics.totalExpenses' },
-      categories: { $first: '$metrics.categoryBreakdown' }
-    }
-  },
-  {
-    $sort: { _id: 1 }
-  },
-  {
-    $project: {
-      month: '$_id',
-      totalExpenses: 1,
-      topCategory: { $arrayElemAt: ['$categories', 0] },
-      monthOverMonth: {
-        $subtract: ['$totalExpenses', { $lag: '$totalExpenses' }]
-      }
-    }
-  }
-];
-\end{lstlisting}
-\end{exemple}
-
-\subsection{Communication entre les tiers de My Smart Budget}
-
-\textbf{Architecture de communication :}
-
-\begin{exemple}
-\textbf{Flux de données My Smart Budget :}
-\begin{verbatim}
-    +================================================================+
-    |                 MY SMART BUDGET - ARCHITECTURE 3 TIERS        |
-    +================================================================+
-
-    +--------------------+    HTTPS/JWT      +--------------------+
-    |   TIER 1           | <-------------->  |   TIER 2           |
-    |   REACT FRONTEND   |   REST API        |   NODE.JS BACKEND  |
-    |                    |   WebSocket       |                    |
-    | +--------------+   |                   | +--------------+   |
-    | | Dashboard    |   |                   | | Controllers  |   |
-    | | Transactions |   |                   | | Services     |   |
-    | | Budgets      |   |                   | | Middlewares  |   |
-    | | Reports      |   |                   | | Validators   |   |
-    | +--------------+   |                   | +--------------+   |
-    +--------------------+                   +--------------------+
-            |                                          |
-            | Service Worker                           | SQL/NoSQL
-            | (Offline sync)                           | Transactions
-            v                                          v
-    +--------------------+              +--------------------+
-    |   CACHE LOCAL      |              |   TIER 3           |
-    |   IndexedDB        |              |   DATA LAYER       |
-    |   localStorage     |              |                    |
-    +--------------------+              | +--------------+   |
-                                       | | PostgreSQL   |   |
-                                       | | MongoDB      |   |
-                                       | | Redis Cache  |   |
-                                       | +--------------+   |
-                                       +--------------------+
-                                       
-    Flux de données typique:
-    1. User -> React -> Validation locale
-    2. React -> API REST -> JWT validation
-    3. Controller -> Service -> Business logic
-    4. Service -> Repository -> Database
-    5. Database -> Repository -> Service
-    6. Service -> Controller -> Response
-    7. API -> React -> Update UI
-    8. React -> Cache local (offline support)
-\end{verbatim}
-\end{exemple}
-
-\subsection{Avantages de l'architecture pour My Smart Budget}
-
-\textbf{Bénéfices spécifiques à l'application financière :}
-
-\begin{exemple}
-\textbf{Avantages de l'architecture :}
-\begin{itemize}
-    \item \textbf{Sécurité renforcée :} Isolation des données financières sensibles
-    \item \textbf{Performance :} Cache Redis pour calculs répétitifs de budgets
-    \item \textbf{Scalabilité :} Possibilité d'ajouter des workers pour les calculs
-    \item \textbf{Offline first :} Synchronisation des transactions hors ligne
-    \item \textbf{Audit trail :} MongoDB pour tracer toutes les opérations
-    \item \textbf{Real-time :} WebSocket pour alertes de dépassement budget
-    \item \textbf{Multi-device :} API REST permettant mobile et web
-    \item \textbf{Conformité :} Architecture facilitant RGPD/PCI DSS
-\end{itemize}
-\end{exemple}
-
-\begin{conseil}
-\begin{itemize}
-    \item Chiffrer toutes les données financières sensibles
-    \item Implémenter une authentification à deux facteurs
-    \item Logger toutes les opérations financières pour l'audit
-    \item Utiliser des decimal types pour éviter les erreurs d'arrondi
-    \item Mettre en cache les calculs de budget coûteux
-    \item Prévoir la synchronisation offline pour mobile
-    \item Implémenter des webhooks pour les banques
-\end{itemize}
-\end{conseil}
-
-\begin{jury}
-\begin{itemize}
-    \item Comment sécurisez-vous les données financières des utilisateurs ?
-    \item Quelle est votre stratégie de synchronisation offline ?
-    \item Comment gérez-vous la précision des calculs monétaires ?
-    \item Votre architecture supporte-t-elle plusieurs devises ?
-    \item Comment tracez-vous les opérations pour l'audit ?
-    \item Quelle est la latence de vos alertes de dépassement ?
-    \item Comment gérez-vous les transactions récurrentes ?
-\end{itemize}
-\end{jury}
-
-\section{Développement Frontend - Interface My Smart Budget}
-
-Le frontend de My Smart Budget privilégie l'expérience utilisateur avec des tableaux de bord intuitifs, des visualisations de données claires et une navigation fluide entre les modules financiers.
-
-\textbf{Technologies choisies :} React avec TypeScript pour la sécurité des types dans les calculs financiers, Material-UI pour une interface moderne et Chart.js pour les visualisations.
-
-\textbf{Architecture des composants :} Organisation modulaire par domaine fonctionnel (transactions, budgets, rapports) avec des composants réutilisables pour l'affichage des montants.
-
-\textbf{Accessibilité et UX :} Interface accessible WCAG AA avec support du mode sombre, navigation clavier complète et lecteurs d'écran pour l'inclusion financière.
-
-\begin{exemple}
-\textbf{Composant TransactionForm accessible :}
-\begin{lstlisting}[language=JavaScript]
-const TransactionForm = ({ onSubmit, categories, budget }) => {
-  const [formData, setFormData] = useState({
-    amount: '',
-    category: '',
-    description: '',
-    type: 'expense',
-    date: new Date()
-  });
-  
-  const [errors, setErrors] = useState({});
-  
-  const validateAmount = (value) => {
-    const amount = parseFloat(value);
-    if (isNaN(amount) || amount <= 0) {
-      return 'Le montant doit être supérieur à 0';
-    }
-    if (amount > 1000000) {
-      return 'Le montant semble trop élevé';
-    }
-    return null;
-  };
-  
-  const handleSubmit = async (e) => {
-    e.preventDefault();
-    const amountError = validateAmount(formData.amount);
-    
-    if (amountError) {
-      setErrors({ amount: amountError });
-      return;
-    }
-    
-    // Vérification du budget disponible
-    if (budget && parseFloat(formData.amount) > budget.remaining) {
-      const confirm = await showConfirmDialog(
-        'Dépassement de budget',
-        `Cette transaction dépassera votre budget de ${
-          parseFloat(formData.amount) - budget.remaining
-        }€. Continuer ?`
-      );
-      
-      if (!confirm) return;
-    }
-    
-    await onSubmit(formData);
-  };
-  
-  return (
-    <form onSubmit={handleSubmit} aria-label="Ajouter une transaction">
-      <FormControl fullWidth error={!!errors.amount}>
-        <InputLabel htmlFor="amount-input">
-          Montant *
-        </InputLabel>
-        <Input
-          id="amount-input"
-          type="number"
-          step="0.01"
-          value={formData.amount}
-          onChange={(e) => setFormData({
-            ...formData,
-            amount: e.target.value
-          })}
-          startAdornment={<InputAdornment position="start">€</InputAdornment>}
-          aria-describedby="amount-error"
-          aria-required="true"
-          inputProps={{
-            'aria-label': 'Montant en euros',
-            min: 0,
-            max: 1000000
-          }}
-        />
-        {errors.amount && (
-          <FormHelperText id="amount-error" role="alert">
-            {errors.amount}
-          </FormHelperText>
-        )}
-      </FormControl>
-      
-      <FormControl fullWidth>
-        <InputLabel id="category-label">Catégorie *</InputLabel>
-        <Select
-          labelId="category-label"
-          value={formData.category}
-          onChange={(e) => setFormData({
-            ...formData,
-            category: e.target.value
-          })}
-          aria-required="true"
-        >
-          {categories.map(cat => (
-            <MenuItem key={cat.id} value={cat.id}>
-              <ListItemIcon>{cat.icon}</ListItemIcon>
-              <ListItemText>
-                {cat.name}
-                {cat.budget && (
-                  <Typography variant="caption" color="textSecondary">
-                    {' '}(Budget: {cat.budget.remaining}€ restants)
-                  </Typography>
-                )}
-              </ListItemText>
-            </MenuItem>
-          ))}
-        </Select>
-      </FormControl>
-      
-      <Button
-        type="submit"
-        variant="contained"
-        color="primary"
-        fullWidth
-        aria-label="Enregistrer la transaction"
-      >
-        Enregistrer
-      </Button>
-    </form>
-  );
+  generatedAt: Date // TTL index possible pour suppression auto
 };
 \end{lstlisting}
-\end{exemple}
 
-\begin{exemple}
-\textbf{Dashboard avec graphiques :}
-\begin{lstlisting}[language=JavaScript]
-const BudgetDashboard = () => {
-  const { budgets, transactions, loading } = useBudgetData();
-  
-  return (
-    <Grid container spacing={3}>
-      {/* Cartes de résumé */}
-      <Grid item xs={12} md={4}>
-        <Card>
-          <CardContent>
-            <Typography color="textSecondary" gutterBottom>
-              Solde du mois
-            </Typography>
-            <Typography variant="h4" component="div">
-              {formatCurrency(calculateBalance(transactions))}
-            </Typography>
-            <LinearProgress
-              variant="determinate"
-              value={calculateSavingsRate(transactions)}
-              aria-label="Taux d'épargne"
-            />
-          </CardContent>
-        </Card>
-      </Grid>
-      
-      {/* Graphique des dépenses */}
-      <Grid item xs={12} md={8}>
-        <Card>
-          <CardContent>
-            <Typography variant="h6">
-              Évolution des dépenses
-            </Typography>
-            <ResponsiveContainer width="100%" height={300}>
-              <LineChart data={transactions}>
-                <CartesianGrid strokeDasharray="3 3" />
-                <XAxis dataKey="date" />
-                <YAxis />
-                <Tooltip formatter={formatCurrency} />
-                <Legend />
-                <Line
-                  type="monotone"
-                  dataKey="expenses"
-                  stroke="#f44336"
-                  name="Dépenses"
-                />
-                <Line
-                  type="monotone"
-                  dataKey="income"
-                  stroke="#4caf50"
-                  name="Revenus"
-                />
-              </LineChart>
-            </ResponsiveContainer>
-          </CardContent>
-        </Card>
-      </Grid>
-    </Grid>
-  );
-};
-\end{lstlisting}
-\end{exemple}
+\section{Sécurité et Conformité}
 
-\begin{conseil}
-\begin{itemize}
-    \item Formater les montants selon la locale de l'utilisateur
-    \item Utiliser des couleurs contrastées pour l'accessibilité
-    \item Implémenter le mode offline avec Service Workers
-    \item Optimiser les rerenders avec React.memo
-    \item Virtualiser les longues listes de transactions
-    \item Précharger les données fréquemment consultées
-\end{itemize}
-\end{conseil}
+La sécurité a été intégrée dès la conception ("Security by Design") pour protéger les données financières.
 
-\begin{jury}
-\begin{itemize}
-    \item Comment gérez-vous l'affichage de grandes listes de transactions ?
-    \item Votre application fonctionne-t-elle hors ligne ?
-    \item Quels sont vos scores Lighthouse pour une page de dashboard ?
-    \item Comment optimisez-vous le chargement initial ?
-    \item L'interface est-elle utilisable au clavier uniquement ?
-    \item Comment gérez-vous les erreurs réseau ?
-\end{itemize}
-\end{jury}
+\subsection{Validation et Assainissement}
 
-\section{Développement Backend - API My Smart Budget}
+Toutes les données entrantes passent par une double barrière de validation.
 
-L'API REST de My Smart Budget gère toute la logique financière avec une attention particulière à la sécurité, la validation des données et la performance des calculs budgétaires.
-
-\begin{exemple}
-\textbf{Structure backend My Smart Budget :}
-\begin{verbatim}
-src/
-+-- controllers/
-|   +-- authController.js          # Authentification/2FA
-|   +-- transactionController.js   # CRUD transactions
-|   +-- budgetController.js        # Gestion budgets
-|   +-- analyticsController.js     # Rapports et stats
-|   +-- bankController.js          # Sync bancaire
-+-- services/
-|   +-- transactionService.js      # Logique transactions
-|   +-- budgetService.js           # Calculs budgets
-|   +-- alertService.js            # Alertes dépassement
-|   +-- bankSyncService.js         # Import bancaire
-|   +-- mlService.js               # Catégorisation auto
-+-- repositories/
-|   +-- transactionRepository.js   # Accès DB transactions
-|   +-- budgetRepository.js        # Accès DB budgets
-|   +-- userRepository.js          # Accès DB users
-+-- middleware/
-|   +-- auth.js                    # JWT validation
-|   +-- rateLimiter.js            # Protection API
-|   +-- validator.js              # Validation données
-|   +-- auditLogger.js            # Log des opérations
-+-- utils/
-|   +-- currencyConverter.js      # Conversion devises
-|   +-- calculator.js             # Calculs financiers
-|   +-- encryption.js             # Chiffrement données
-\end{verbatim}
-
-\textbf{Validation et sécurité :}
-\begin{lstlisting}[language=JavaScript]
-// Middleware de validation des transactions
+\begin{lstlisting}[language=JavaScript, caption={Middleware de validation Express}]
 const validateTransaction = [
+  // Validation du type et de la plage de valeur
   body('amount')
     .isFloat({ min: 0.01, max: 1000000 })
-    .withMessage('Montant invalide')
-    .customSanitizer(value => Math.round(value * 100) / 100),
+    .withMessage('Montant invalide'),
   
-  body('category')
-    .isUUID()
-    .withMessage('Catégorie invalide'),
-  
-  body('date')
-    .isISO8601()
-    .toDate()
-    .custom(date => date <= new Date())
-    .withMessage('La date ne peut pas être dans le futur'),
-  
+  // Assainissement (Sanitization) pour éviter les XSS
   body('description')
     .trim()
-    .isLength({ max: 500 })
-    .escape(), // Protection XSS
-  
+    .escape(),
+    
   (req, res, next) => {
     const errors = validationResult(req);
-    if (!errors.isEmpty()) {
-      return res.status(400).json({ 
-        errors: errors.array(),
-        message: 'Données invalides'
-      });
-    }
+    if (!errors.isEmpty()) return res.status(400).json({ errors: errors.array() });
     next();
   }
 ];
-
-// Protection contre les attaques par force brute
-const loginLimiter = rateLimit({
-  windowMs: 15 * 60 * 1000, // 15 minutes
-  max: 5, // 5 tentatives max
-  message: 'Trop de tentatives, réessayez dans 15 minutes',
-  standardHeaders: true,
-  legacyHeaders: false,
-});
 \end{lstlisting}
-\end{exemple}
 
-\section{Gestion des données - My Smart Budget}
+\subsection{Chiffrement des données sensibles}
 
-La couche données de My Smart Budget utilise PostgreSQL pour les données transactionnelles critiques avec des contraintes strictes et MongoDB pour l'analytique avec des agrégations complexes.
+Les informations critiques (comme les tokens bancaires) sont chiffrées en base via AES-256-GCM.
 
-\begin{exemple}
-\textbf{Transactions avec Prisma :}
 \begin{lstlisting}[language=JavaScript]
-class BudgetTransactionService {
-  async transferBetweenBudgets(userId, fromBudgetId, toBudgetId, amount) {
-    // Transaction ACID pour garantir la cohérence
-    return await prisma.$transaction(async (tx) => {
-      // Vérifier le budget source
-      const fromBudget = await tx.budget.findUnique({
-        where: { id: fromBudgetId, userId }
-      });
-      
-      if (!fromBudget || fromBudget.remaining < amount) {
-        throw new Error('Fonds insuffisants');
-      }
-      
-      // Débiter le budget source
-      await tx.budget.update({
-        where: { id: fromBudgetId },
-        data: { 
-          remaining: { decrement: amount },
-          spent: { increment: amount }
-        }
-      });
-      
-      // Créditer le budget destination
-      await tx.budget.update({
-        where: { id: toBudgetId },
-        data: { 
-          remaining: { increment: amount },
-          spent: { decrement: amount }
-        }
-      });
-      
-      // Logger la transaction
-      await tx.budgetTransfer.create({
-        data: {
-          fromBudgetId,
-          toBudgetId,
-          amount,
-          userId,
-          timestamp: new Date()
-        }
-      });
-      
-      return { success: true, amount };
-    });
-  }
+encryptData(text) {
+  const iv = crypto.randomBytes(16);
+  const cipher = crypto.createCipheriv('aes-256-gcm', process.env.KEY, iv);
+  let encrypted = cipher.update(text, 'utf8', 'hex');
+  encrypted += cipher.final('hex');
+  return { encrypted, iv: iv.toString('hex'), tag: cipher.getAuthTag() };
 }
 \end{lstlisting}
-
-\textbf{Agrégations MongoDB pour analytics :}
-\begin{lstlisting}[language=JavaScript]
-// Analyse des habitudes de dépenses
-async function analyzeSpendingPatterns(userId, period) {
-  const pipeline = [
-    // Filtrer par utilisateur et période
-    {
-      $match: {
-        userId: new ObjectId(userId),
-        date: {
-          $gte: period.start,
-          $lte: period.end
-        },
-        type: 'expense'
-      }
-    },
-    // Grouper par jour de la semaine
-    {
-      $group: {
-        _id: { $dayOfWeek: '$date' },
-        avgAmount: { $avg: '$amount' },
-        totalAmount: { $sum: '$amount' },
-        count: { $sum: 1 },
-        categories: { $addToSet: '$category' }
-      }
-    },
-    // Ajouter des insights
-    {
-      $project: {
-        dayOfWeek: '$_id',
-        avgAmount: { $round: ['$avgAmount', 2] },
-        totalAmount: { $round: ['$totalAmount', 2] },
-        transactionCount: '$count',
-        uniqueCategories: { $size: '$categories' },
-        spendingIntensity: {
-          $switch: {
-            branches: [
-              { case: { $lt: ['$avgAmount', 20] }, then: 'low' },
-              { case: { $lt: ['$avgAmount', 50] }, then: 'medium' },
-              { case: { $gte: ['$avgAmount', 50] }, then: 'high' }
-            ]
-          }
-        }
-      }
-    },
-    { $sort: { dayOfWeek: 1 } }
-  ];
-  
-  return await db.collection('transactions').aggregate(pipeline).toArray();
-}
-\end{lstlisting}
-\end{exemple}
-
-\section{Sécurité et Conformité - My Smart Budget}
-
-My Smart Budget implémente des mesures de sécurité strictes pour protéger les données financières sensibles des utilisateurs.
-
-\begin{exemple}
-\textbf{Chiffrement des données sensibles :}
-\begin{lstlisting}[language=JavaScript]
-// Chiffrement AES-256 pour les données bancaires
-const crypto = require('crypto');
-
-class EncryptionService {
-  constructor() {
-    this.algorithm = 'aes-256-gcm';
-    this.key = Buffer.from(process.env.ENCRYPTION_KEY, 'hex');
-  }
-  
-  encryptBankCredentials(credentials) {
-    const iv = crypto.randomBytes(16);
-    const cipher = crypto.createCipheriv(this.algorithm, this.key, iv);
-    
-    let encrypted = cipher.update(JSON.stringify(credentials), 'utf8', 'hex');
-    encrypted += cipher.final('hex');
-    
-    const authTag = cipher.getAuthTag();
-    
-    return {
-      encrypted,
-      iv: iv.toString('hex'),
-      authTag: authTag.toString('hex')
-    };
-  }
-  
-  decryptBankCredentials(encryptedData) {
-    const decipher = crypto.createDecipheriv(
-      this.algorithm,
-      this.key,
-      Buffer.from(encryptedData.iv, 'hex')
-    );
-    
-    decipher.setAuthTag(Buffer.from(encryptedData.authTag, 'hex'));
-    
-    let decrypted = decipher.update(encryptedData.encrypted, 'hex', 'utf8');
-    decrypted += decipher.final('utf8');
-    
-    return JSON.parse(decrypted);
-  }
-}
-\end{lstlisting}
-
-\textbf{Audit et conformité RGPD :}
-\begin{lstlisting}[language=JavaScript]
-// Service d'audit pour traçabilité
-class AuditService {
-  async logFinancialOperation(userId, operation, details) {
-    await this.auditDb.collection('audit_logs').insertOne({
-      userId,
-      operation,
-      details: this.sanitizeDetails(details),
-      ip: this.getClientIp(),
-      userAgent: this.getUserAgent(),
-      timestamp: new Date(),
-      sessionId: this.getSessionId(),
-      risk_score: this.calculateRiskScore(operation, details)
-    });
-    
-    // Détection d'anomalies
-    if (this.isAnomalous(operation, details)) {
-      await this.alertService.notifySecurityTeam({
-        userId,
-        operation,
-        reason: 'Activité suspecte détectée'
-      });
-    }
-  }
-  
-  async exportUserData(userId) {
-    // Conformité RGPD - Export des données
-    const userData = {
-      profile: await this.userRepo.findById(userId),
-      transactions: await this.transactionRepo.findByUser(userId),
-      budgets: await this.budgetRepo.findByUser(userId),
-      auditLogs: await this.getAuditLogs(userId)
-    };
-    
-    return this.encryptionService.encryptForExport(userData);
-  }
-}
-\end{lstlisting}
-\end{exemple}
-
-\begin{conseil}
-\begin{itemize}
-    \item Chiffrer toutes les données bancaires au repos
-    \item Implémenter l'authentification à deux facteurs (2FA)
-    \item Utiliser des tokens JWT avec expiration courte
-    \item Logger toutes les opérations financières
-    \item Scanner régulièrement les dépendances (npm audit)
-    \item Implémenter le rate limiting sur toutes les routes
-    \item Anonymiser les données dans les logs
-    \item Prévoir l'export RGPD des données utilisateur
-\end{itemize}
-\end{conseil}
 
 \begin{jury}
+\textbf{Questions potentielles lors de la soutenance :}
 \begin{itemize}
-    \item Comment protégez-vous les données bancaires ?
-    \item Votre application est-elle conforme au RGPD ?
-    \item Comment détectez-vous les transactions frauduleuses ?
-    \item Quelle est votre stratégie de backup ?
-    \item Comment gérez-vous les sessions utilisateur ?
-    \item Avez-vous un plan de réponse aux incidents ?
-    \item Comment auditez-vous les accès aux données sensibles ?
+    \item \textit{"Pourquoi avoir mélangé PostgreSQL et MongoDB ?"} \\
+    $\rightarrow$ Réponse : PostgreSQL garantit la cohérence des transactions financières (ACID), tandis que MongoDB offre la flexibilité et la rapidité d'écriture pour les logs et les données analytiques non structurées.
+    \item \textit{"Comment gérez-vous les erreurs d'arrondi sur les montants ?"} \\
+    $\rightarrow$ Réponse : Utilisation du type \texttt{DECIMAL} en base de données et manipulation des montants en centimes (entiers) côté serveur avant conversion.
 \end{itemize}
 \end{jury}
 
-\section{Liens utiles}
+\section{Bilan de la réalisation}
 
-\begin{itemize}
-    \item PCI DSS Compliance: \url{https://www.pcisecuritystandards.org/}
-    \item RGPD pour applications financières: \url{https://www.cnil.fr/}
-    \item Open Banking API: \url{https://www.openbanking.org.uk/}
-    \item Plaid API (Agrégation bancaire): \url{https://plaid.com/docs/}
-    \item Chart.js Documentation: \url{https://www.chartjs.org/docs/}
-    \item JWT Best Practices: \url{https://tools.ietf.org/html/rfc8725}
-    \item OWASP Top 10: \url{https://owasp.org/www-project-top-ten/}
-\end{itemize}
+L'implémentation respecte l'architecture définie lors de la conception. L'utilisation de \textbf{Services} découplés des \textbf{Contrôleurs} facilite les tests unitaires, tandis que la séparation Frontend/Backend via une API REST permet d'envisager sereinement le développement futur d'une application mobile native utilisant les mêmes endpoints.

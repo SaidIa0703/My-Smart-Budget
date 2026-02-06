@@ -1,0 +1,6 @@
+{
+  "version": 3,
+  "sources": [],
+  "sections": [
+    {"offset": {"line": 4, "column": 0}, "map": {"version":3,"sources":["file:///Users/ahbeuhdellsaidi/Desktop/PFE%20ABDELGHANI%20SAIDI/my-smart-budget/src/app/loading.tsx"],"sourcesContent":["// app/loading.tsx\nexport default function Loading() {\n  return <div style={{ padding: 16 }}>Chargement…</div>;\n}"],"names":[],"mappings":"AAAA,kBAAkB;;;;;;;AACH,SAAS;IACtB,qBAAO,8OAAC;QAAI,OAAO;YAAE,SAAS;QAAG;kBAAG;;;;;;AACtC","debugId":null}}]
+}

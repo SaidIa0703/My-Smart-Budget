@@ -1,0 +1,41 @@
+# Stage 1: Build
+FROM node:18-alpine AS builder
+
+WORKDIR /app
+
+# Copier les fichiers de dépendances
+COPY package*.json ./
+
+# Installer les dépendances
+RUN npm ci
+
+# Copier le code source
+COPY . .
+
+# Builder l'app Next.js
+RUN npm run build
+
+# Stage 2: Production
+FROM node:18-alpine
+
+WORKDIR /app
+
+# Copier les dépendances depuis le builder
+COPY --from=builder /app/node_modules ./node_modules
+COPY --from=builder /app/package*.json ./
+COPY --from=builder /app/.next ./.next
+COPY --from=builder /app/public ./public
+
+# Variables d'environnement
+ENV NODE_ENV=production
+ENV PORT=3000
+
+# Exposer le port
+EXPOSE 3000
+
+# Health check
+HEALTHCHECK --interval=30s --timeout=10s --start-period=5s --retries=3 \
+  CMD node -e "require('http').get('http://localhost:3000', (r) => {if (r.statusCode !== 200) throw new Error(r.statusCode)})"
+
+# Lancer l'app
+CMD ["npm", "start"]

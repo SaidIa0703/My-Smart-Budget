@@ -40,12 +40,6 @@ jobs:
             rm -rf my-smart-budget || true
             git clone https://github.com/SaidIa0703/my-smart-budget.git my-smart-budget
             cd my-smart-budget/APP/MY_budget
-            sudo /usr/local/bin/docker-compose down -v || true
-            sudo /usr/local/bin/docker-compose pull
-            sudo /usr/local/bin/docker-compose up -d
-            volumes:
-            postgres_data:
-            mongodb_data:
-            networks:
-            smart-budget-network:
-            driver: bridge
+            docker-compose down -v || true
+            docker-compose pull
+            docker-compose up -d

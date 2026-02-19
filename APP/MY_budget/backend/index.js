@@ -8,7 +8,7 @@ const app = express();
 app.use(cors());
 app.use(express.json());
 
-// Connecter MongoDB au démarrage
+// Connecter MongoDB et PostgreSQL au démarrage
 connectMongo();
 testPostgres();
 
@@ -134,6 +134,7 @@ app.get('/', (req, res) => {
   });
 });
 
+// Démarrer le serveur
 const PORT = process.env.PORT || 5000;
 app.listen(PORT, () => {
   console.log(`🚀 Serveur lancé sur le port ${PORT}`);

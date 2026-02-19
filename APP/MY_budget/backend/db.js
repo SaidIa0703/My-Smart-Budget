@@ -1,5 +1,5 @@
-import pgPromise from 'pg-promise';
-import { connect } from 'mongoose';
+const pgPromise = require('pg-promise');
+const mongoose = require('mongoose');
 
 // Configuration PostgreSQL
 const pgp = pgPromise();
@@ -14,7 +14,7 @@ const db = pgp({
 // Connexion MongoDB
 const connectMongo = async () => {
   try {
-    await connect(
+    await mongoose.connect(
       process.env.MONGO_URI || 'mongodb://smart_user:smart_password@localhost:27017/smart_budget?authSource=admin',
       {
         useNewUrlParser: true,
@@ -37,4 +37,4 @@ const testPostgres = async () => {
   }
 };
 
-export default { db, connectMongo, testPostgres };
+module.exports = { db, connectMongo, testPostgres };

@@ -15,15 +15,11 @@ const db = pgp({
 const connectMongo = async () => {
   try {
     await mongoose.connect(
-      process.env.MONGO_URI || 'mongodb://smart_user:smart_password@localhost:27017/smart_budget?authSource=admin',
-      {
-        useNewUrlParser: true,
-        useUnifiedTopology: true,
-      }
+      process.env.MONGO_URI || 'mongodb://smart_user:smart_password@localhost:27017/smart_budget?authSource=admin'
     );
     console.log('✅ MongoDB connecté');
   } catch (err) {
-    console.error('❌ Erreur MongoDB:', err);
+    console.error('❌ Erreur MongoDB:', err.message);
   }
 };
 

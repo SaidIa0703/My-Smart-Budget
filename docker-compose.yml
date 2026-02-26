@@ -1,0 +1,88 @@
+services:
+  postgres:
+    image: postgres:16-alpine
+    container_name: smart-budget-postgres
+    environment:
+      POSTGRES_USER: smart_user
+      POSTGRES_PASSWORD: smart_password
+      POSTGRES_DB: smart_budget
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    networks:
+      - smart-budget-network
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U smart_user"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  mongodb:
+    image: mongo:7
+    container_name: smart-budget-mongodb
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: smart_user
+      MONGO_INITDB_ROOT_PASSWORD: smart_password
+      MONGO_INITDB_DATABASE: smart_budget
+    ports:
+      - "27017:27017"
+    volumes:
+      - mongodb_data:/data/db
+    networks:
+      - smart-budget-network
+    healthcheck:
+      test: ["CMD", "mongosh", "--eval", "db.adminCommand('ping')"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  backend:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    container_name: smart-budget-backend
+    ports:
+      - "5001:5000"
+    environment:
+      NODE_ENV: production
+      PORT: 5000
+      DB_HOST: postgres
+      DB_PORT: 5432
+      DB_USER: smart_user
+      DB_PASSWORD: smart_password
+      DB_NAME: smart_budget
+      MONGO_URI: mongodb://smart_user:smart_password@mongodb:27017/smart_budget?authSource=admin
+      NEXT_PUBLIC_API_URL: http://16.171.253.76:5001
+    depends_on:
+      postgres:
+        condition: service_healthy
+      mongodb:
+        condition: service_healthy
+    networks:
+      - smart-budget-network
+    restart: unless-stopped
+
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+    container_name: smart-budget-frontend
+    ports:
+      - "3000:3000"
+    environment:
+      NODE_ENV: production
+      NEXT_PUBLIC_API_URL: http://16.171.253.76:5001
+    depends_on:
+      - backend
+    networks:
+      - smart-budget-network
+    restart: unless-stopped
+
+volumes:
+  postgres_data:
+  mongodb_data:
+
+networks:
+  smart-budget-network:
+    driver: bridge

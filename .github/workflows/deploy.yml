@@ -21,8 +21,8 @@ jobs:
         run: docker build -t abedel/my-smart-budget-backend:latest ./APP/MY_budget/backend
       
       - name: Build Frontend
-        run: docker build -t abedel/my-smart-budget-frontend:latest ./APP/MY_budget/frontend
-      
+        run: docker build --no-cache -t abedel/my-smart-budget-frontend:latest ./APP/MY_budget/frontend    
+         
       - name: Push Backend
         run: docker push abedel/my-smart-budget-backend:latest
       

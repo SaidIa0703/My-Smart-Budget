@@ -1,3 +1,4 @@
+"use client";
 import React, { useState, useEffect } from 'react';
 import { 
   TrendingUp, TrendingDown, CreditCard, Target, PiggyBank, 
@@ -388,38 +389,6 @@ const MySmartBudget = () => {
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-gray-50 via-indigo-50 to-purple-50">
-      <style jsx>{`
-        @keyframes fadeIn {
-          from { opacity: 0; }
-          to { opacity: 1; }
-        }
-        @keyframes slideInLeft {
-          from { transform: translateX(-20px); opacity: 0; }
-          to { transform: translateX(0); opacity: 1; }
-        }
-        @keyframes slideInRight {
-          from { transform: translateX(20px); opacity: 0; }
-          to { transform: translateX(0); opacity: 1; }
-        }
-        @keyframes slideInUp {
-          from { transform: translateY(20px); opacity: 0; }
-          to { transform: translateY(0); opacity: 1; }
-        }
-        @keyframes slideDown {
-          from { transform: translateY(-10px); opacity: 0; }
-          to { transform: translateY(0); opacity: 1; }
-        }
-        @keyframes scaleIn {
-          from { transform: scale(0.95); opacity: 0; }
-          to { transform: scale(1); opacity: 1; }
-        }
-        .animate-fadeIn { animation: fadeIn 0.5s ease-out; }
-        .animate-slideInLeft { animation: slideInLeft 0.5s ease-out; }
-        .animate-slideInRight { animation: slideInRight 0.5s ease-out; }
-        .animate-slideInUp { animation: slideInUp 0.5s ease-out; }
-        .animate-slideDown { animation: slideDown 0.3s ease-out; }
-        .animate-scaleIn { animation: scaleIn 0.5s ease-out; }
-      `}</style>
 
       {/* Header */}
       <header className="bg-white shadow-lg sticky top-0 z-50 border-b border-gray-100">

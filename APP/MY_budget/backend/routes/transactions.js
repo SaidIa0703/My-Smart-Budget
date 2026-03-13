@@ -18,7 +18,7 @@ router.post('/add',  async (req, res) =>{
         res.status(201).json(transactions);
     }catch(error) {
         console.error('Error:', error);
-        res.status(501).json({ message: 'Erreur du serveur'});
+        res.status(501).json({ message: 'Erreur serveur'});
     }
 });
 

@@ -1,108 +1,141 @@
-import React, { useState } from 'react';
-import MockupCard from './MockupCard';
+'use client';
 
-interface Category {
-  id: string;
-  label: string;
-  emoji: string;
+import React, { useState } from 'react';
+import { Plus } from 'lucide-react';
+
+interface Props {
+  onTransactionAdded?: () => void;
 }
 
-const AddTransaction: React.FC = () => {
-  const [activeCategory, setActiveCategory] = useState('alimentation');
-  const [amount, setAmount] = useState('28,50€');
-  const [description, setDescription] = useState('Restaurant Luc');
+export default function AddTransaction({ onTransactionAdded }: Props) {
+  const [formData, setFormData] = useState({
+    name: '',
+    category: '',
+    amount: '',
+    date: new Date().toISOString().split('T')[0],
+  });
+  const [loading, setLoading] = useState(false);
+  const [message, setMessage] = useState('');
 
-  const categories: Category[] = [
-    { id: 'alimentation', label: '🍔 Alimentation', emoji: '🍔' },
-    { id: 'transport', label: '🚗 Transport', emoji: '🚗' },
-    { id: 'loisirs', label: '🎬 Loisirs', emoji: '🎬' },
-    { id: 'sante', label: '🏥 Santé', emoji: '🏥' },
-    { id: 'logement', label: '🏠 Logement', emoji: '🏠' },
-    { id: 'education', label: '📚 Éducation', emoji: '📚' },
-  ];
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setLoading(true);
+    setMessage('');
+
+    try {
+      const user = JSON.parse(localStorage.getItem('user') || '{}');
+      
+      const response = await fetch('http://localhost:5001/api/transactions/add', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          userId: user.id,
+          ...formData,
+          amount: parseFloat(formData.amount)
+        })
+      });
+
+      if (response.ok) {
+        setMessage('✅ Transaction ajoutée!');
+        setFormData({
+          name: '',
+          category: '',
+          amount: '',
+          date: new Date().toISOString().split('T')[0],
+        });
+        
+        // Appelle le callback sans recharger
+        setTimeout(() => {
+          if (onTransactionAdded) {
+            onTransactionAdded();
+          }
+        }, 500);
+      } else {
+        setMessage('❌ Erreur');
+      }
+    } catch (error) {
+      setMessage('❌ Erreur serveur');
+      console.error(error);
+    }
+    setLoading(false);
+  };
 
   return (
-    <MockupCard title="➕ Ajouter une Transaction" delay={0.2}>
-      <div className="bg-white p-8 overflow-y-auto h-full">
-        <div className="mb-7">
-          <h3 className="text-2xl font-bold text-slate-900 mb-2">Nouvelle transaction</h3>
-          <p className="text-slate-500 text-sm">Remplissez les détails ci-dessous</p>
-        </div>
+    <div className="bg-white rounded-lg shadow-lg p-6 mb-8">
+      <h2 className="text-2xl font-bold mb-6">Ajouter une Transaction</h2>
 
-        {/* Amount Input */}
-        <div className="mb-6">
-          <label className="block text-xs font-bold text-slate-700 mb-2 uppercase tracking-wider">
-            💵 Montant
-          </label>
+      {message && (
+        <div className={`mb-4 p-4 rounded-lg ${message.includes('✅') ? 'bg-green-100 text-green-700' : 'bg-red-100 text-red-700'}`}>
+          {message}
+        </div>
+      )}
+
+      <form onSubmit={handleSubmit} className="space-y-4">
+        <div>
+          <label className="block text-sm font-medium mb-2">Description</label>
           <input
             type="text"
-            value={amount}
-            onChange={(e) => setAmount(e.target.value)}
-            className="w-full px-4 py-3 border-2 border-slate-200 rounded-2xl text-base font-medium focus:outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-100 transition-all duration-300"
-            placeholder="0,00€"
+            placeholder="Ex: Carrefour, Salaire..."
+            value={formData.name}
+            onChange={(e) => setFormData({ ...formData, name: e.target.value })}
+            className="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500"
+            required
           />
         </div>
 
-        {/* Category Selector */}
-        <div className="mb-6">
-          <label className="block text-xs font-bold text-slate-700 mb-3 uppercase tracking-wider">
-            📂 Catégorie
-          </label>
-          <div className="grid grid-cols-3 gap-2">
-            {categories.map((cat) => (
-              <button
-                key={cat.id}
-                onClick={() => setActiveCategory(cat.id)}
-                className={`py-3 px-2 rounded-2xl text-xs font-semibold transition-all duration-300 text-center ${
-                  activeCategory === cat.id
-                    ? 'border-2 border-blue-500 bg-gradient-to-br from-blue-50 to-purple-50 text-blue-600'
-                    : 'border-2 border-slate-200 bg-white text-slate-600 hover:border-slate-300'
-                }`}
-              >
-                {cat.label}
-              </button>
-            ))}
+        <div>
+          <label className="block text-sm font-medium mb-2">Catégorie</label>
+          <select
+            value={formData.category}
+            onChange={(e) => setFormData({ ...formData, category: e.target.value })}
+            className="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500"
+            required
+          >
+            <option value="">Choisir une catégorie</option>
+            <option value="Alimentation">🛒 Alimentation</option>
+            <option value="Transport">🚗 Transport</option>
+            <option value="Loisirs">🎮 Loisirs</option>
+            <option value="Abonnements">📱 Abonnements</option>
+            <option value="Santé">⚕️ Santé</option>
+            <option value="Revenus">💰 Revenus</option>
+          </select>
+        </div>
+
+        <div className="grid grid-cols-2 gap-4">
+          <div>
+            <label className="block text-sm font-medium mb-2">Montant (€)</label>
+            <input
+              type="number"
+              placeholder="0.00"
+              value={formData.amount}
+              onChange={(e) => setFormData({ ...formData, amount: e.target.value })}
+              className="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500"
+              step="0.01"
+              required
+            />
+          </div>
+
+          <div>
+            <label className="block text-sm font-medium mb-2">Date</label>
+            <input
+              type="date"
+              value={formData.date}
+              onChange={(e) => setFormData({ ...formData, date: e.target.value })}
+              className="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500"
+              required
+            />
           </div>
         </div>
 
-        {/* Description Input */}
-        <div className="mb-6">
-          <label className="block text-xs font-bold text-slate-700 mb-2 uppercase tracking-wider">
-            📝 Description
-          </label>
-          <input
-            type="text"
-            value={description}
-            onChange={(e) => setDescription(e.target.value)}
-            className="w-full px-4 py-3 border-2 border-slate-200 rounded-2xl text-base focus:outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-100 transition-all duration-300"
-            placeholder="Ex: Courses au supermarché"
-          />
-        </div>
-
-        {/* Date Input */}
-        <div className="mb-7">
-          <label className="block text-xs font-bold text-slate-700 mb-2 uppercase tracking-wider">
-            📅 Date
-          </label>
-          <input
-            type="text"
-            defaultValue="23 Jan 2025"
-            className="w-full px-4 py-3 border-2 border-slate-200 rounded-2xl text-base focus:outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-100 transition-all duration-300"
-          />
-        </div>
-
-        {/* Buttons */}
-        <div className="grid grid-cols-2 gap-3 mt-8">
-          <button className="py-3 px-4 bg-slate-100 text-slate-600 rounded-2xl font-semibold hover:bg-slate-200 transition-all duration-300">
-            Annuler
-          </button>
-          <button className="py-3 px-4 bg-gradient-to-r from-blue-600 to-purple-600 text-white rounded-2xl font-semibold hover:shadow-lg hover:-translate-y-1 transition-all duration-300">
-            ➕ Ajouter
-          </button>
-        </div>
-      </div>
-    </MockupCard>
+        <button
+          type="submit"
+          disabled={loading}
+          className="w-full px-4 py-3 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 transition font-medium flex items-center justify-center gap-2 disabled:opacity-50"
+        >
+          <Plus size={20} />
+          {loading ? 'Chargement...' : 'Ajouter la Transaction'}
+        </button>
+      </form>
+    </div>
   );
-};
-
-export default AddTransaction;
+}

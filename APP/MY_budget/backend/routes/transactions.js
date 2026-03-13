@@ -13,7 +13,7 @@ router.post('/add',  async (req, res) =>{
 
         const transactions = await db.one(
             'INSERT INTO transactions (user_id, name, category, amount, date, created_at) VALUES ($1, $2, $3, $4, $5, NOW()) RETURNING *',
-[userId, name, category, amount, date]
+            [userId, name, category, amount, date]
         );
         res.status(201).json(transactions);
     }catch(error) {
@@ -45,7 +45,7 @@ router.delete('/:id', async (req, res) => {
         res.json({message : 'Transaction supprimée'});
     }catch(error){
         console.error('Error', error);
-        res.status(500).json({message : 'Transaction supprimée'});
+        res.status(500).json({message : 'Erreur serveur'});
     }
 });
 

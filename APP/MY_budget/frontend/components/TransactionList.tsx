@@ -1,51 +1,88 @@
-"use client";
+'use client';
 
-import { Transaction } from "../src/app/profile/index";
+import { useEffect, useState } from 'react';
+import { Trash2 } from 'lucide-react';
 
-export default function TransactionList({
-  items,
-  onDelete,
-  onClearAll,
-}: {
-  items: Transaction[];
-  onDelete: (id: string) => void;
-  onClearAll: () => void;
-}) {
-  if (!items.length) {
-    return <p className="text-sm text-gray-500">Aucune transaction pour le moment.</p>;
+export default function TransactionList() {
+  const [transactions, setTransactions] = useState([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    fetchTransactions();
+  }, []);
+
+  const fetchTransactions = async () => {
+    try {
+      const user = JSON.parse(localStorage.getItem('user') || '{}');
+      const response = await fetch(`http://localhost:5001/api/transactions/${user.id}`);
+      
+      if (response.ok) {
+        const data = await response.json();
+        setTransactions(data);
+      }
+    } catch (error) {
+      console.error('Erreur:', error);
+    }
+    setLoading(false);
+  };
+
+  const handleDelete = async (id: number) => {
+    try {
+      const response = await fetch(`http://localhost:5001/api/transactions/${id}`, {
+        method: 'DELETE'
+      });
+
+      if (response.ok) {
+        setTransactions(transactions.filter(t => t.id !== id));
+      }
+    } catch (error) {
+      console.error('Erreur:', error);
+    }
+  };
+
+  if (loading) {
+    return <div className="text-center py-8">Chargement...</div>;
   }
 
-  const totalIncome = items.filter(i => i.type === "income").reduce((s, i) => s + i.amount, 0);
-  const totalExpense = items.filter(i => i.type === "expense").reduce((s, i) => s + i.amount, 0);
+  if (transactions.length === 0) {
+    return <div className="text-center py-8 text-gray-500">Aucune transaction</div>;
+  }
 
   return (
-    <div className="space-y-4">
-      <div className="flex items-center justify-between">
-        <div className="text-sm text-gray-600">
-          <span className="mr-3">Revenus: {fmt(totalIncome)}</span>
-          <span>Dépenses: {fmt(totalExpense)}</span>
-        </div>
-        <button onClick={onClearAll} className="text-sm text-red-600 hover:underline">Tout effacer</button>
+    <div className="bg-white rounded-lg shadow-lg overflow-hidden">
+      <div className="overflow-x-auto">
+        <table className="w-full">
+          <thead className="bg-gray-100">
+            <tr>
+              <th className="px-6 py-3 text-left text-sm font-semibold">Description</th>
+              <th className="px-6 py-3 text-left text-sm font-semibold">Catégorie</th>
+              <th className="px-6 py-3 text-left text-sm font-semibold">Montant</th>
+              <th className="px-6 py-3 text-left text-sm font-semibold">Date</th>
+              <th className="px-6 py-3 text-left text-sm font-semibold">Actions</th>
+            </tr>
+          </thead>
+          <tbody>
+            {transactions.map((transaction: any) => (
+              <tr key={transaction.id} className="border-t hover:bg-gray-50">
+                <td className="px-6 py-3">{transaction.name}</td>
+                <td className="px-6 py-3">{transaction.category}</td>
+                <td className={`px-6 py-3 font-semibold ${transaction.amount > 0 ? 'text-green-600' : 'text-red-600'}`}>
+                  {transaction.amount > 0 ? '+' : ''}€{transaction.amount.toFixed(2)}
+                </td>
+                <td className="px-6 py-3">{new Date(transaction.date).toLocaleDateString('fr-FR')}</td>
+                <td className="px-6 py-3">
+                  <button
+                    onClick={() => handleDelete(transaction.id)}
+                    className="p-2 text-red-600 hover:bg-red-50 rounded-lg transition"
+                  >
+                    <Trash2 size={18} />
+                  </button>
+                </td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
       </div>
-
-      <ul className="divide-y rounded-xl border bg-white">
-        {items.map((t) => (
-          <li key={t.id} className="flex items-center justify-between gap-3 px-4 py-3">
-            <div>
-              <p className="font-medium">{t.label}</p>
-              <p className="text-xs text-gray-500">{new Date(t.createdAt).toLocaleString("fr-FR")}</p>
-            </div>
-            <div className={`font-semibold ${t.type === "income" ? "text-emerald-600" : "text-red-600"}`}>
-              {t.type === "income" ? "+" : "-"} {fmt(t.amount)}
-            </div>
-            <button onClick={() => onDelete(t.id)} className="text-xs text-gray-500 hover:text-red-600">Supprimer</button>
-          </li>
-        ))}
-      </ul>
     </div>
   );
-}
-
-function fmt(n: number) {
-  return new Intl.NumberFormat("fr-FR", { style: "currency", currency: "EUR" }).format(n);
 }

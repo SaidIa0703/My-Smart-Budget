@@ -16,7 +16,7 @@ export default function App() {
             💎 BudgetFlow
           </h1>
           <p className="text-xl text-slate-400 font-light">
-            Interface moderne et intuitive pour gérer votre budget avec style
+            Interface innovante et intuitive pour gérer votre budget
           </p>
         </div>
 

@@ -1,0 +1,24 @@
+'use client';
+
+import Navbar from '../../../components/Navbar';
+import MySmartBudget from '../../../components/Dashboard';
+import { useEffect } from 'react';
+import { useRouter } from 'next/navigation';
+
+export default function TransactionsPage() {
+  const router = useRouter();
+
+  useEffect(() => {
+    const token = localStorage.getItem('token');
+    if (!token) {
+      router.push('/login');
+    }
+  }, []);
+
+  return (
+    <>
+      <Navbar />
+      <MySmartBudget />
+    </>
+  );
+}

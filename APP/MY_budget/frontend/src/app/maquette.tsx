@@ -45,7 +45,7 @@ const MySmartBudget = () => {
 
   const fetchTransactions = async () => {
     try {
-      const response = await fetch(`http://localhost:5001/api/transactions/${user?.id}`);
+      const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/transactions/${user?.id}`);
       if (response.ok) {
         const data = await response.json();
         setTransactions(data);
@@ -71,7 +71,7 @@ const MySmartBudget = () => {
     setMessage('');
 
     try {
-      const response = await fetch('http://localhost:5001/api/transactions/add', {
+      const response = await fetch('${process.env.NEXT_PUBLIC_API_URL}/transactions/add', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
@@ -102,7 +102,7 @@ const MySmartBudget = () => {
   // ✅ SUPPRIMER UNE TRANSACTION
   const handleDeleteTransaction = async (id: number) => {
     try {
-      const response = await fetch(`http://localhost:5001/api/transactions/${id}`, {
+      const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/transactions/${id}`, {
         method: 'DELETE'
       });
       if (response.ok) {

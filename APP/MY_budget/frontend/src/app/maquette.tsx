@@ -304,7 +304,7 @@ const MySmartBudget = () => {
     {showAddForm && (
       <div className="bg-white rounded-3xl p-6 shadow-xl border border-gray-100">
         <div className="flex justify-between items-center mb-6">
-          <h2 className="text-2xl font-bold">Ajouter une Transaction</h2>
+          <h2 className="text-2xl font-bold">Ajouter un Transaction</h2>
           <button onClick={() => setShowAddForm(false)} className="p-2 hover:bg-gray-100 rounded-lg">
             <X size={24} />
           </button>

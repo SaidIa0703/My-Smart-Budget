@@ -331,7 +331,7 @@ const MySmartBudget = () => {
       {categories.length > 0 && (
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
           <div className="bg-white rounded-3xl p-6 shadow-xl border border-gray-100">
-            <h3 className="text-xl font-bold mb-4">Dépenses par catégorie</h3>
+            <h3 className="text-xl font-bold mb-4">Dépenses  catégorie</h3>
             <ResponsiveContainer width="100%" height={300}>
               <PieChart>
                 <Pie

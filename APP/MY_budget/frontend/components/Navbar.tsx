@@ -19,7 +19,7 @@ export default function Navbar() {
     <header className="w-full border-b bg-white">
       <nav className="mx-auto flex max-w-6xl items-center justify-between p-4">
         <Link href="/" className="font-bold text-lg">
-          My Smart Budget
+          My Smart python
         </Link>
 
         {/* Desktop */}

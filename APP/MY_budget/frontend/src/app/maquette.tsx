@@ -1,4 +1,4 @@
-
+"use client";
 import React, { useState, useEffect } from 'react';
 import {
   TrendingUp, CreditCard, Target, PiggyBank,
@@ -390,7 +390,7 @@ const MySmartBudget = () => {
           <span className="text-3xl">{profileBadge.icon}</span>
           <div>
             <p className="font-bold">Profil {profileBadge.label}</p>
-            <p className="text-indigo-100 text-sm">Votre dashboard est personnalisé selon vos préférences</p>
+            <p className="text-indigo-100 text-sm">Le code c'est trop style #404</p>
           </div>
         </div>
       )}

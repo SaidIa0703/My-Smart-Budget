@@ -22,12 +22,20 @@ jobs:
       
       - name: Build Frontend
         run: docker build --build-arg NEXT_PUBLIC_API_URL=https://smarterbudget.net/api -t abedel/my-smart-budget-frontend:latest ./APP/MY_budget/frontend
-      
-      - name: Push Backend
-        run: docker push abedel/my-smart-budget-backend:latest
-      
-      - name: Push Frontend
-        run: docker push abedel/my-smart-budget-frontend:latest
+
+      - name: Save images
+        run: |
+          docker save abedel/my-smart-budget-frontend:latest | gzip > frontend.tar.gz
+          docker save abedel/my-smart-budget-backend:latest | gzip > backend.tar.gz
+
+      - name: Copy images to EC2
+        uses: appleboy/scp-action@v0.1.7
+        with:
+          host: ${{ secrets.EC2_HOST }}
+          username: ${{ secrets.EC2_USER }}
+          key: ${{ secrets.EC2_KEY }}
+          source: "frontend.tar.gz,backend.tar.gz"
+          target: "/home/ec2-user/"
 
       - name: Copy docker-compose to EC2
         uses: appleboy/scp-action@v0.1.7
@@ -39,14 +47,15 @@ jobs:
           target: "/home/ec2-user/my-smart-budget"
           strip_components: 2
 
-      - name: Deploy to EC2
+      - name: Load images and deploy
         uses: appleboy/ssh-action@v1.0.3
         with:
           host: ${{ secrets.EC2_HOST }}
           username: ${{ secrets.EC2_USER }}
           key: ${{ secrets.EC2_KEY }}
           script: |
+            docker load < ~/frontend.tar.gz
+            docker load < ~/backend.tar.gz
             cd ~/my-smart-budget
-            docker-compose pull
             docker-compose up -d --force-recreate
             docker image prune -f

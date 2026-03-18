@@ -7,7 +7,6 @@ import {
   Calendar, ChevronRight, X, Check, AlertCircle, ArrowUpRight,
   ArrowDownRight, Filter, Search, Eye, EyeOff, Menu, Trash2
 } from 'lucide-react';
-import { PieChart, Pie, BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer, Cell } from 'recharts';
 
 const MySmartBudget = () => {
   const [currentPage, setCurrentPage] = useState('dashboard');

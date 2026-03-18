@@ -46,7 +46,7 @@ services:
       - mongodb
     networks:
       - smart-budget-network
-    restart: unless-stopped
+    restart: always
 
   frontend:
     image: abedel/my-smart-budget-frontend:latest
@@ -60,7 +60,7 @@ services:
       - backend
     networks:
       - smart-budget-network
-    restart: unless-stopped
+    restart: always
 
 volumes:
   postgres_data:

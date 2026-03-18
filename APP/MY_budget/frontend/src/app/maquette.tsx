@@ -1,13 +1,11 @@
 'use client';
-
+import { ResponsiveContainer, PieChart, Pie, Cell, Tooltip, BarChart, CartesianGrid, XAxis, YAxis, Bar } from 'recharts';
 import React, { useState, useEffect } from 'react';
 import { 
   TrendingUp, TrendingDown, CreditCard, Target, PiggyBank, 
   Bell, Settings, Plus, Home, Receipt, Wallet, User,
   Calendar, ChevronRight, X, Check, AlertCircle, ArrowUpRight,
-  ArrowDownRight, Filter, Search, Eye, EyeOff, Menu, Trash2,
-  PieChart,
-  BarChart
+  ArrowDownRight, Filter, Search, Eye, EyeOff, Menu, Trash2
 } from 'lucide-react';
 
 const MySmartBudget = () => {

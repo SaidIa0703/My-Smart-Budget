@@ -12,6 +12,12 @@ services:
       - postgres_data:/var/lib/postgresql/data
     networks:
       - smart-budget-network
+    restart: always
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U smart_user -d smart_budget"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
 
   mongodb:
     image: mongo:7
@@ -26,6 +32,12 @@ services:
       - mongodb_data:/data/db
     networks:
       - smart-budget-network
+    restart: always
+    healthcheck:
+      test: ["CMD", "mongosh", "--eval", "db.adminCommand('ping')"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
 
   backend:
     image: abedel/my-smart-budget-backend:latest
@@ -42,8 +54,10 @@ services:
       DB_NAME: smart_budget
       MONGO_URI: mongodb://smart_user:smart_password@mongodb:27017/smart_budget?authSource=admin
     depends_on:
-      - postgres
-      - mongodb
+      postgres:
+        condition: service_healthy
+      mongodb:
+        condition: service_healthy
     networks:
       - smart-budget-network
     restart: always

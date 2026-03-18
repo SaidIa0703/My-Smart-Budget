@@ -12,8 +12,9 @@ services:
       - postgres_data:/var/lib/postgresql/data
     networks:
       - smart-budget-network
+    restart: always
     healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U smart_user"]
+      test: ["CMD-SHELL", "pg_isready -U smart_user -d smart_budget"]
       interval: 10s
       timeout: 5s
       retries: 5
@@ -31,6 +32,7 @@ services:
       - mongodb_data:/data/db
     networks:
       - smart-budget-network
+    restart: always
     healthcheck:
       test: ["CMD", "mongosh", "--eval", "db.adminCommand('ping')"]
       interval: 10s
@@ -38,9 +40,7 @@ services:
       retries: 5
 
   backend:
-    build:
-      context: ./backend
-      dockerfile: Dockerfile
+    image: abedel/my-smart-budget-backend:latest
     container_name: smart-budget-backend
     ports:
       - "5001:5000"
@@ -53,7 +53,6 @@ services:
       DB_PASSWORD: smart_password
       DB_NAME: smart_budget
       MONGO_URI: mongodb://smart_user:smart_password@mongodb:27017/smart_budget?authSource=admin
-      NEXT_PUBLIC_API_URL: http://16.171.253.76:5001
     depends_on:
       postgres:
         condition: service_healthy
@@ -61,23 +60,21 @@ services:
         condition: service_healthy
     networks:
       - smart-budget-network
-    restart: unless-stopped
+    restart: always
 
   frontend:
-    build:
-      context: ./frontend
-      dockerfile: Dockerfile
+    image: abedel/my-smart-budget-frontend:latest
     container_name: smart-budget-frontend
     ports:
       - "3000:3000"
     environment:
       NODE_ENV: production
-      NEXT_PUBLIC_API_URL: http://16.171.253.76:5001
+      NEXT_PUBLIC_API_URL: https://smarterbudget.net/api
     depends_on:
       - backend
     networks:
       - smart-budget-network
-    restart: unless-stopped
+    restart: always
 
 volumes:
   postgres_data:

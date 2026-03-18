@@ -628,7 +628,7 @@ const MySmartBudget = () => {
                 MSB
               </div>
               <h1 className="text-2xl font-bold bg-gradient-to-r from-indigo-600 to-purple-600 bg-clip-text text-transparent">
-                My Smart Budget - Antoine
+                My Smart Budget - Antoine MIlle
 
               </h1>
             </div>

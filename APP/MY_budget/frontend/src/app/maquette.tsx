@@ -203,7 +203,7 @@ const MySmartBudget = () => {
         <div className={`bg-gradient-to-br from-rose-400 to-orange-400 rounded-3xl p-6 text-white shadow-2xl transform transition-all duration-500 hover:scale-105 delay-200 ${animateCards ? 'animate-slideInRight' : ''}`}>
           <div className="flex justify-between items-start">
             <div>
-              <p className="text-rose-100 text-sm font-medium">Dépenses</p>
+              <p className="text-rose-100 text-sm font-medium">Antoine</p>
               <h3 className="text-3xl font-bold mt-2">€{stats.depenses.toFixed(2)}</h3>
             </div>
             <div className="p-3 bg-white/20 rounded-2xl">

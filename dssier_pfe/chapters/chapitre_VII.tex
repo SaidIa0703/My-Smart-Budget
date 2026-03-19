@@ -35,6 +35,8 @@ La stratégie de tests de \textbf{My Smart Budget} suit la pyramide de tests ave
 
 \subsection{Tests unitaires - Couverture détaillée}
 
+L'exemple ci-dessous montre un test unitaire typique du service de calcul budgétaire. Il vérifie que les alertes sont déclenchées aux bons seuils et que les cas limites (budget à zéro, dépassement) sont correctement gérés :
+
 \begin{exemple}
 \textbf{Test unitaire du service de calcul budgétaire :}
 \begin{lstlisting}[language=JavaScript]
@@ -212,7 +214,11 @@ describe('BudgetCalculatorService', () => {
 \end{lstlisting}
 \end{exemple}
 
+Ces tests vérifient que le service de calcul se comporte correctement dans tous les cas, y compris les situations limites. Ils s'exécutent en moins de 10 secondes à chaque sauvegarde.
+
 \subsection{Tests d'intégration - API et Base de données}
+
+Les tests d'intégration valident que les couches communiquent bien entre elles. L'exemple suivant teste les endpoints de transactions de bout en bout, avec une vraie base de données de test :
 
 \begin{exemple}
 \textbf{Tests d'intégration des endpoints critiques :}
@@ -761,6 +767,8 @@ scenarios: (100.00%) 1 scenario, 200 max VUs, 14m30s max duration
     \item ✅ \textbf{Dashboard < 2s :} Atteint (1.98s en P95)
     \item ⚠️ \textbf{P99 élevé :} 1842ms (optimisation nécessaire pour cas extrêmes)
 \end{itemize}
+
+En pratique, cela signifie que l'application répond en moins d'une seconde dans 95\,\% des cas, même lors des pics de charge du début de mois. Seul le percentile 99 dépasse 1,8 secondes, ce qui représente des cas très rares à optimiser en priorité.
 \end{tcolorbox}
 
 \subsection{Monitoring de performance en production}
@@ -834,7 +842,7 @@ sonar.issue.ignore.multicriteria.e2.resourceKey=**/*.jsx
 
 \begin{tcolorbox}[colback=green!5!white,colframe=green!60!black,title=\textbf{Dashboard SonarQube - My Smart Budget (15 décembre 2024)}]
 \begin{center}
-\includegraphics[width=0.5\textwidth]{assets/images/sonarqube-badge.png}
+\begin{center}\small\textit{\textrightarrow{} Badge SonarQube — voir Annexe~\ref{ann:figures}, figure~\ref{fig:sonarqube-badge}}\end{center}
 \end{center}
 
 \begin{center}
@@ -1226,32 +1234,13 @@ Vulnérabilités bloquantes & 0 & → 0 \\
 \begin{tcolorbox}[colback=yellow!5!white,colframe=yellow!60!black,title=\textbf{Plan d'amélioration Q1 2025}]
 \textbf{Objectifs prioritaires :}
 \begin{enumerate}
-    \item \textbf{Augmenter la couverture à 90\%} 
-        \begin{itemize}
-            \item Focus sur les composants React (actuellement 76.8\%)
-            \item Ajouter tests mutations (Stryker.js)
-        \end{itemize}
+    \item \textbf{Augmenter la couverture à 90\%} — Mon objectif personnel est de concentrer l'effort sur les composants React (actuellement 76,8\%) et d'ajouter des tests de mutation (Stryker.js).
     
-    \item \textbf{Réduire le temps du pipeline à < 10 min}
-        \begin{itemize}
-            \item Parallélisation des tests E2E
-            \item Cache Docker layers
-            \item Tests sélectifs sur PR (affected only)
-        \end{itemize}
+    \item \textbf{Réduire le temps du pipeline à moins de 10 minutes} — Je prévois de paralléliser les tests E2E et d'activer le cache Docker pour ne pas freiner mon rythme de développement.
     
-    \item \textbf{Améliorer la performance P99}
-        \begin{itemize}
-            \item Objectif P99 < 1500ms (actuellement 1842ms)
-            \item Optimisation requêtes MongoDB
-            \item Cache Redis sur endpoints lourds
-        \end{itemize}
+    \item \textbf{Améliorer la performance P99} — Objectif P99 < 1500ms (actuellement 1842ms) via l'optimisation des requêtes MongoDB et un cache Redis sur les endpoints lourds.
     
-    \item \textbf{Zero Code Smell}
-        \begin{itemize}
-            \item Refactoring des 47 code smells restants
-            \item Sessions de pair programming
-            \item Code reviews systématiques
-        \end{itemize}
+    \item \textbf{Zero Code Smell} — Refactoring des 47 code smells restants identifiés par SonarQube.
 \end{enumerate}
 \end{tcolorbox}
 

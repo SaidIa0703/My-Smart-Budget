@@ -14,13 +14,9 @@ L'implémentation repose sur une stack moderne et robuste, choisie pour sa flexi
     \item \textbf{Tier 3 (Données) :} PostgreSQL (Transactionnel) + MongoDB (Logs/Analytics).
 \end{itemize}
 
-\begin{figure}[H]
-    \centering
-    % Placeholder pour ton schéma d'architecture
-    \includegraphics[width=0.9\textwidth]{assets/images/architecture_3_tiers.png}
-    \caption{Flux de données implémenté dans l'architecture 3-tiers}
-    \label{fig:arch_impl}
-\end{figure}
+\begin{center}
+\small$\rightarrow$~\textit{Flux de données 3-tiers — voir Annexe~\ref{ann:figures}, figure~\ref{fig:arch_impl}}
+\end{center}
 
 \section{Couche Présentation (Frontend)}
 
@@ -49,7 +45,7 @@ src/
 
 \subsection{Implémentation des formulaires complexes}
 
-La gestion des transactions nécessite une validation rigoureuse côté client pour garantir l'intégrité des données avant l'envoi au serveur.
+La gestion des transactions nécessite une validation rigoureuse côté client pour garantir l'intégrité des données avant l'envoi au serveur. L'exemple ci-dessous montre le composant principal de saisie, avec validation locale et avertissement en cas de dépassement de budget :
 
 \begin{lstlisting}[language=JavaScript, caption={Composant TransactionForm avec validation et UX}]
 const TransactionForm = ({ onSubmit, categories, budget }) => {
@@ -100,6 +96,8 @@ const TransactionForm = ({ onSubmit, categories, budget }) => {
 };
 \end{lstlisting}
 
+Ce composant garantit que l'utilisateur est averti avant tout dépassement de budget, sans bloquer l'action si elle est confirmée.
+
 \begin{conseil}
 \textbf{Bonnes pratiques Frontend appliquées :}
 \begin{itemize}
@@ -147,7 +145,7 @@ class TransactionController {
 
 \subsection{Services Métier}
 
-C'est ici que réside l'intelligence de l'application (calculs, règles de gestion).
+C'est ici que réside l'intelligence de l'application (calculs, règles de gestion). L'exemple suivant montre comment le service surveille automatiquement la consommation d'un budget après chaque transaction :
 
 \begin{exemple}
 \textbf{BudgetService.js — Logique d'alerte :}
@@ -177,6 +175,8 @@ class BudgetService {
 }
 \end{lstlisting}
 \end{exemple}
+
+Concrètement, chaque ajout de dépense déclenche silencieusement cette vérification : l'utilisateur reçoit une notification sans même avoir à consulter son tableau de bord.
 
 \section{Couche Données (Data Layer)}
 
@@ -277,3 +277,5 @@ encryptData(text) {
 \section{Bilan de la réalisation}
 
 L'implémentation respecte l'architecture définie lors de la conception. L'utilisation de \textbf{Services} découplés des \textbf{Contrôleurs} facilite les tests unitaires, tandis que la séparation Frontend/Backend via une API REST permet d'envisager sereinement le développement futur d'une application mobile native utilisant les mêmes endpoints.
+
+En résumé, cette couche d'implémentation traduit fidèlement les choix de conception en code fonctionnel, testé et sécurisé. Ce que le jury doit retenir : chaque couche a une responsabilité claire, et aucune logique métier ne s'est glissée dans les contrôleurs ou les composants React.

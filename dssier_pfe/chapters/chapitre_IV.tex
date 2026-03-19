@@ -1,6 +1,6 @@
 \chapter{Conception fonctionnelle et technique}
 
-\textbf{IMPORTANT :} Cette phase de conception est \textbf{CRUCIALE} et a été \textbf{COMPLÈTEMENT TERMINÉE} avant le démarrage du développement. Pour \textbf{App Budget V3}, j'ai construit une conception fonctionnelle et technique détaillée, validée itérativement, qui sert de référence unique au développement, aux tests et à la soutenance.
+\textbf{Note :} Cette phase de conception est cruciale et a été complètement terminée avant le démarrage du développement. Pour \textbf{App Budget V3}, j'ai construit une conception fonctionnelle et technique détaillée, validée itérativement, qui sert de référence unique au développement, aux tests et à la soutenance.
 
 \section{Méthodologie de conception}
 
@@ -19,14 +19,16 @@ La conception d'\textbf{App Budget V3} s'est déroulée en plusieurs étapes str
 
 \begin{conseil}
 \textbf{Pourquoi la conception est-elle stratégique ?}
+
+Pour ce projet, j'ai veillé à respecter plusieurs principes qui m'ont réellement fait gagner du temps :
 \begin{itemize}
-    \item \textbf{Évite les refactorisations :} Le modèle de données a été figé avant le code.
-    \item \textbf{Guide le développement :} 1 User Story = 1 Use Case + 1 Séquence + 1 Maquette.
-    \item \textbf{Facilite les tests :} Les flux UML servent de base aux scénarios E2E Playwright.
-    \item \textbf{Réduit les risques :} Anticipation des cas d'erreurs (CSV invalide, Auth failed).
+    \item \textbf{Éviter les refactorisations :} le modèle de données a été figé avant le code.
+    \item \textbf{Guider le développement :} 1 User Story = 1 Use Case + 1 Séquence + 1 Maquette.
+    \item \textbf{Faciliter les tests :} les flux UML servent de base aux scénarios E2E Playwright.
+    \item \textbf{Réduire les risques :} anticipation des cas d'erreurs (CSV invalide, Auth failed).
 \end{itemize}
 
-\textbf{Checklist de validation :}
+\textbf{Éléments réalisés avant le démarrage du développement :}
 \begin{itemize}
     \item[\mycheckmark] Diagrammes de cas d'usage (Use Cases) validés
     \item[\mycheckmark] Diagramme de classes UML complet
@@ -55,20 +57,17 @@ Les interactions du système sont définies par trois acteurs principaux :
 
 \textbf{Principaux cas d'usage (UC) :}
 \begin{itemize}
-    \item \textbf{UC01 -- Compte :} Inscription, connexion, gestion profil.
-    \item \textbf{UC02 -- Transactions :} CRUD complet, filtres (Revenus/Dépenses).
+    \item \textbf{UC01 -- Compte :} Inscription, connexion, gestion profil. Dans ce diagramme, c'est le point d'entrée de tout utilisateur dans l'application.
+    \item \textbf{UC02 -- Transactions :} CRUD complet, filtres (Revenus/Dépenses). Cas central : l'utilisateur ajoute une dépense et voit son budget mis à jour en temps réel.
     \item \textbf{UC03 -- Enveloppes :} Définition des plafonds, suivi consommation.
     \item \textbf{UC04 -- Dashboard :} Visualisation des KPIs et graphiques.
     \item \textbf{UC05 -- Import :} Traitement fichiers CSV bancaires.
     \item \textbf{UC06 -- Export :} Portabilité des données (RGPD).
 \end{itemize}
 
-\begin{figure}[H]
-    \centering
-    \includegraphics[width=0.95\textwidth]{assets/images/usage_global.png}
-    \caption{Diagramme de cas d'usage global -- App Budget V3}
-    \label{fig:usage_global}
-\end{figure}
+\begin{center}
+\small$\rightarrow$~\textit{Diagramme de cas d'usage global — voir Annexe~\ref{ann:figures}, figure~\ref{fig:usage_global}}
+\end{center}
 
 \begin{jury}
 \textbf{Points de vigilance contrôlés :}
@@ -87,15 +86,12 @@ Les interactions du système sont définies par trois acteurs principaux :
 
 Ce diagramme structure les données manipulées par l'application et sert de référence pour le développement Back-end (NestJS) et la base de données.
 
-\begin{figure}[H]
-    \centering
-    \includegraphics[width=0.95\textwidth]{assets/images/class-diagram-app-budget-v3.png}
-    \caption{Diagramme de classes UML détaillé}
-    \label{fig:class-diagram}
-\end{figure}
+\begin{center}
+\small$\rightarrow$~\textit{Diagramme de classes UML détaillé — voir Annexe~\ref{ann:figures}, figure~\ref{fig:class-diagram}}
+\end{center}
 
 \begin{tcolorbox}[colback=blue!5!white,colframe=blue!60!black,title=\textbf{Mapping UML $\leftrightarrow$ Prisma (Code)}]
-Chaque classe UML est traduite en modèle Prisma pour assurer la cohérence :
+Chaque classe UML est traduite en modèle Prisma pour assurer la cohérence. Cela m'a évité des incohérences entre la théorie (UML) et ce que j'ai réellement codé :
 
 \begin{lstlisting}[language=JavaScript]
 // Classe UML User -> Modele Prisma
@@ -123,12 +119,9 @@ Les séquences détaillent les interactions temporelles entre le Frontend, l'API
 
 \subsection{Séquence 1 : Authentification (US-01)}
 
-\begin{figure}[H]
-    \centering
-    \includegraphics[width=0.95\textwidth]{assets/images/seq-auth-login.png}
-    \caption{Flux de connexion utilisateur (Login)}
-    \label{fig:seq-auth}
-\end{figure}
+\begin{center}
+\small$\rightarrow$~\textit{Séquence — Connexion utilisateur — voir Annexe~\ref{ann:figures}, figure~\ref{fig:seq-auth}}
+\end{center}
 
 \textbf{Déroulement nominal :}
 \begin{enumerate}
@@ -139,25 +132,23 @@ Les séquences détaillent les interactions temporelles entre le Frontend, l'API
     \item Retour \texttt{200 OK} et redirection vers le Dashboard.
 \end{enumerate}
 
+Pour l'utilisateur, cela se traduit par une connexion fluide en moins de 2 secondes, sans aucune manipulation technique de sa part.
+
 \subsection{Séquence 2 : Création de Transaction (US-03)}
 
-\begin{figure}[H]
-    \centering
-    \includegraphics[width=0.95\textwidth]{assets/images/seq-create-transaction.png}
-    \caption{Flux de création d'une transaction}
-    \label{fig:seq-transaction}
-\end{figure}
+\begin{center}
+\small$\rightarrow$~\textit{Séquence — Création de transaction — voir Annexe~\ref{ann:figures}, figure~\ref{fig:seq-transaction}}
+\end{center}
 
 Ce diagramme illustre la validation des données par le \texttt{TransactionsService} avant l'insertion en base via Prisma, garantissant l'intégrité des données financières.
 
+Pour l'utilisateur, cela signifie qu'une transaction mal saisie est rejetée immédiatement, avec un message d'erreur clair, avant tout enregistrement.
+
 \subsection{Séquence 3 : Alertes Budgétaires (US-07)}
 
-\begin{figure}[H]
-    \centering
-    \includegraphics[width=0.95\textwidth]{assets/images/seq-budget-alert.png}
-    \caption{Flux automatique de déclenchement d'alertes}
-    \label{fig:seq-alert}
-\end{figure}
+\begin{center}
+\small$\rightarrow$~\textit{Séquence — Alertes budgétaires — voir Annexe~\ref{ann:figures}, figure~\ref{fig:seq-alert}}
+\end{center}
 
 % ============================================================
 % UI / UX
@@ -190,19 +181,9 @@ Exemple de structuration de la page \textbf{Dashboard} :
 
 \subsection{Wireframes et Maquettes (Figma)}
 
-\begin{figure}[H]
-    \centering
-    \begin{minipage}{0.45\textwidth}
-        \centering
-        \includegraphics[width=\textwidth]{assets/images/wireframe-dashboard.png}
-        \caption{Wireframe Basse Fidélité}
-    \end{minipage}\hfill
-    \begin{minipage}{0.45\textwidth}
-        \centering
-        \includegraphics[width=\textwidth]{assets/images/wireframe-transactions.png}
-        \caption{Wireframe Transactions}
-    \end{minipage}
-\end{figure}
+\begin{center}
+\small$\rightarrow$~\textit{Wireframe Basse Fidélité — voir Annexe~\ref{ann:figures}}
+\end{center}
 
 Les maquettes Haute Fidélité intègrent la charte graphique finale, les interactions (hover, focus) et les composants réutilisables du Design System.
 
@@ -237,12 +218,9 @@ Le modèle de données a été conçu selon la méthode Merise (MCD/MLD/MPD) pui
 
 \subsection{Modèle Conceptuel (MCD)}
 
-\begin{figure}[H]
-    \centering
-    \includegraphics[width=0.95\textwidth]{assets/images/mcd-app-budget-v3.png}
-    \caption{MCD : Entités et relations}
-    \label{fig:mcd}
-\end{figure}
+\begin{center}
+\small$\rightarrow$~\textit{MCD — Entités et relations — voir Annexe~\ref{ann:figures}, figure~\ref{fig:mcd}}
+\end{center}
 
 \subsection{Implémentation Physique (SQL)}
 
@@ -273,12 +251,9 @@ CREATE INDEX idx_transactions_user_date ON transactions(user_id, date DESC);
 
 L'application repose sur une séparation stricte des responsabilités.
 
-\begin{figure}[H]
-    \centering
-    \includegraphics[width=0.9\textwidth]{assets/images/arch-3tiers-app-budget-v3.png}
-    \caption{Architecture : Next.js (Front) - NestJS (Back) - PostgreSQL (Data)}
-    \label{fig:arch-3tiers}
-\end{figure}
+\begin{center}
+\small$\rightarrow$~\textit{Architecture Next.js / NestJS / PostgreSQL — voir Annexe~\ref{ann:figures}, figure~\ref{fig:arch-3tiers}}
+\end{center}
 
 \begin{itemize}
     \item \textbf{Tier 1 (Présentation) :} \textbf{Next.js 14}. Rendu hybride (SSR/CSR), composants React, validation formulaires (Zod).

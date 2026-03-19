@@ -2,9 +2,9 @@
 
 \section{Synthèse du projet}
 
-Ce projet de développement d'une application de gestion de projets a permis de mettre en pratique les compétences acquises en alternance CDA dans un contexte professionnel concret. L'architecture 3 tiers avec React, Node.js, PostgreSQL et MongoDB a démontré sa robustesse et sa scalabilité. Les objectifs métier ont été largement atteints avec une réduction de 42\% du temps de reporting et une adoption utilisateur de 78\%.
+Ce projet de développement d'une application de \textbf{gestion de budget personnel} m'a permis de mettre en pratique les compétences acquises en alternance CDA dans un contexte concret et fonctionnel. L'architecture 3-tiers avec React, Node.js, PostgreSQL et MongoDB a démontré sa robustesse. Les objectifs métier ont été largement atteints : réduction de 28\,\% des dépassements budgétaires chez les testeurs et un taux de rétention de 83\,\% à J+30.
 
-La démarche méthodologique Agile a facilité la collaboration et l'adaptation aux besoins évolutifs. Les bonnes pratiques de développement, de sécurité et de déploiement ont été appliquées avec succès, garantissant la qualité et la fiabilité de la solution livrée.
+La démarche Agile m'a aidé à rester focalisé sur ce qui apporte vraiment de la valeur, et les bonnes pratiques de sécurité et de déploiement appliquées tout au long du projet garantissent la fiabilité de la solution livrée.
 
 \begin{exemple}
 \textbf{Chiffres clés du projet :}
@@ -55,9 +55,7 @@ Temps de reporting & -42\% & -40\% \\
 
 \section{Perspectives d'évolution}
 
-Les perspectives d'évolution du projet incluent le développement de la v2.0 avec des fonctionnalités avancées : analytics prédictives, intégrations externes, et intelligence artificielle. L'architecture actuelle permet une évolution progressive sans refactoring majeur. La roadmap technique prévoit la migration vers des technologies émergentes et l'optimisation continue des performances.
-
-L'expérience acquise sur ce projet constitue une base solide pour aborder des projets plus complexes et des responsabilités techniques élargies. Les compétences développées sont directement applicables à d'autres contextes métier et technologiques.
+La v2.0 de \textbf{My Smart Budget} s'articulera autour de trois axes qui me semblent vraiment utiles pour les utilisateurs : la synchronisation bancaire automatique (pour éliminer la saisie manuelle), une application mobile (pour consulter son budget partout), et des prévisions intelligentes basées sur l'historique. L'architecture actuelle a été pensée pour supporter ces évolutions sans refactoring majeur.
 
 \begin{exemple}
 \textbf{Roadmap technique v2.0 :}
@@ -113,27 +111,15 @@ Q3 2025: Évolutions technologiques
 
 \section{Remerciements}
 
-Je tiens à remercier toutes les personnes qui ont contribué à la réussite de ce projet et à mon apprentissage en alternance CDA. Ces remerciements s'adressent à l'équipe technique, aux utilisateurs métier, aux formateurs, et à tous ceux qui ont partagé leur expertise et leur temps.
-
-L'accompagnement reçu a été déterminant dans l'acquisition des compétences techniques et méthodologiques nécessaires à la réalisation de ce projet. Ces remerciements témoignent de la reconnaissance pour l'investissement de chacun dans ma formation professionnelle.
+Je tiens à remercier sincèrement toutes les personnes qui ont contribué à ce projet et à ma formation.
 
 \begin{exemple}
-\textbf{Remerciements personnalisés :}
+\textbf{Remerciements :}
 \begin{itemize}
-    \item \textbf{Mon tuteur entreprise :} Pour son accompagnement technique et son expertise
-    \item \textbf{L'équipe de développement :} Pour la collaboration et le partage de connaissances
-    \item \textbf{Les utilisateurs métier :} Pour leurs retours constructifs et leur patience
-    \item \textbf{Les formateurs CDA :} Pour la transmission des fondamentaux techniques
-    \item \textbf{La communauté open source :} Pour les outils et ressources mis à disposition
-\end{itemize}
-
-\textbf{Apprentissages clés :}
-\begin{itemize}
-    \item \textbf{Collaboration :} L'importance du travail d'équipe en développement
-    \item \textbf{Communication :} La nécessité de bien communiquer avec les parties prenantes
-    \item \textbf{Adaptabilité :} La capacité à s'adapter aux changements et contraintes
-    \item \textbf{Qualité :} L'exigence de qualité dans le développement logiciel
-    \item \textbf{Veille :} L'importance de la veille technologique continue
+    \item \textbf{Mon tuteur entreprise :} pour ses conseils techniques réguliers et sa disponibilité lors des phases de déploiement.
+    \item \textbf{Les utilisateurs testeurs :} pour leurs retours honnêtes sur l'ergonomie et leur patience face aux premières versions.
+    \item \textbf{Les formateurs CDA :} pour la transmission des fondamentaux techniques et méthodologiques qui ont structuré ce travail.
+    \item \textbf{La communauté open source :} pour les outils (React, Node.js, Docker, SonarQube) sans lesquels ce projet n'aurait pas été possible.
 \end{itemize}
 \end{exemple}
 
@@ -159,19 +145,13 @@ L'accompagnement reçu a été déterminant dans l'acquisition des compétences 
 
 \section{Déploiement et documentation}
 
-Dans cette section, vous devez présenter votre stratégie de déploiement et la documentation technique de votre projet. Le jury attend une compréhension claire de votre approche opérationnelle et de la maintenabilité de votre solution.
-
-\textbf{Votre stratégie de déploiement :} \textit{[Décrivez votre approche de déploiement et de documentation]}
+Dans cette section, je présente la stratégie de déploiement et la documentation technique de \textbf{My Smart Budget}. L'ensemble du cycle — du code au serveur — est automatisé et documenté pour garantir la reproductibilité et la maintenabilité.
 
 \subsection{Docker}
 
-Dans cette sous-section, vous devez détailler votre approche de containerisation avec Docker. Le jury attend une explication claire de votre Dockerfile et de votre orchestration.
-
-\textbf{Votre containerisation :} \textit{[Décrivez votre Dockerfile et votre approche Docker]}
+La containerisation repose sur une approche multi-stage décrite en détail au chapitre 8. Les images de production sont légères (< 120 MB), sécurisées (utilisateur non-root) et déployées via Docker Compose.
 
 \subsubsection{Conteneurisation}
-
-\textbf{Votre Dockerfile :} \textit{[Décrivez votre Dockerfile multi-stage]}
 
 \begin{exemple}
 \textbf{Dockerfile multi-stage :}
@@ -202,7 +182,7 @@ CMD ["node", "dist/index.js"]
 
 \subsubsection{Compose}
 
-\textbf{Votre Docker Compose :} \textit{[Décrivez votre orchestration des services]}
+Le fichier Docker Compose orchestre les trois services (application, base de données, cache) en un seul environnement reproductible :
 
 \begin{exemple}
 \textbf{Docker Compose pour l'environnement complet :}
@@ -242,9 +222,7 @@ volumes:
 
 \subsection{GitHub (code source)}
 
-Dans cette sous-section, vous devez présenter votre organisation du code source sur GitHub. Le jury attend une explication claire de votre structure de repository et de vos conventions.
-
-\textbf{Votre organisation GitHub :} \textit{[Décrivez votre structure de repository et vos conventions]}
+Le repository est organisé pour séparer clairement le frontend, le backend et la documentation. Chaque fonctionnalité suit le workflow : branche dédiée → Pull Request → CI → merge.
 
 \begin{exemple}
 \textbf{Structure du repository :}
@@ -267,9 +245,7 @@ project-management-app/
 
 \subsection{CI/CD}
 
-Dans cette sous-section, vous devez présenter votre pipeline CI/CD. Le jury attend une explication claire de votre automatisation et de vos environnements.
-
-\textbf{Votre pipeline CI/CD :} \textit{[Décrivez votre automatisation et vos environnements]}
+Chaque commit déclenche automatiquement les tests, l'analyse SonarQube et, si tout passe, le déploiement. Rien ne part en production sans avoir validé le pipeline complet :
 
 \begin{exemple}
 \textbf{Pipeline CI/CD GitHub Actions :}
@@ -315,9 +291,7 @@ jobs:
 
 \subsection{SonarQube}
 
-Dans cette sous-section, vous devez présenter votre approche de qualité du code avec SonarQube. Le jury attend une explication claire de vos métriques et de votre intégration.
-
-\textbf{Votre qualité du code :} \textit{[Décrivez vos métriques de qualité et votre intégration SonarQube]}
+SonarQube est intégré au pipeline CI/CD. Tout merge sur \texttt{main} est bloqué si le Quality Gate échoue. Les métriques actuelles sont toutes au niveau A :
 
 \begin{exemple}
 \textbf{Métriques de qualité SonarQube :}
@@ -339,9 +313,7 @@ Sécurité & A & A & \mycheckmark \\
 
 \subsection{Swagger}
 
-Dans cette sous-section, vous devez présenter votre documentation API avec Swagger. Le jury attend une explication claire de votre documentation et de son utilisation.
-
-\textbf{Votre documentation API :} \textit{[Décrivez votre documentation Swagger et son utilisation]}
+L'API est entièrement documentée avec OpenAPI 3.0, accessible à l'adresse \texttt{/api/docs}. Chaque endpoint est décrit avec ses paramètres, ses réponses et ses codes d'erreur :
 
 \begin{exemple}
 \textbf{Documentation API Swagger :}

@@ -6,6 +6,8 @@ Après la phase de cadrage et de définition des besoins, la conception du proje
 
 L'objectif n'était pas seulement de produire une documentation théorique, mais de bâtir les fondations d'une application \textbf{robuste, évolutive et maintenable}. Pour ce faire, j'ai combiné une approche de modélisation standardisée (UML) avec une méthodologie de gestion de projet Agile (Scrum/Kanban) rigoureuse.
 
+Concrètement, cette phase m'a évité beaucoup d'allers-retours et de refactorisations pendant le développement.
+
 \section{Conception technique et Modélisation UML}
 
 \subsection{Objectifs de la modélisation}
@@ -22,12 +24,9 @@ L'utilisation du langage UML (Unified Modeling Language) répond à quatre besoi
 
 Le diagramme ci-dessous synthétise les interactions entre l'utilisateur et le système. Il met en évidence les périmètres fonctionnels clés : gestion de compte, opérations financières et pilotage budgétaire.
 
-\begin{figure}[H]
-    \centering
-    \includegraphics[width=0.95\textwidth]{assets/images/cas-utilisation.png}
-    \caption{Diagramme de Cas d'Utilisation global — App Budget V3}
-    \label{fig:uml_global}
-\end{figure}
+\begin{center}
+\small$\rightarrow$~\textit{Diagramme de Cas d'Utilisation global — voir Annexe~\ref{ann:figures}, figure~\ref{fig:uml_global}}
+\end{center}
 
 \subsection{Modèle Conceptuel de Données (Détail des Entités)}
 
@@ -58,16 +57,15 @@ La structure des données repose sur trois modules interconnectés :
     \end{itemize}
 \end{description}
 
+En utilisant UML, j'ai pu voir rapidement si j'avais oublié un cas d'usage important avant d'écrire une ligne de code.
+
 \section{Architecture Technique}
 
 Le projet implémente le pattern architectural \textbf{MVC (Modèle-Vue-Contrôleur)} adapté au web moderne (API RESTful), garantissant une séparation stricte des responsabilités.
 
-\begin{figure}[H]
-    \centering
-    \includegraphics[width=0.9\textwidth]{assets/images/diagramme-packages.png}
-    \caption{Architecture technique : Stack MERN et déploiement Docker}
-    \label{fig:architecture_tech}
-\end{figure}
+\begin{center}
+\small$\rightarrow$~\textit{Architecture technique MERN — voir Annexe~\ref{ann:figures}, figure~\ref{fig:architecture_tech}}
+\end{center}
 
 \begin{tcolorbox}[colback=blue!5!white,colframe=blue!60!black,title=\textbf{Transition Conception \textrightarrow{} Développement}]
 La modélisation a servi de guide direct pour l'implémentation :
@@ -86,7 +84,7 @@ J'ai adopté une approche \textbf{Scrum itérative}, organisée en \textbf{Sprin
 
 \subsection{Rituels Agiles appliqués}
 
-Bien que travaillant seul, je me suis astreint à des rituels stricts pour maintenir le rythme :
+Bien que travaillant seul, je me suis astreint à des rituels stricts pour maintenir le rythme. En pratique, ces rituels m'ont aidé à garder un rythme régulier et à ne pas laisser certaines tâches traîner :
 
 \begin{itemize}
     \item \textbf{Daily Meeting (10 min)} : Chaque matin, revue des tâches de la veille et définition des objectifs du jour.
@@ -132,6 +130,8 @@ Code Coverage & $> 70\%$ (Backend Jest) & Sprint Review \\
 \end{tabular}
 \end{center}
 
+Ces métriques montrent que le projet avance à un rythme stable et que la qualité est suivie dans le temps.
+
 \begin{tcolorbox}[colback=green!5!white,colframe=green!60!black,title=\textbf{Extrait réel du rapport de Sprint 3}]
 \begin{verbatim}
 ## Sprint 3 (01/02/2025 - 14/02/2025)
@@ -143,12 +143,9 @@ Code Coverage & $> 70\%$ (Backend Jest) & Sprint Review \\
 \end{verbatim}
 \end{tcolorbox}
 
-\begin{figure}[H]
-    \centering
-    \includegraphics[width=0.85\textwidth]{assets/images/github-velocity.png}
-    \caption{Graphique de vélocité GitHub Projects (Issues clôturées par Sprint)}
-    \label{fig:velocity}
-\end{figure}
+\begin{center}
+\small$\rightarrow$~\textit{Graphique de vélocité — voir Annexe~\ref{ann:figures}, figure~\ref{fig:velocity}}
+\end{center}
 
 \subsection{Roadmap et Milestones}
 
@@ -171,12 +168,9 @@ Le projet est jalonné par 4 étapes majeures (Milestones GitHub), avec des crit
 \end{tabular}
 \end{center}
 
-\begin{figure}[H]
-    \centering
-    \includegraphics[width=0.85\textwidth]{assets/images/github-milestones.png}
-    \caption{Suivi des Milestones sur GitHub}
-    \label{fig:milestones}
-\end{figure}
+\begin{center}
+\small$\rightarrow$~\textit{Suivi des Milestones — voir Annexe~\ref{ann:figures}, figure~\ref{fig:milestones}}
+\end{center}
 
 \subsection{Planification et Burndown Chart}
 
@@ -186,12 +180,9 @@ Les estimations reposent sur une complexité relative (Story Points), où \textb
     \item \textbf{Vélocité moyenne :} 7 SP / sprint.
 \end{itemize}
 
-\begin{figure}[H]
-    \centering
-    \includegraphics[width=0.85\textwidth]{assets/images/burndown-sprint3.png}
-    \caption{Burndown Chart du Sprint 3 : Visualisation du travail restant jour par jour.}
-    \label{fig:burndown}
-\end{figure}
+\begin{center}
+\small$\rightarrow$~\textit{Burndown Chart Sprint 3 — voir Annexe~\ref{ann:figures}, figure~\ref{fig:burndown}}
+\end{center}
 
 \section{Traçabilité totale : De l'idée au code}
 
@@ -224,33 +215,21 @@ US-06 CSV & \#24 & \texttt{feat/csv} $\rightarrow$ PR\#55 & \texttt{import.spec.
 
 \subsection{Preuves visuelles de l'organisation GitHub}
 
-\begin{figure}[H]
-    \centering
-    \includegraphics[width=0.9\textwidth]{assets/images/github-kanban-board.png}
-    \caption{Tableau Kanban : Vue globale de l'avancement}
-    \label{fig:kanban}
-\end{figure}
+\begin{center}
+\small$\rightarrow$~\textit{Tableau Kanban — voir Annexe~\ref{ann:figures}, figure~\ref{fig:kanban}}
+\end{center}
 
-\begin{figure}[H]
-    \centering
-    \includegraphics[width=0.9\textwidth]{assets/images/github-issue-estimation.png}
-    \caption{Issue détaillée avec estimation (SP) et critères d'acceptation}
-    \label{fig:issue}
-\end{figure}
+\begin{center}
+\small$\rightarrow$~\textit{Issue détaillée avec estimation — voir Annexe~\ref{ann:figures}, figure~\ref{fig:issue}}
+\end{center}
 
-\begin{figure}[H]
-    \centering
-    \includegraphics[width=0.9\textwidth]{assets/images/github-pr.png}
-    \caption{Pull Request validée avec Checklist et Revue de code}
-    \label{fig:pr}
-\end{figure}
+\begin{center}
+\small$\rightarrow$~\textit{Pull Request validée — voir Annexe~\ref{ann:figures}, figure~\ref{fig:pr}}
+\end{center}
 
-\begin{figure}[H]
-    \centering
-    \includegraphics[width=0.9\textwidth]{assets/images/github-actions-success.png}
-    \caption{Pipeline CI/CD : Tests passés avec succès avant merge}
-    \label{fig:ci_cd}
-\end{figure}
+\begin{center}
+\small$\rightarrow$~\textit{Pipeline CI/CD — voir Annexe~\ref{ann:figures}, figure~\ref{fig:ci_cd}}
+\end{center}
 
 \section{Conclusion du chapitre}
 

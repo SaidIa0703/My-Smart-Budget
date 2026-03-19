@@ -1,0 +1,288 @@
+% ============================================================
+% ANNEXES — Figures et diagrammes
+% My Smart Budget — Dossier CDA SAIDI Abdelghani
+% ============================================================
+
+% Commande de sécurité : affiche un cadre gris si l'image est absente
+\newcommand{\safefig}[3]{%
+  \IfFileExists{#1}{%
+    \includegraphics[width=#2]{#1}%
+  }{%
+    \fbox{\parbox{#2}{\centering\vspace{1.5cm}%
+      \textit{\small Image non disponible :}\\[4pt]%
+      \texttt{\tiny #3}%
+      \vspace{1.5cm}%
+    }}%
+  }%
+}
+
+\appendix
+\chapter{Figures et diagrammes}
+\label{ann:figures}
+
+Cette annexe regroupe l'ensemble des schémas, diagrammes et captures d'écran référencés dans le dossier. Chaque figure est identifiée par son numéro de chapitre d'origine.
+
+% ============================================================
+\section{Chapitre 1 — Présentation personnelle et du projet}
+% ============================================================
+
+\begin{figure}[H]
+    \centering
+    \safefig{chapters/assets/images/diagramme_context.png}{0.95\textwidth}{diagramme\_context.png}
+    \caption{Diagramme de contexte de l'application My Smart Budget}
+    \label{fig:diagramme_contexte}
+\end{figure}
+
+\begin{figure}[H]
+    \centering
+    \safefig{chapters/assets/images/cas-utilisation.png}{0.95\textwidth}{cas-utilisation.png}
+    \caption{Diagramme de classes UML de l'application My Smart Budget}
+    \label{fig:diagramme_classes}
+\end{figure}
+
+% ============================================================
+\section{Chapitre 2 — Cadrage et Cahier des Charges}
+% ============================================================
+
+\begin{figure}[H]
+    \centering
+    \safefig{chapters/assets/images/architecture_3_tiers.png}{0.95\textwidth}{architecture\_3\_tiers.png}
+    \caption{Architecture 3-tiers : Client React \textrightarrow{} API Express \textrightarrow{} MongoDB}
+    \label{fig:architecture-3-tiers}
+\end{figure}
+
+% ============================================================
+\section{Chapitre 3 — Conception, Modélisation et Gestion de Projet}
+% ============================================================
+
+\begin{figure}[H]
+    \centering
+    \safefig{chapters/assets/images/cas-utilisation.png}{0.95\textwidth}{cas-utilisation.png}
+    \caption{Diagramme de Cas d'Utilisation global — App Budget V3}
+    \label{fig:uml_global}
+\end{figure}
+
+\begin{figure}[H]
+    \centering
+    \safefig{chapters/assets/images/diagramme-packages.png}{0.95\textwidth}{diagramme-packages.png}
+    \caption{Architecture technique : Stack MERN et déploiement Docker}
+    \label{fig:architecture_tech}
+\end{figure}
+
+\begin{figure}[H]
+    \centering
+    \safefig{chapters/assets/images/github-velocity.png}{0.9\textwidth}{github-velocity.png}
+    \caption{Graphique de vélocité GitHub Projects (Issues clôturées par Sprint)}
+    \label{fig:velocity}
+\end{figure}
+
+\begin{figure}[H]
+    \centering
+    \safefig{chapters/assets/images/github-milestones.png}{0.9\textwidth}{github-milestones.png}
+    \caption{Suivi des Milestones sur GitHub}
+    \label{fig:milestones}
+\end{figure}
+
+\begin{figure}[H]
+    \centering
+    \safefig{chapters/assets/images/burndown-sprint3.png}{0.9\textwidth}{burndown-sprint3.png}
+    \caption{Burndown Chart du Sprint 3 : visualisation du travail restant jour par jour}
+    \label{fig:burndown}
+\end{figure}
+
+\begin{figure}[H]
+    \centering
+    \safefig{chapters/assets/images/github-kanban-board.png}{0.95\textwidth}{github-kanban-board.png}
+    \caption{Tableau Kanban : vue globale de l'avancement}
+    \label{fig:kanban}
+\end{figure}
+
+\begin{figure}[H]
+    \centering
+    \safefig{chapters/assets/images/github-issue-estimation.png}{0.95\textwidth}{github-issue-estimation.png}
+    \caption{Issue détaillée avec estimation (Story Points) et critères d'acceptation}
+    \label{fig:issue}
+\end{figure}
+
+\begin{figure}[H]
+    \centering
+    \safefig{chapters/assets/images/github-pr.png}{0.95\textwidth}{github-pr.png}
+    \caption{Pull Request validée avec checklist et revue de code}
+    \label{fig:pr}
+\end{figure}
+
+\begin{figure}[H]
+    \centering
+    \safefig{chapters/assets/images/github-actions-success.png}{0.95\textwidth}{github-actions-success.png}
+    \caption{Pipeline CI/CD : tests passés avec succès avant merge}
+    \label{fig:ci_cd}
+\end{figure}
+
+% ============================================================
+\section{Chapitre 4 — Conception fonctionnelle et technique}
+% ============================================================
+
+\begin{figure}[H]
+    \centering
+    \safefig{chapters/assets/images/usage_global.png}{0.95\textwidth}{usage\_global.png}
+    \caption{Diagramme de cas d'usage global — App Budget V3}
+    \label{fig:usage_global}
+\end{figure}
+
+\begin{figure}[H]
+    \centering
+    \safefig{chapters/assets/images/class-diagram-app-budget-v3.png}{0.95\textwidth}{class-diagram-app-budget-v3.png}
+    \caption{Diagramme de classes UML détaillé — App Budget V3}
+    \label{fig:class-diagram}
+\end{figure}
+
+\begin{figure}[H]
+    \centering
+    \safefig{chapters/assets/images/seq-auth-login.png}{0.95\textwidth}{seq-auth-login.png}
+    \caption{Diagramme de séquence — Flux de connexion utilisateur (Login)}
+    \label{fig:seq-auth}
+\end{figure}
+
+\begin{figure}[H]
+    \centering
+    \safefig{chapters/assets/images/seq-create-transaction.png}{0.95\textwidth}{seq-create-transaction.png}
+    \caption{Diagramme de séquence — Flux de création d'une transaction}
+    \label{fig:seq-transaction}
+\end{figure}
+
+\begin{figure}[H]
+    \centering
+    \safefig{chapters/assets/images/seq-budget-alert.png}{0.95\textwidth}{seq-budget-alert.png}
+    \caption{Diagramme de séquence — Flux automatique de déclenchement d'alertes}
+    \label{fig:seq-alert}
+\end{figure}
+
+\begin{figure}[H]
+    \centering
+    \begin{minipage}{0.48\textwidth}
+        \centering
+        \safefig{chapters/assets/images/wireframe-dashboard.png}{\textwidth}{wireframe-dashboard.png}
+        \caption{Wireframe basse fidélité — Dashboard}
+        \label{fig:wireframe-dashboard}
+    \end{minipage}\hfill
+    \begin{minipage}{0.48\textwidth}
+        \centering
+        \safefig{chapters/assets/images/wireframe-transactions.png}{\textwidth}{wireframe-transactions.png}
+        \caption{Wireframe — Page Transactions}
+        \label{fig:wireframe-transactions}
+    \end{minipage}
+\end{figure}
+
+\begin{figure}[H]
+    \centering
+    \safefig{chapters/assets/images/mcd-app-budget-v3.png}{0.95\textwidth}{mcd-app-budget-v3.png}
+    \caption{Modèle Conceptuel de Données (MCD) — entités et relations}
+    \label{fig:mcd}
+\end{figure}
+
+\begin{figure}[H]
+    \centering
+    \safefig{chapters/assets/images/arch-3tiers-app-budget-v3.png}{0.95\textwidth}{arch-3tiers-app-budget-v3.png}
+    \caption{Architecture 3-tiers : Next.js (Front) — NestJS (Back) — PostgreSQL (Data)}
+    \label{fig:arch-3tiers}
+\end{figure}
+
+% ============================================================
+\section{Chapitre 5 — Réalisation technique et Implémentation}
+% ============================================================
+
+\begin{figure}[H]
+    \centering
+    \safefig{chapters/assets/images/architecture_3_tiers.png}{0.95\textwidth}{architecture\_3\_tiers.png}
+    \caption{Flux de données implémenté dans l'architecture 3-tiers}
+    \label{fig:arch_impl}
+\end{figure}
+
+% ============================================================
+\section{Chapitre 7 — Tests et qualité logicielle}
+% ============================================================
+
+\begin{figure}[H]
+    \centering
+    \safefig{chapters/assets/images/sonarqube-badge.png}{0.6\textwidth}{sonarqube-badge.png}
+    \caption{Badge SonarQube — résumé qualité du code (My Smart Budget)}
+    \label{fig:sonarqube-badge}
+\end{figure}
+
+% ============================================================
+\section{Maquettes de l'interface — Questionnaire d'onboarding}
+% ============================================================
+
+\begin{figure}[H]
+    \centering
+    \safefig{chapters/assets/images/question1.png}{0.7\textwidth}{question1.png}
+    \caption{Onboarding — Étape 1 : Profil Personnel (nom, âge, situation matrimoniale)}
+    \label{fig:maquette-onboarding-1}
+\end{figure}
+
+\begin{figure}[H]
+    \centering
+    \safefig{chapters/assets/images/question2.png}{0.7\textwidth}{question2.png}
+    \caption{Onboarding — Étape 2 : Situation Professionnelle (statut, revenu mensuel)}
+    \label{fig:maquette-onboarding-2}
+\end{figure}
+
+\begin{figure}[H]
+    \centering
+    \safefig{chapters/assets/images/question3.png}{0.7\textwidth}{question3.png}
+    \caption{Onboarding — Étape 3 : Composition Familiale (enfants à charge, type de logement)}
+    \label{fig:maquette-onboarding-3}
+\end{figure}
+
+\begin{figure}[H]
+    \centering
+    \safefig{chapters/assets/images/question4.png}{0.7\textwidth}{question4.png}
+    \caption{Onboarding — Étape 4 : Vos Objectifs financiers (dernière étape)}
+    \label{fig:maquette-onboarding-4}
+\end{figure}
+
+% ============================================================
+\section{Maquettes de l'interface — Profils et budgets}
+% ============================================================
+
+\begin{figure}[H]
+    \centering
+    \safefig{chapters/assets/images/profilgen.png}{0.7\textwidth}{profilgen.png}
+    \caption{Sélection du profil prédéfini (Célibataire, En couple, Famille, Retraité(e), Étudiant(e))}
+    \label{fig:maquette-profils-liste}
+\end{figure}
+
+\begin{figure}[H]
+    \centering
+    \safefig{chapters/assets/images/profil1.png}{0.7\textwidth}{profil1.png}
+    \caption{Budget recommandé — Profil Jeune Célibataire (28 ans, 2\,500\,€/mois)}
+    \label{fig:maquette-budget-celibataire}
+\end{figure}
+
+\begin{figure}[H]
+    \centering
+    \safefig{chapters/assets/images/profil2.png}{0.7\textwidth}{profil2.png}
+    \caption{Budget recommandé — Profil Famille Mariée (42 ans, 3\,500\,€/mois, 2 enfants)}
+    \label{fig:maquette-budget-famille}
+\end{figure}
+
+\begin{figure}[H]
+    \centering
+    \safefig{chapters/assets/images/profil3.png}{0.7\textwidth}{profil3.png}
+    \caption{Budget recommandé — Profil Retraité(e) (68 ans, 1\,800\,€/mois)}
+    \label{fig:maquette-budget-retraite}
+\end{figure}
+
+\begin{figure}[H]
+    \centering
+    \safefig{chapters/assets/images/profiletudiant.png}{0.7\textwidth}{profiletudiant.png}
+    \caption{Budget recommandé — Profil Étudiant(e) (22 ans, 800\,€/mois)}
+    \label{fig:maquette-budget-etudiant}
+\end{figure}
+
+\begin{figure}[H]
+    \centering
+    \safefig{chapters/assets/images/tabBudget.png}{0.95\textwidth}{tabBudget.png}
+    \caption{Tableau comparatif des budgets par profil (Célibataire, Famille, Retraité(e), Étudiant(e))}
+    \label{fig:maquette-tableau-comparatif}
+\end{figure}

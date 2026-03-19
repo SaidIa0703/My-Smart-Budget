@@ -15,7 +15,7 @@ Dans le cadre de mon projet personnel, j'assure l'ensemble des étapes du cycle 
     \item \textbf{Déploiement et maintenance} : configuration de l'environnement serveur, conteneurisation avec Docker et déploiement sur un service cloud.
 \end{itemize}
 
-Ce rôle autonome me permet de développer une vision complète d'un projet web, de la phase de conception à la mise en production, tout en consolidant mes compétences techniques, méthodologiques et organisationnelles.
+Ce rôle autonome me permet de suivre un projet web de la phase de conception à la mise en production. Il m'aide aussi à consolider mes compétences techniques, méthodologiques et organisationnelles.
 \end{tcolorbox}
 
 \begin{tcolorbox}[colback=gray!5!white,colframe=gray!60!black,title=\textbf{Contexte du projet}]
@@ -35,6 +35,8 @@ L'objectif est de proposer une solution simple, intelligente et accessible depui
 
 Le projet repose sur une architecture web moderne et sécurisée :  
 \textit{React.js} pour le front-end, \textit{Node.js/Express} pour le back-end, \textit{MongoDB} pour le stockage, et \textit{Docker/AWS} pour le déploiement.
+
+J'ai choisi de travailler sur la gestion de budget car c'est un sujet qui me concerne au quotidien et que je vois comme un vrai problème pour beaucoup de personnes de mon entourage.
 \end{tcolorbox}
 
 \begin{tcolorbox}[colback=green!5!white,colframe=green!60!black,title=\textbf{Durée et planification du projet}]
@@ -136,7 +138,7 @@ Le projet \textbf{My Smart Budget} vise à générer des gains mesurables tant p
     \item \textbf{Gain de productivité :} réduction du temps de saisie des dépenses grâce à l'automatisation et à la catégorisation intelligente (gain mesuré de \textbf{35\,\%} sur panel test) ;
     \item \textbf{Réduction d'erreurs :} fiabilisation des calculs et des rapports budgétaires grâce à la centralisation des données (\textbf{-95\,\%} d'erreurs vs Excel) ;
     \item \textbf{Amélioration de l'expérience utilisateur :} interface simplifiée, accessible et motivante (taux de satisfaction actuel : \textbf{87\,\%} sur 12 testeurs) ;
-    \item \textbf{Valorisation de la marque :} démonstration du savoir-faire technique de l'entreprise sur un produit complet et fonctionnel.
+    \item \textbf{Valorisation du travail :} ce projet me permet aussi de montrer mes compétences techniques sur un produit complet et utilisable.
 \end{itemize}
 \end{tcolorbox}
 
@@ -158,6 +160,8 @@ Le projet \textbf{My Smart Budget} vise à générer des gains mesurables tant p
 
     \item \textbf{Temporel :} Déployer une \textbf{version 1.0} de l'application au plus tard en \textbf{octobre 2025}, incluant l'ensemble des fonctionnalités de base (gestion des transactions, budgets, catégories, tableaux de bord), puis planifier une \textbf{version 2.0 en décembre 2025} intégrant au moins \textbf{deux nouvelles fonctionnalités} issues des retours utilisateurs.
 \end{itemize}
+
+L'essentiel pour moi est que les utilisateurs gardent l'application dans la durée et se sentent réellement plus à l'aise avec leur budget.
 \end{tcolorbox}
 
 % ========================
@@ -263,20 +267,17 @@ Le diagramme suivant illustre les principaux flux d'informations entre les acteu
 \textbf{Zone grise :} systèmes externes (banques, services tiers) — hors périmètre mais interfacés.
 \end{tcolorbox}
 
-\begin{figure}[H]
-    \centering
-    \includegraphics[width=0.9\textwidth]{assets/images/diagramme_context.png}
-    \caption{Diagramme de contexte de l'application My Smart Budget — flux d'informations et interactions principales}
-    \label{fig:diagramme_contexte}
-\end{figure}
+\begin{center}
+\small$\rightarrow$~\textit{Diagramme de contexte — voir Annexe~\ref{ann:figures}, figure~\ref{fig:diagramme_contexte}}
+\end{center}
 
 % === NOUVEAU : Lecture détaillée du diagramme ===
 \begin{tcolorbox}[colback=blue!5!white,colframe=blue!60!black,title=\textbf{Lecture du diagramme — Architecture et flux}]
 \textbf{Acteurs et leurs rôles :}
 \begin{itemize}
-    \item \textbf{Utilisateur final :} Consulte dashboard, saisit transactions, configure budgets → \textit{Frontend React}
-    \item \textbf{Administrateur :} Gère les utilisateurs, consulte métriques globales → \textit{Backend admin}
-    \item \textbf{Système bancaire :} Fournit données via API (import CSV/OFX) → \textit{Service d'import} (prévu V2)
+    \item \textbf{Utilisateur final :} Consulte dashboard, saisit transactions, configure budgets $\rightarrow$ \textit{Frontend React}
+    \item \textbf{Administrateur :} Gère les utilisateurs, consulte métriques globales $\rightarrow$ \textit{Backend admin}
+    \item \textbf{Système bancaire :} Fournit données via API (import CSV/OFX) $\rightarrow$ \textit{Service d'import} (prévu V2)
 \end{itemize}
 
 \textbf{Architecture technique (dans le périmètre) :}
@@ -309,12 +310,9 @@ Il illustre les principales entités du système (utilisateurs, transactions, bu
 Chaque classe correspond à une collection dans MongoDB, avec les index appropriés pour optimiser les requêtes.
 \end{tcolorbox}
 
-\begin{figure}[H]
-    \centering
-    \includegraphics[width=0.95\textwidth]{assets/images/cas-utilisation.png}
-    \caption{Diagramme de classes UML de l'application My Smart Budget}
-    \label{fig:diagramme_classes}
-\end{figure}
+\begin{center}
+\small$\rightarrow$~\textit{Diagramme de classes UML — voir Annexe~\ref{ann:figures}, figure~\ref{fig:diagramme_classes}}
+\end{center}
 
 \begin{tcolorbox}[colback=gray!10!white,colframe=gray!70!black,title=\textbf{Analyse du modèle de données}]
 Le modèle repose sur une organisation simple, cohérente et évolutive, pensée pour faciliter les traitements financiers et les analyses statistiques :
@@ -517,4 +515,6 @@ Ce projet représente pour moi une expérience professionnelle formatrice et con
 \end{itemize}
 
 En conclusion, \textbf{My Smart Budget} constitue une première étape solide vers la conception d'applications web à forte valeur ajoutée, combinant technologie, ergonomie et utilité concrète, avec des résultats mesurables et une roadmap claire pour l'évolution future.
+
+Ce projet m'a notamment appris que j'ai tendance à sous-estimer le temps nécessaire aux tests, et que la phase de débogage peut être plus longue que prévu — deux points que je garderai en tête pour mes prochains projets.
 \end{tcolorbox}

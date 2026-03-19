@@ -6,6 +6,8 @@ La stratégie de containerisation de \textbf{My Smart Budget} utilise Docker pou
 
 \subsection{Architecture Docker multi-stage optimisée}
 
+L'exemple ci-dessous illustre la stratégie multi-stage appliquée au backend : séparation des dépendances, de la compilation et de l'image de production, ce qui réduit significativement la taille finale de l'image.
+
 \begin{exemple}
 \textbf{Dockerfile multi-stage pour My Smart Budget (Backend) :}
 \begin{lstlisting}[language=dockerfile]
@@ -102,7 +104,11 @@ CMD ["nginx", "-g", "daemon off;"]
 \end{lstlisting}
 \end{exemple}
 
+Concrètement, cette approche multi-stage garantit que l'image de production ne contient que le strict nécessaire : pas d'outils de build, pas de dépendances de développement, utilisateur non-root.
+
 \subsection{Orchestration avec Docker Compose}
+
+L'exemple suivant montre comment les trois services (backend, frontend, base de données) sont orchestrés ensemble pour former un environnement complet reproductible :
 
 \begin{exemple}
 \textbf{docker-compose.yml pour environnement complet :}
@@ -276,7 +282,7 @@ Redis & 34 MB & 34 MB & --- & 0 \\
 
 \subsection{Architecture du pipeline complet}
 
-Le pipeline CI/CD de My Smart Budget automatise l'ensemble du cycle de développement, du commit au déploiement en production, avec des contrôles qualité à chaque étape.
+Le pipeline CI/CD de My Smart Budget automatise l'ensemble du cycle de développement, du commit au déploiement en production, avec des contrôles qualité à chaque étape. L'idée centrale est simple : rien ne part en staging ou en production sans avoir passé les tests et les contrôles de sécurité.
 
 \begin{exemple}
 \textbf{Pipeline CI/CD principal (.github/workflows/main.yml) :}
@@ -1347,6 +1353,8 @@ Utilisation mémoire & 45\% & → stable \\
     \item ✅ \textbf{Change Failure Rate :} 4.8\% (Elite)  
     \item ✅ \textbf{MTTR :} 12 minutes (Elite)
 \end{itemize}
+
+Cela permet à n'importe quel développeur ou opérateur de comprendre rapidement comment intervenir si un problème survient, grâce à une documentation opérationnelle complète et à des dashboards toujours à jour.
 \end{tcolorbox}
 
 \section{Liens et ressources}

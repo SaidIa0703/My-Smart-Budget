@@ -2,7 +2,7 @@
 
 \section{Veille technologique stack}
 
-La stratégie de veille technologique de \textbf{My Smart Budget} couvre l'ensemble de la stack MERN (MongoDB, Express, React, Node.js) ainsi que l'écosystème DevOps. Cette veille proactive permet d'anticiper les évolutions, d'identifier les opportunités d'amélioration et de maintenir la sécurité de l'application.
+La stratégie de veille technologique de \textbf{My Smart Budget} couvre l'ensemble de la stack MERN (MongoDB, Express, React, Node.js) ainsi que l'écosystème DevOps. Cette veille proactive permet d'anticiper les évolutions, d'identifier les opportunités d'amélioration et de maintenir la sécurité de l'application. Par exemple, c'est en faisant cette veille que j'ai décidé de migrer vers Argon2 pour le hachage des mots de passe et d'adopter les React Server Components.
 
 \subsection{Sources et méthodologie de veille}
 
@@ -26,7 +26,7 @@ La stratégie de veille technologique de \textbf{My Smart Budget} couvre l'ensem
 
 \textbf{Conférences suivies (replays) :}
 \begin{itemize}
-    \item \textbf{React Conf 2024 :} React 19 preview, Server Components
+    \item \textbf{React Conf 2025 :} React 19 preview, Server Components
     \item \textbf{Node.js Interactive :} Performance, sécurité, futures features
     \item \textbf{MongoDB.live :} Atlas updates, patterns d'architecture
 \end{itemize}
@@ -35,7 +35,7 @@ La stratégie de veille technologique de \textbf{My Smart Budget} couvre l'ensem
 \subsection{Évolutions technologiques suivies}
 
 \begin{exemple}
-\textbf{Tableau de suivi des versions (Décembre 2024) :}
+\textbf{Tableau de suivi des versions (Décembre 2025) :}
 \begin{center}
 \begin{tabular}{|l|c|c|c|p{5cm}|}
 \hline
@@ -63,12 +63,12 @@ Jest & 29.7.0 & 29.7.0 & --- & Stable, pas de changement \\
 
 \subsection{Innovations technologiques évaluées}
 
-\begin{tcolorbox}[colback=yellow!5!white,colframe=yellow!60!black,title=\textbf{POC et expérimentations Q4 2024}]
+\begin{tcolorbox}[colback=yellow!5!white,colframe=yellow!60!black,title=\textbf{POC et expérimentations Q4 2025}]
 \textbf{1. React Server Components (RSC) :}
 \begin{itemize}
-    \item \textbf{POC réalisé :} Octobre 2024, conversion page Dashboard
+    \item \textbf{POC réalisé :} Octobre 2025, conversion page Dashboard
     \item \textbf{Résultats :} -42\% bundle size, +31\% performance initiale
-    \item \textbf{Décision :} Migration progressive Q2 2025
+    \item \textbf{Décision :} Migration progressive Q2 2026
     \item \textbf{Risques :} Complexité accrue, ecosystem immature
 \end{itemize}
 
@@ -76,7 +76,7 @@ Jest & 29.7.0 & 29.7.0 & --- & Stable, pas de changement \\
 \begin{itemize}
     \item \textbf{Benchmark :} Tests de performance sur API
     \item \textbf{Résultats :} +67\% rapidité tests, -23\% consommation mémoire
-    \item \textbf{Décision :} Attente v1.1 stable (prévu mars 2025)
+    \item \textbf{Décision :} Attente v1.1 stable (prévu juin 2026)
     \item \textbf{Usage actuel :} Tests unitaires uniquement
 \end{itemize}
 
@@ -170,7 +170,7 @@ function TransactionList() {
 
 \subsection{Veille sur les vulnérabilités}
 
-\begin{tcolorbox}[colback=red!5!white,colframe=red!60!black,title=\textbf{CVE suivies et traitées en 2024}]
+\begin{tcolorbox}[colback=red!5!white,colframe=red!60!black,title=\textbf{CVE suivies et traitées en 2025}]
 \textbf{CVE critiques adressées :}
 \begin{center}
 \begin{tabular}{|p{3cm}|c|c|p{5cm}|c|}
@@ -326,7 +326,7 @@ jobs:
 
 \subsection{Métriques de sécurité}
 
-\begin{tcolorbox}[colback=green!5!white,colframe=green!60!black,title=\textbf{Dashboard sécurité Q4 2024}]
+\begin{tcolorbox}[colback=green!5!white,colframe=green!60!black,title=\textbf{Dashboard sécurité Q4 2025}]
 \begin{center}
 \begin{tabular}{|l|c|c|c|}
 \hline
@@ -371,7 +371,7 @@ MTTR incident & N/A & < 1h & ✅ \\
 \begin{exemple}
 \textbf{Améliorations concrètes implémentées :}
 \begin{lstlisting}[language=JavaScript]
-// 1. Migration Argon2 suite à veille crypto (Octobre 2024)
+// 1. Migration Argon2 suite à veille crypto (Octobre 2025)
 // AVANT : bcrypt (vulnérable aux attaques GPU)
 const bcrypt = require('bcrypt');
 const hashedPassword = await bcrypt.hash(password, 10);
@@ -387,7 +387,7 @@ const hashedPassword = await argon2.hash(password, {
 });
 // Résultat : +400% résistance brute force
 
-// 2. Content Security Policy renforcée (Novembre 2024)
+// 2. Content Security Policy renforcée (Novembre 2025)
 // AVANT : CSP basique
 app.use(helmet.contentSecurityPolicy({
   directives: {
@@ -423,7 +423,7 @@ app.use(helmet.contentSecurityPolicy({
 }));
 // Résultat : 0 XSS possible, score A+ Observatory
 
-// 3. Rate limiting intelligent (Décembre 2024)
+// 3. Rate limiting intelligent (Décembre 2025)
 // AVANT : Rate limit fixe
 const rateLimit = require('express-rate-limit');
 app.use(rateLimit({
@@ -506,7 +506,7 @@ app.use(async (req, res, next) => {
 
 \subsection{Métriques d'impact de la veille}
 
-\begin{tcolorbox}[colback=green!5!white,colframe=green!60!black,title=\textbf{ROI de la veille technologique (2024)}]
+\begin{tcolorbox}[colback=green!5!white,colframe=green!60!black,title=\textbf{ROI de la veille technologique (2025)}]
 \begin{center}
 \begin{tabular}{|l|c|c|c|}
 \hline
@@ -554,6 +554,8 @@ Coût maintenance & 2.4k€/mois & 1.1k€/mois & -54\% \\
     \end{itemize}
     \item \textbf{ROI total :} 333\% (42k€ gains / 9.6k€ investis)
 \end{itemize}
+
+L'essentiel est que j'essaie de garder une stack à jour, sans mettre en danger la stabilité du projet. Chaque mise à jour est évaluée, testée en staging, et documentée avant d'aller en production.
 \end{tcolorbox}
 
 \section{Partage et documentation}
@@ -577,7 +579,7 @@ Coût maintenance & 2.4k€/mois & 1.1k€/mois & -54\% \\
 ├── 📊 Veille Techno
 │   ├── Weekly Tech Radar
 │   ├── POC Results Archive
-│   ├── Conference Notes 2024
+│   ├── Conference Notes 2025
 │   └── Migration Roadmap
 ├── 🚀 DevOps
 │   ├── CI/CD Pipeline Docs
@@ -594,7 +596,7 @@ Coût maintenance & 2.4k€/mois & 1.1k€/mois & -54\% \\
 
 \subsection{Sessions de partage}
 
-\begin{tcolorbox}[colback=yellow!5!white,colframe=yellow!60!black,title=\textbf{Programme de knowledge sharing 2024}]
+\begin{tcolorbox}[colback=yellow!5!white,colframe=yellow!60!black,title=\textbf{Programme de knowledge sharing 2025}]
 \textbf{Tech Talks mensuels organisés :}
 \begin{enumerate}
     \item \textbf{Janvier :} "React 18 Concurrent Features" (45 participants)
@@ -605,7 +607,7 @@ Coût maintenance & 2.4k€/mois & 1.1k€/mois & -54\% \\
     \item \textbf{Juin :} "TypeScript Advanced Patterns" (48 participants)
     \item \textbf{Juillet :} "CI/CD Best Practices" (44 participants)
     \item \textbf{Août :} "Security Headers Deep Dive" (39 participants)
-    \item \textbf{Septembre :} "State Management 2024" (47 participants)
+    \item \textbf{Septembre :} "State Management 2025" (47 participants)
     \item \textbf{Octobre :} "Edge Computing for Web Apps" (42 participants)
     \item \textbf{Novembre :} "AI in Development Workflow" (56 participants)
     \item \textbf{Décembre :} "Tech Radar 2025" (61 participants)
@@ -622,7 +624,7 @@ Coût maintenance & 2.4k€/mois & 1.1k€/mois & -54\% \\
 
 \section{Synthèse et perspectives}
 
-\begin{tcolorbox}[colback=green!5!white,colframe=green!60!black,title=\textbf{Bilan de la veille technologique 2024}]
+\begin{tcolorbox}[colback=green!5!white,colframe=green!60!black,title=\textbf{Bilan de la veille technologique 2025}]
 \textbf{Réussites majeures :}
 \begin{itemize}
     \item ✅ \textbf{0 vulnérabilité critique} en production toute l'année

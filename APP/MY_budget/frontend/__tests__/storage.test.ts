@@ -1,4 +1,4 @@
-import { saveSession, getToken, getUser, clearSession } from '../src/app/utils/storage';
+import { saveSession, getToken, getUser, clearSession } from '@/src/app/utils/storage';
 
 describe('storage utilities', () => {
   beforeEach(() => {

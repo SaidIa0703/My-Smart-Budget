@@ -1,7 +1,7 @@
 import '@testing-library/jest-dom';
 import React from 'react';
 import { render, screen, waitFor, fireEvent } from '@testing-library/react';
-import TransactionList from '../components/transactionList';
+import TransactionList from '@/components/transactionList';
 
 const mockTransactions = [
   { id: 1, name: 'Carrefour', category: 'Alimentation', amount: -50, date: '2024-01-15T00:00:00.000Z' },

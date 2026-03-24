@@ -1,7 +1,7 @@
 import '@testing-library/jest-dom';
 import React from 'react';
 import { render, screen, fireEvent, waitFor } from '@testing-library/react';
-import Navbar from '../components/navbar';
+import Navbar from '@/components/navbar';
 
 const mockPush = jest.fn();
 

@@ -1,6 +1,6 @@
 
 import { useState } from "react";
-import { TransactionInput } from "../src/app/profile";
+import { TransactionInput } from "@/src/app/profile";
 
 export default function TransactionForm({ onAdd }: { onAdd: (t: TransactionInput) => void }) {
   const [label, setLabel] = useState("");

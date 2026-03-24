@@ -1,7 +1,7 @@
 import '@testing-library/jest-dom';
 import React from 'react';
 import { render, screen, fireEvent, waitFor } from '@testing-library/react';
-import AddTransaction from '../components/addTransaction';
+import AddTransaction from '@/components/addTransaction';
 
 beforeEach(() => {
   localStorage.setItem('user', JSON.stringify({ id: 1 }));

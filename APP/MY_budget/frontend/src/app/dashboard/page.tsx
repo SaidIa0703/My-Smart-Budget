@@ -1,7 +1,7 @@
 'use client';
 
-import Navbar from '../../../components/navbar';
-import MySmartBudget from '../../../components/dashboard';
+import Navbar from '@/components/navbar';
+import MySmartBudget from '@/components/dashboard';
 import { useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 

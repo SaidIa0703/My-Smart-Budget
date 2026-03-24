@@ -1,7 +1,7 @@
 'use client';
 
-import Navbar from '../../../components/Navbar';
-import BudgetCategories from '../../../components/BudgetCategories';
+import Navbar from '../../../components/navbar';
+import BudgetCategories from '../../../components/budgetCategories';
 import { useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 

@@ -1,7 +1,7 @@
 'use client';
 
-import Navbar from '../../../components/Navbar';
-import SavingsGoals from '../../../components/SavingsGoals';
+import Navbar from '../../../components/navbar';
+import SavingsGoals from '../../../components/savingsGoals';
 import { useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 

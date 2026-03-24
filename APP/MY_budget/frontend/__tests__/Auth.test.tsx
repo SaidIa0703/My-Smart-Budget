@@ -1,7 +1,7 @@
 import '@testing-library/jest-dom';
 import React from 'react';
 import { render, screen, fireEvent, waitFor } from '@testing-library/react';
-import AuthComponent from '../components/Auth';
+import AuthComponent from '../components/auth';
 
 const mockPush = jest.fn();
 

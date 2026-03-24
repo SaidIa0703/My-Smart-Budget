@@ -9,10 +9,10 @@ jest.mock('next/navigation', () => ({
   usePathname: () => '/',
 }));
 
-jest.mock('../components/Navbar', () => () => <nav>Navbar</nav>);
-jest.mock('../components/Dashboard', () => () => <div>Dashboard</div>);
-jest.mock('../components/SavingsGoals', () => () => <div>SavingsGoals</div>);
-jest.mock('../components/TransactionList', () => () => <div>TransactionList</div>);
+jest.mock('../components/navbar', () => () => <nav>Navbar</nav>);
+jest.mock('../components/dashboard', () => () => <div>Dashboard</div>);
+jest.mock('../components/savingsGoals', () => () => <div>SavingsGoals</div>);
+jest.mock('../components/transactionList', () => () => <div>TransactionList</div>);
 
 import DashboardPage from '../src/app/dashboard/page';
 import GoalsPage from '../src/app/goals/page';

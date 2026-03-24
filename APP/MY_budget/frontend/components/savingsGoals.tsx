@@ -1,5 +1,5 @@
 import React from 'react';
-import MockupCard from './MockupCard';
+import MockupCard from './mockupCard';
 
 interface Goal {
   id: string;

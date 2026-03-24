@@ -2,7 +2,7 @@
 
 import React, { useState } from 'react';
 import { useRouter } from 'next/navigation';
-import { saveSession } from '../src/app/utils/storage';
+import { saveSession } from '@/src/app/utils/storage';
 import { Mail, Lock, User, Eye, EyeOff, AlertCircle, CheckCircle } from 'lucide-react';
 
 export default function AuthComponent() {

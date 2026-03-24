@@ -2,7 +2,7 @@
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { Eye, EyeOff, Wallet, Mail, Lock, User, ArrowRight } from 'lucide-react';
-import { saveSession } from '../utils/storage';
+import { saveSession } from '@/src/app/utils/storage';
 
 export default function LoginPage() {
   const router = useRouter();

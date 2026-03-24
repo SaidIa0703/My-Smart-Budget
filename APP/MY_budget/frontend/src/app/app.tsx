@@ -1,11 +1,11 @@
 import React from 'react';
-import Dashboard from '../../components/dashboard';
-import AddTransaction from '../../components/addTransaction';
-import TransactionHistory from '../../components/transactionHistory';
-import BudgetCategories from '../../components/budgetCategories';
-import Reports from '../../components/reports';
-import SavingsGoals from '../../components/savingsGoals';
-import Navbar from '../../components/navbar';
+import Dashboard from '@/components/dashboard';
+import AddTransaction from '@/components/addTransaction';
+import TransactionHistory from '@/components/transactionHistory';
+import BudgetCategories from '@/components/budgetCategories';
+import Reports from '@/components/reports';
+import SavingsGoals from '@/components/savingsGoals';
+import Navbar from '@/components/navbar';
 export default function App() {
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-900 via-slate-900 to-slate-800 p-16">

@@ -1,5 +1,5 @@
 import React from 'react';
-import MockupCard from './mockupCard';
+import MockupCard from '@/components/mockupCard';
 
 interface ReportItem {
   id: string;

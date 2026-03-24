@@ -1,7 +1,7 @@
 import '@testing-library/jest-dom';
 import React from 'react';
 import { render, screen, fireEvent, waitFor } from '@testing-library/react';
-import AuthComponent from '../components/auth';
+import AuthComponent from '@/components/auth';
 
 const mockPush = jest.fn();
 
@@ -9,7 +9,7 @@ jest.mock('next/navigation', () => ({
   useRouter: () => ({ push: mockPush }),
 }));
 
-jest.mock('../src/app/utils/storage', () => ({
+jest.mock('@/src/app/utils/storage', () => ({
   saveSession: jest.fn(),
 }));
 
@@ -109,7 +109,7 @@ describe('AuthComponent', () => {
 
   it('calls saveSession and redirects on successful login', async () => {
     jest.useFakeTimers();
-    const { saveSession } = require('../src/app/utils/storage');
+    const { saveSession } = require('@/src/app/utils/storage');
     (globalThis.fetch as jest.Mock).mockResolvedValueOnce({
       ok: true,
       json: async () => ({ token: 'tok123', user: { id: 1, email: 'test@test.com' } }),

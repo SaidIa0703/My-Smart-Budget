@@ -1,7 +1,7 @@
 'use client';
 
-import Navbar from '../../../components/navbar';
-import Reports from '../../../components/reports';
+import Navbar from '@/components/navbar';
+import Reports from '@/components/reports';
 import { useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 

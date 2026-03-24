@@ -1,11 +1,11 @@
 'use client';
 import { ResponsiveContainer, PieChart, Pie, Cell, Tooltip, BarChart, CartesianGrid, XAxis, YAxis, Bar } from 'recharts';
 import React, { useState, useEffect } from 'react';
-import { 
-  TrendingUp, TrendingDown, CreditCard, Target, PiggyBank, 
+import {
+  TrendingUp, CreditCard, Target, PiggyBank,
   Bell, Settings, Plus, Home, Receipt, Wallet, User,
-  Calendar, ChevronRight, X, Check, AlertCircle, ArrowUpRight,
-  ArrowDownRight, Filter, Search, Eye, EyeOff, Menu, Trash2
+  ChevronRight, X, ArrowUpRight,
+  ArrowDownRight, Search, Eye, EyeOff, Menu, Trash2
 } from 'lucide-react';
 import Questionnaire from '@/src/app/questionnaire';
 
@@ -74,10 +74,10 @@ const MySmartBudget = () => {
 
   // ✅ CORRECTION 2 : redirect vers /login si pas connecté + vérification questionnaire
   useEffect(() => {
-    if (typeof window === 'undefined') return;
+    if (typeof globalThis.window === 'undefined') return;
     const userData = localStorage.getItem('user');
     if (!userData) {
-      window.location.href = '/login';
+      globalThis.location.href = '/login';
       return;
     }
     const parsedUser = JSON.parse(userData);
@@ -129,7 +129,7 @@ const MySmartBudget = () => {
 
   const logout = () => {
     localStorage.clear();
-    window.location.href = '/login';
+    globalThis.location.href = '/login';
   };
 
   // ✅ CORRECTION 3 : template literal corrigé (backtick au lieu de quote)
@@ -143,11 +143,11 @@ const MySmartBudget = () => {
         body: JSON.stringify({
           userId: user?.id,
           ...formData,
-          amount: parseFloat(formData.amount)
+          amount: Number.parseFloat(formData.amount)
         })
       });
       if (response.ok) {
-        setMessage('✅ Transaction ajoutée!');
+        setMessage('Transaction ajoutée!');
         setFormData({
           name: '',
           category: '',
@@ -157,10 +157,11 @@ const MySmartBudget = () => {
         setShowAddForm(false);
         fetchTransactions();
       } else {
-        setMessage('❌ Erreur');
+        setMessage('Erreur');
       }
     } catch (error) {
-      setMessage('❌ Erreur serveur');
+      console.error('Erreur ajout transaction:', error);
+      setMessage('Erreur serveur');
     }
   };
 
@@ -233,6 +234,16 @@ const MySmartBudget = () => {
   }
 
   // ─── DASHBOARD ────────────────────────────────────────────────────────────
+
+  const getCategoryIcon = (amount: number, category: string): string => {
+    if (amount > 0) return '💰';
+    if (category === 'Alimentation') return '🛒';
+    if (category === 'Transport') return '🚗';
+    if (category === 'Loisirs') return '🎮';
+    if (category === 'Abonnements') return '📱';
+    if (category === 'Santé') return '⚕️';
+    return '💸';
+  };
 
   const NavItem = ({ icon: Icon, label, page }) => (
     <button
@@ -365,7 +376,7 @@ const MySmartBudget = () => {
             >
               <div className="flex items-center gap-4">
                 <div className="text-3xl">
-                  {transaction.amount > 0 ? '💰' : transaction.category === 'Alimentation' ? '🛒' : transaction.category === 'Transport' ? '🚗' : transaction.category === 'Loisirs' ? '🎮' : transaction.category === 'Abonnements' ? '📱' : transaction.category === 'Santé' ? '⚕️' : '💸'}
+                  {getCategoryIcon(transaction.amount, transaction.category)}
                 </div>
                 <div>
                   <p className="font-semibold text-gray-800">{transaction.name}</p>
@@ -397,7 +408,7 @@ const MySmartBudget = () => {
           </div>
 
           {message && (
-            <div className={`mb-4 p-4 rounded-lg ${message.includes('✅') ? 'bg-green-100 text-green-700' : 'bg-red-100 text-red-700'}`}>
+            <div className={`mb-4 p-4 rounded-lg ${message.startsWith('Transaction') ? 'bg-green-100 text-green-700' : 'bg-red-100 text-red-700'}`}>
               {message}
             </div>
           )}
@@ -501,7 +512,7 @@ const MySmartBudget = () => {
           {(searchText || filterCategory) && (
             <div className="p-3 bg-indigo-100 border border-indigo-300 rounded-xl">
               <p className="text-indigo-700 font-medium">
-                🔎 {filteredTransactions.length} résultat{filteredTransactions.length !== 1 ? 's' : ''} trouvé{filteredTransactions.length !== 1 ? 's' : ''}
+                🔎 {filteredTransactions.length} résultat{filteredTransactions.length === 1 ? '' : 's'} trouvé{filteredTransactions.length === 1 ? '' : 's'}
               </p>
             </div>
           )}
@@ -538,7 +549,7 @@ const MySmartBudget = () => {
               >
                 <div className="flex items-center gap-4 flex-1">
                   <div className="text-4xl">
-                    {transaction.amount > 0 ? '💰' : transaction.category === 'Alimentation' ? '🛒' : transaction.category === 'Transport' ? '🚗' : transaction.category === 'Loisirs' ? '🎮' : transaction.category === 'Abonnements' ? '📱' : transaction.category === 'Santé' ? '⚕️' : '💸'}
+                    {getCategoryIcon(transaction.amount, transaction.category)}
                   </div>
                   <div className="flex-1">
                     <p className="font-bold text-gray-800 text-lg">{transaction.name}</p>

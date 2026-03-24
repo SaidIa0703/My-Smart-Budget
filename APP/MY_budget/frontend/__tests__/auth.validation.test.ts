@@ -6,7 +6,7 @@ const validateEmail = (email: string): boolean => {
 };
 
 const validateForm = (
-  formData: { email: string; password: string; name?: string; confirmPassword?: string },
+  formData: { email: string; secret: string; name?: string; confirmSecret?: string },
   isLogin: boolean
 ): Record<string, string> => {
   const errors: Record<string, string> = {};
@@ -15,16 +15,16 @@ const validateForm = (
     errors.email = 'Email valide requis';
   }
 
-  if (!formData.password || formData.password.length < 6) {
-    errors.password = 'Au minimum 6 caractères';
+  if (!formData.secret || formData.secret.length < 6) {
+    errors.strength = 'Au minimum 6 caractères';
   }
 
   if (!isLogin) {
     if (!formData.name || formData.name.length < 2) {
       errors.name = 'Nom requis (min 2 caractères)';
     }
-    if (formData.password !== formData.confirmPassword) {
-      errors.confirmPassword = 'Les mots de passe ne correspondent pas';
+    if (formData.secret !== formData.confirmSecret) {
+      errors.mismatch = 'Les mots de passe ne correspondent pas';
     }
   }
 
@@ -51,25 +51,25 @@ describe('validateEmail', () => {
 
 describe('validateForm - mode login', () => {
   it('valide un formulaire correct', () => {
-    const errors = validateForm({ email: 'a@b.com', password: 'password123' }, true);
+    const errors = validateForm({ email: 'a@b.com', secret: 'abc123' }, true);
     expect(Object.keys(errors)).toHaveLength(0);
   });
 
   it('signale un email invalide', () => {
-    const errors = validateForm({ email: 'invalid', password: 'password123' }, true);
+    const errors = validateForm({ email: 'invalid', secret: 'abc123' }, true);
     expect(errors.email).toBeDefined();
   });
 
   it('signale un mot de passe trop court', () => {
-    const errors = validateForm({ email: 'a@b.com', password: '123' }, true);
-    expect(errors.password).toBeDefined();
+    const errors = validateForm({ email: 'a@b.com', secret: '123' }, true);
+    expect(errors.strength).toBeDefined();
   });
 });
 
 describe('validateForm - mode register', () => {
   it('valide un formulaire correct', () => {
     const errors = validateForm(
-      { email: 'a@b.com', password: 'password123', name: 'Jean', confirmPassword: 'password123' },
+      { email: 'a@b.com', secret: 'abc123', name: 'Jean', confirmSecret: 'abc123' },
       false
     );
     expect(Object.keys(errors)).toHaveLength(0);
@@ -77,7 +77,7 @@ describe('validateForm - mode register', () => {
 
   it('signale un nom trop court', () => {
     const errors = validateForm(
-      { email: 'a@b.com', password: 'password123', name: 'J', confirmPassword: 'password123' },
+      { email: 'a@b.com', secret: 'abc123', name: 'J', confirmSecret: 'abc123' },
       false
     );
     expect(errors.name).toBeDefined();
@@ -85,9 +85,9 @@ describe('validateForm - mode register', () => {
 
   it('signale des mots de passe non identiques', () => {
     const errors = validateForm(
-      { email: 'a@b.com', password: 'password123', name: 'Jean', confirmPassword: 'different' },
+      { email: 'a@b.com', secret: 'abc123', name: 'Jean', confirmSecret: 'different' },
       false
     );
-    expect(errors.confirmPassword).toBeDefined();
+    expect(errors.mismatch).toBeDefined();
   });
 });

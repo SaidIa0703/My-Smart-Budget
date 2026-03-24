@@ -1,8 +1,8 @@
 
-import { useState } from "react";
+import React, { useState } from "react";
 import { TransactionInput } from "@/src/app/profile";
 
-export default function TransactionForm({ onAdd }: { onAdd: (t: TransactionInput) => void }) {
+export default function TransactionForm({ onAdd }: Readonly<{ onAdd: (t: TransactionInput) => void }>) {
   const [label, setLabel] = useState("");
   const [amount, setAmount] = useState<string>("");
   const [type, setType] = useState<"income" | "expense">("expense");
@@ -20,8 +20,9 @@ export default function TransactionForm({ onAdd }: { onAdd: (t: TransactionInput
   return (
     <form onSubmit={handleSubmit} className="space-y-3">
       <div className="space-y-1">
-        <label className="text-sm text-gray-600">Intitulé</label>
+        <label htmlFor="label" className="text-sm text-gray-600">Intitulé</label>
         <input
+          id="label"
           className="w-full rounded-md border px-3 py-2 outline-none focus:ring"
           placeholder="Courses, Salaire, Loyer…"
           value={label}
@@ -31,8 +32,9 @@ export default function TransactionForm({ onAdd }: { onAdd: (t: TransactionInput
 
       <div className="grid grid-cols-2 gap-3">
         <div className="space-y-1">
-          <label className="text-sm text-gray-600">Montant (€)</label>
+          <label htmlFor="amount" className="text-sm text-gray-600">Montant (€)</label>
           <input
+            id="amount"
             className="w-full rounded-md border px-3 py-2 outline-none focus:ring"
             inputMode="decimal"
             placeholder="0,00"
@@ -41,8 +43,8 @@ export default function TransactionForm({ onAdd }: { onAdd: (t: TransactionInput
           />
         </div>
         <div className="space-y-1">
-          <label className="text-sm text-gray-600">Type</label>
-          <select className="w-full rounded-md border px-3 py-2" value={type} onChange={(e) => setType(e.target.value as any)}>
+          <label htmlFor="type" className="text-sm text-gray-600">Type</label>
+          <select id="type" className="w-full rounded-md border px-3 py-2" value={type} onChange={(e) => setType(e.target.value as "income" | "expense")}>
             <option value="expense">Dépense</option>
             <option value="income">Revenu</option>
           </select>

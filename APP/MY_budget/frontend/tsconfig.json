@@ -17,6 +17,7 @@
     "paths": {
       "@/*": ["./*"]
     },
+    "types": ["jest", "node"],
     "plugins": [
       {
         "name": "next"

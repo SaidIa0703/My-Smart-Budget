@@ -2,7 +2,7 @@
 
 \section{Introduction}
 
-Après la phase de cadrage et de définition des besoins, la conception du projet \textbf{App Budget V3} a constitué une étape charnière avant le lancement des développements. Cette phase a permis de structurer l'architecture logicielle, de modéliser les données et de définir les processus de collaboration.
+Après la phase de cadrage et de définition des besoins, la conception du projet \textbf{My Smart Budget} a constitué une étape charnière avant le lancement des développements. Cette phase a permis de structurer l'architecture logicielle, de modéliser les données et de définir les processus de collaboration.
 
 L'objectif n'était pas seulement de produire une documentation théorique, mais de bâtir les fondations d'une application \textbf{robuste, évolutive et maintenable}. Pour ce faire, j'ai combiné une approche de modélisation standardisée (UML) avec une méthodologie de gestion de projet Agile (Scrum/Kanban) rigoureuse.
 
@@ -24,9 +24,12 @@ L'utilisation du langage UML (Unified Modeling Language) répond à quatre besoi
 
 Le diagramme ci-dessous synthétise les interactions entre l'utilisateur et le système. Il met en évidence les périmètres fonctionnels clés : gestion de compte, opérations financières et pilotage budgétaire.
 
-\begin{center}
-\small$\rightarrow$~\textit{Diagramme de Cas d'Utilisation global — voir Annexe~\ref{ann:figures}, figure~\ref{fig:uml_global}}
-\end{center}
+\begin{figure}[H]
+    \centering
+    \safefig{chapters/assets/images/cas-utilisation.png}{0.90\textwidth}{cas-utilisation.png}
+    \caption{Diagramme de Cas d'Utilisation global — My Smart Budget}
+    \label{fig:uml_global}
+\end{figure}
 
 \subsection{Modèle Conceptuel de Données (Détail des Entités)}
 
@@ -63,16 +66,20 @@ En utilisant UML, j'ai pu voir rapidement si j'avais oublié un cas d'usage impo
 
 Le projet implémente le pattern architectural \textbf{MVC (Modèle-Vue-Contrôleur)} adapté au web moderne (API RESTful), garantissant une séparation stricte des responsabilités.
 
-\begin{center}
-\small$\rightarrow$~\textit{Architecture technique MERN — voir Annexe~\ref{ann:figures}, figure~\ref{fig:architecture_tech}}
-\end{center}
+\begin{figure}[H]
+    \centering
+    \safefig{chapters/assets/images/diagramme-packages.png}{0.90\textwidth}{diagramme-packages.png}
+    \caption{Architecture technique : Stack Next.js/Express/PostgreSQL+MongoDB et déploiement Docker}
+    \label{fig:architecture_tech}
+\end{figure}
 
 \begin{tcolorbox}[colback=blue!5!white,colframe=blue!60!black,title=\textbf{Transition Conception \textrightarrow{} Développement}]
 La modélisation a servi de guide direct pour l'implémentation :
 \begin{itemize}
-    \item Les \textbf{Entités UML} sont devenues des \textbf{Schémas Mongoose}.
-    \item Les \textbf{Cas d'utilisation} ont défini les routes de l'\textbf{API REST}.
-    \item Les \textbf{Relations} (1..n) ont dicté les stratégies de \textbf{population MongoDB}.
+    \item Les \textbf{entités relationnelles} (User, Transaction, Budget) sont devenues des \textbf{tables PostgreSQL} (via pg-promise).
+    \item Les \textbf{données non-structurées} (logs, préférences) sont stockées via des \textbf{schémas Mongoose} (MongoDB).
+    \item Les \textbf{Cas d'utilisation} ont défini les routes de l'\textbf{API REST Express}.
+    \item Les \textbf{Relations} (1..n) ont dicté les jointures SQL côté PostgreSQL et les références \texttt{ObjectId} côté MongoDB.
 \end{itemize}
 \end{tcolorbox}
 
@@ -143,9 +150,12 @@ Ces métriques montrent que le projet avance à un rythme stable et que la quali
 \end{verbatim}
 \end{tcolorbox}
 
-\begin{center}
-\small$\rightarrow$~\textit{Graphique de vélocité — voir Annexe~\ref{ann:figures}, figure~\ref{fig:velocity}}
-\end{center}
+\begin{figure}[H]
+    \centering
+    \safefig{chapters/assets/images/github-velocity.png}{0.85\textwidth}{github-velocity.png}
+    \caption{Graphique de vélocité GitHub Projects (Issues clôturées par Sprint)}
+    \label{fig:velocity}
+\end{figure}
 
 \subsection{Roadmap et Milestones}
 
@@ -168,9 +178,12 @@ Le projet est jalonné par 4 étapes majeures (Milestones GitHub), avec des crit
 \end{tabular}
 \end{center}
 
-\begin{center}
-\small$\rightarrow$~\textit{Suivi des Milestones — voir Annexe~\ref{ann:figures}, figure~\ref{fig:milestones}}
-\end{center}
+\begin{figure}[H]
+    \centering
+    \safefig{chapters/assets/images/github-milestones.png}{0.85\textwidth}{github-milestones.png}
+    \caption{Suivi des Milestones sur GitHub}
+    \label{fig:milestones}
+\end{figure}
 
 \subsection{Planification et Burndown Chart}
 
@@ -180,9 +193,12 @@ Les estimations reposent sur une complexité relative (Story Points), où \textb
     \item \textbf{Vélocité moyenne :} 7 SP / sprint.
 \end{itemize}
 
-\begin{center}
-\small$\rightarrow$~\textit{Burndown Chart Sprint 3 — voir Annexe~\ref{ann:figures}, figure~\ref{fig:burndown}}
-\end{center}
+\begin{figure}[H]
+    \centering
+    \safefig{chapters/assets/images/burndown-sprint3.png}{0.85\textwidth}{burndown-sprint3.png}
+    \caption{Burndown Chart du Sprint 3 : visualisation du travail restant jour par jour}
+    \label{fig:burndown}
+\end{figure}
 
 \section{Traçabilité totale : De l'idée au code}
 
@@ -215,21 +231,33 @@ US-06 CSV & \#24 & \texttt{feat/csv} $\rightarrow$ PR\#55 & \texttt{import.spec.
 
 \subsection{Preuves visuelles de l'organisation GitHub}
 
-\begin{center}
-\small$\rightarrow$~\textit{Tableau Kanban — voir Annexe~\ref{ann:figures}, figure~\ref{fig:kanban}}
-\end{center}
+\begin{figure}[H]
+    \centering
+    \safefig{chapters/assets/images/github-kanban-board.png}{0.85\textwidth}{github-kanban-board.png}
+    \caption{Tableau Kanban : vue globale de l'avancement}
+    \label{fig:kanban}
+\end{figure}
 
-\begin{center}
-\small$\rightarrow$~\textit{Issue détaillée avec estimation — voir Annexe~\ref{ann:figures}, figure~\ref{fig:issue}}
-\end{center}
+\begin{figure}[H]
+    \centering
+    \safefig{chapters/assets/images/github-issue-estimation.png}{0.85\textwidth}{github-issue-estimation.png}
+    \caption{Issue détaillée avec estimation (Story Points) et critères d'acceptation}
+    \label{fig:issue}
+\end{figure}
 
-\begin{center}
-\small$\rightarrow$~\textit{Pull Request validée — voir Annexe~\ref{ann:figures}, figure~\ref{fig:pr}}
-\end{center}
+\begin{figure}[H]
+    \centering
+    \safefig{chapters/assets/images/github-pr.png}{0.85\textwidth}{github-pr.png}
+    \caption{Pull Request validée avec checklist et revue de code}
+    \label{fig:pr}
+\end{figure}
 
-\begin{center}
-\small$\rightarrow$~\textit{Pipeline CI/CD — voir Annexe~\ref{ann:figures}, figure~\ref{fig:ci_cd}}
-\end{center}
+\begin{figure}[H]
+    \centering
+    \safefig{chapters/assets/images/github-actions-success.png}{0.85\textwidth}{github-actions-success.png}
+    \caption{Pipeline CI/CD : tests passés avec succès avant merge}
+    \label{fig:ci_cd}
+\end{figure}
 
 \section{Conclusion du chapitre}
 

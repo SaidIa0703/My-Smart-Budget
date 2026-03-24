@@ -20,7 +20,7 @@ Une analyse des risques a été menée en se basant sur le référentiel OWASP T
 \hline
 \textbf{A02} - Cryptographic Failures & Élevé & TLS 1.3 obligatoire, Bcrypt (Cost 12) pour les mots de passe, Chiffrement AES-256 des données sensibles. \\
 \hline
-\textbf{A03} - Injection & Élevé & Utilisation de l'ORM Prisma (requêtes paramétrées) et validation Joi/Zod en entrée. \\
+\textbf{A03} - Injection & Élevé & Requêtes paramétrées pg-promise (PostgreSQL) + Mongoose (MongoDB) et validation Joi en entrée. \\
 \hline
 \textbf{A05} - Security Misconfig. & Moyen & Headers HTTP sécurisés (Helmet), retrait des signatures serveur (X-Powered-By). \\
 \hline
@@ -46,7 +46,7 @@ module.exports = (app) => {
     contentSecurityPolicy: {
       directives: {
         defaultSrc: ["'self'"],
-        scriptSrc: ["'self'", "'unsafe-inline'"], // Adapte pour React
+        scriptSrc: ["'self'", "'unsafe-inline'"], // Adapte pour Next.js
         imgSrc: ["'self'", "data:", "https:"],
       }
     }
@@ -83,7 +83,7 @@ Le système repose sur une paire de tokens (Access/Refresh) pour combiner sécur
 \begin{lstlisting}[language=JavaScript]
 async login(email, password, ip) {
   // 1. Recherche utilisateur (+ select password hash)
-  const user = await User.findOne({ email }).select('+password +loginAttempts');
+  const user = await db.oneOrNone('SELECT * FROM users WHERE email = $1', [email]);
   
   // 2. Protection contre l'enumeration et brute-force
   if (!user || user.isLocked()) {
@@ -118,12 +118,12 @@ const checkTransactionOwnership = async (req, res, next) => {
   const transactionId = req.params.id;
   const userId = req.user.id;
 
-  const transaction = await Transaction.findById(transactionId);
+  const transaction = await db.oneOrNone('SELECT * FROM transactions WHERE id = $1', [transactionId]);
   
   if (!transaction) return res.status(404).json({ error: 'Non trouvé' });
 
   // Verification critique : La ressource appartient-elle au demandeur ?
-  if (transaction.userId.toString() !== userId) {
+  if (String(transaction.user_id) !== String(userId)) {
     // Log de securite critique
     await SecurityLogger.alert('UNAUTHORIZED_ACCESS_ATTEMPT', { userId, resourceId: transactionId });
     return res.status(403).json({ error: 'Acces interdit' });
@@ -166,32 +166,29 @@ Les droits d'accès, de portabilité et d'oubli sont automatisés via l'API.
 \textbf{Contrôleur RGPD - Droit à l'oubli (Article 17) :}
 \begin{lstlisting}[language=JavaScript]
 async deleteAccount(req, res) {
-  const session = await mongoose.startSession();
-  session.startTransaction();
+  const client = await db.$pool.connect();
+  await client.query('BEGIN');
   
   try {
     const userId = req.user.id;
 
     // 1. Anonymisation des données (Soft Delete)
     // On garde la structure pour la coherence comptable mais on supprime l'identite
-    await User.findByIdAndUpdate(userId, {
-      email: `deleted-${uuid()}@anonyme.local`,
-      firstName: 'Deleted',
-      lastName: 'User',
-      password: null,
-      isDeleted: true,
-      deletedAt: new Date()
-    }, { session });
+    await client.query(
+      `UPDATE users SET email=$1, first_name='Deleted', last_name='User',
+       password_hash=NULL, is_deleted=TRUE, deleted_at=NOW() WHERE id=$2`,
+      [`deleted-${uuid()}@anonyme.local`, userId]
+    );
 
     // 2. Suppression des donnees sensibles non critiques
-    await AuditLog.deleteMany({ userId }, { session });
+    await client.query('DELETE FROM audit_logs WHERE user_id = $1', [userId]);
 
     // 3. Confirmation
-    await session.commitTransaction();
+    await client.query('COMMIT');
     res.json({ message: 'Compte supprime et donnees anonymisees.' });
     
   } catch (error) {
-    await session.abortTransaction();
+    await client.query('ROLLBACK');
     throw error;
   }
 }
@@ -222,7 +219,7 @@ La sécurité est validée par des outils automatisés intégrés à la CI/CD.
 \textbf{3. Tests d'intrusion manuels :}
 \begin{itemize}
     \item Injection SQL : \textcolor{green!60!black}{\textbf{Échec}} (Protection ORM efficace)
-    \item XSS Stored : \textcolor{green!60!black}{\textbf{Échec}} (Échappement React + CSP)
+    \item XSS Stored : \textcolor{green!60!black}{\textbf{Échec}} (Échappement Next.js + CSP)
     \item Brute Force : \textcolor{green!60!black}{\textbf{Bloqué}} après 5 tentatives.
 \end{itemize}
 \end{tcolorbox}

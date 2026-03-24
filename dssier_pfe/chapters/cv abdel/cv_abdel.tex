@@ -1,0 +1,191 @@
+%!TEX program = xelatex
+\documentclass[a4paper,9.5pt]{article}
+
+\usepackage[a4paper, top=0.75cm, bottom=0.75cm, left=1.2cm, right=1.2cm]{geometry}
+\usepackage{fontspec}
+\usepackage{xcolor}
+\usepackage{hyperref}
+\usepackage{graphicx}
+\usepackage{tikz}
+\usepackage{enumitem}
+\usepackage{parskip}
+\usepackage{microtype}
+
+\setmainfont{Arial}[
+  BoldFont = Arial Bold,
+  ItalicFont = Arial Italic,
+  BoldItalicFont = Arial Bold Italic
+]
+
+\definecolor{navy}{HTML}{1A2E4A}
+\definecolor{teal}{HTML}{0D7377}
+\definecolor{gray}{HTML}{5A6A7A}
+\definecolor{lgray}{HTML}{F2F4F6}
+\definecolor{lightblue}{HTML}{B0C4D8}
+\definecolor{darktext}{HTML}{2D3E50}
+
+\hypersetup{
+  colorlinks=true, urlcolor=teal, linkcolor=teal,
+  pdfauthor={Abdelghani Saidi}, pdftitle={CV - Abdelghani Saidi}
+}
+
+\pagestyle{empty}
+\setlength{\parindent}{0pt}
+\setlength{\parskip}{0pt}
+
+\newcommand{\cvsection}[1]{%
+  \vspace{2pt}%
+  {\color{navy}\textbf{\uppercase{#1}}}%
+  \vspace{1pt}%
+  \textcolor{teal}{\hrule height 0.7pt}%
+  \vspace{2pt}%
+}
+
+\newcommand{\cventry}[4]{%
+  \vspace{2pt}%
+  {\color{navy}\textbf{#1}}~{\color{gray}|~#2}\hfill{\color{gray}\textit{\footnotesize #3}}\\[-3pt]
+  #4%
+}
+
+\newcommand{\cvbullet}[1]{%
+  \begin{itemize}[leftmargin=1em, itemsep=0pt, topsep=0pt, parsep=0pt]
+    \item[\textcolor{teal}{\footnotesize--}] {\small #1}
+  \end{itemize}%
+}
+
+\newcommand{\cvproject}[5]{%
+  \vspace{2pt}%
+  {\color{navy}\textbf{#1}}~{\color{gray}---}~{\color{teal}\itshape\small #2}%
+  \ifx&#3&\else~{\color{gray}$\rightarrow$}~\href{#4}{\small #3}\fi\\[-3pt]
+  #5%
+}
+
+\newcommand{\skillrow}[2]{%
+  \vspace{1pt}%
+  {\color{navy}\textbf{#1~:}}~{\small #2}\\%
+}
+
+\begin{document}
+
+% ══ HEADER ════════════════════════════════════════════════════════
+\noindent
+\colorbox{navy}{%
+  \begin{minipage}[c][2.5cm][c]{0.195\textwidth}
+    \centering
+    \includegraphics[width=2.0cm,height=2.0cm,keepaspectratio]{photo_cv_abdel.png}
+  \end{minipage}%
+}%
+\colorbox{navy}{%
+  \begin{minipage}[c][2.5cm][c]{0.795\textwidth}
+    \hspace{8pt}%
+    {\color{white}\fontsize{23}{27}\selectfont\textbf{ABDELGHANI SAIDI}}\\[4pt]
+    \hspace{8pt}{\color{lightblue}\itshape  Mastère 1 Cybersecurite~|~En recherche d'alternance }
+  \end{minipage}%
+}
+
+\noindent
+\colorbox{lgray}{%
+  \begin{minipage}{\textwidth}
+    \vspace{2pt}
+    \centering{\small
+      \textcolor{gray}{06.60.14.90.96}~\textcolor{gray}{·}~%
+      \href{mailto:saidi.abdelghani.pro@gmail.com}{\textcolor{teal}{saidi.abdelghani.pro@gmail.com}}~\textcolor{gray}{·}~%
+      \textcolor{gray}{Paray-Vieille-Poste (91) — Mobile géographiquement}~\textcolor{gray}{·}~%
+      \href{https://www.linkedin.com/in/abdelghani-saidi/}{\textcolor{teal}{LinkedIn}}~\textcolor{gray}{·}~%
+      \href{https://github.com/SaidIa0703}{\textcolor{teal}{GitHub}}~\textcolor{gray}{·}~%
+      \textcolor{gray}{Permis B}%
+    }
+    \vspace{2pt}
+  \end{minipage}%
+}
+
+\vspace{2pt}
+
+% ── ACCROCHE ──────────────────────────────────────────────────────
+\noindent
+\begin{tikzpicture}
+  \draw[teal, line width=2pt] (0,0) -- (0,-0.95);
+\end{tikzpicture}%
+\hspace{5pt}%
+\begin{minipage}[t]{0.97\textwidth}
+  \small\color{darktext}
+  Développeur Web Full-Stack, formé en Bachelor RNCP Niv.6 (Colint School), maîtrisant React / Next.js, Node.js / Express, PostgreSQL, Docker et AWS EC2. Auteur de \textbf{My Smart Budget}, déployé en production avec CI/CD automatisé, NGINX reverse proxy SSL et gestion sécurisée des secrets. Futur étudiant en \textbf{Mastère Cybersécurité} (RNCP Niv.7, sept. 2026).
+\end{minipage}
+
+\vspace{2pt}
+
+% ══ EXPÉRIENCES ═══════════════════════════════════════════════════
+\cvsection{Expériences professionnelles}
+
+\cventry{Développeur Full-Stack}{Loic Kalaidjoglou — Emelista}{09/2025 -- 08/2026}{%
+  \cvbullet{Conception et développement d'un site web éco-conçu : optimisation des performances et empreinte carbone réduite}
+  \cvbullet{Mise en place de bonnes pratiques front/back, relation client directe et suivi des livrables}
+}
+
+\cventry{Technicien Informatique}{Fabrice Gigaden}{09/2018 -- 06/2019}{%
+  \cvbullet{Diagnostic et réparation de 50+ ordinateurs $\rightarrow$ satisfaction client maintenue à 100\%}
+}
+
+\cventry{Installateur Fibre Optique}{Bouygues Télécom}{09/2019 -- 06/2020}{%
+  \cvbullet{Déploiement FTTH en zone dense, travail en autonomie sur chantiers résidentiels et tertiaires}
+}
+
+% ══ PROJETS ═══════════════════════════════════════════════════════
+\cvsection{Projets}
+
+\cvproject{My Smart Budget}{Next.js · Express · PostgreSQL · MongoDB · Docker · AWS EC2 · GitHub Actions}{smarterbudget.net}{https://smarterbudget.net}{%
+  \cvbullet{\textbf{CI/CD sécurisé} : pipeline GitHub Actions $\rightarrow$ Docker Hub $\rightarrow$ EC2 — déploiement automatisé en \textless{}3 min, secrets chiffrés dans les \textit{GitHub Encrypted Secrets} (clés SSH, tokens API)}
+  \cvbullet{\textbf{NGINX reverse proxy} avec SSL/TLS : certificats x509 (Let's Encrypt), redirection HTTP$\rightarrow$HTTPS, gestion des clés privée/publique et renouvellement automatique}
+  \cvbullet{\textbf{Docker Compose} multi-services (frontend, backend, PostgreSQL, MongoDB, Nginx) — \texttt{restart: always}, healthchecks, volumes persistants, mise en prod sans coupure (\texttt{--force-recreate})}
+  \cvbullet{Auth JWT, onboarding 7 étapes, tableau de bord financier avec graphiques et conseils personnalisés}
+}
+
+\cvproject{WorldView}{React · REST API}{}{}{%
+  \cvbullet{Interface de visualisation de données géopolitiques par pays — filtres dynamiques, API publique en temps réel}
+}
+
+\cvproject{ProtoRH}{Python · SQL · Flask}{}{}{%
+  \cvbullet{Gestion de planning RH : BDD relationnelle, requêtes SQL optimisées, interface responsive}
+}
+
+% ══ COMPÉTENCES ═══════════════════════════════════════════════════
+\cvsection{Compétences techniques}
+
+\skillrow{Frontend}{React, Next.js, TypeScript, HTML/CSS, Tailwind CSS}
+\skillrow{Backend}{Node.js, Express.js, Python, PHP, Bash, C}
+\skillrow{Bases de données}{PostgreSQL, MongoDB, SQL}
+\skillrow{DevOps / Cloud}{Docker, Docker Compose, Nginx, GitHub Actions}
+\skillrow{Cloud / Infra}{AWS EC2 (débutant), Linux (débutant) --- déploiement, gestion de serveur, SSH}
+\skillrow{Sécurité}{SSL/TLS, certificats x509, clés SSH, GitHub Secrets, HTTPS, NGINX reverse proxy}
+\skillrow{Outils}{Git, GitHub, VS Code, Postman}
+
+% ══ FORMATIONS ════════════════════════════════════════════════════
+\cvsection{Formations}
+
+\cventry{Mastère Cybersécurité --- RNCP Niv. 7}{Colint School}{sept. 2026 -- 2028 (à venir)}{%
+  \cvbullet{M1 Cybersécurité — sécurité des systèmes d'information, pentest, cryptographie, conformité}
+}
+
+\cventry{Bachelor Développeur Web --- RNCP Niv. 6 (CDA)}{Colint School}{2024 -- 2026 (en cours)}{%
+  \cvbullet{Concepteur Développeur d'Applications (3\textsuperscript{e} année) — projet fil rouge : My Smart Budget}
+  \cvbullet{Sécurité applicative : SSL, certificats x509, protection des secrets GitHub, NGINX SSL reverse proxy}
+}
+
+\cventry{Bachelor Développeur Web}{ETNA}{2023 -- 2024}{%
+  \cvbullet{Algorithmes, développement web, bases de données, projets collaboratifs}
+}
+
+\vspace{2pt}
+{\color{navy}\textbf{2023}}~·~BAFA --- Brevet d'Aptitude aux Fonctions d'Animateur\hspace{1em}%
+{\color{navy}\textbf{2022--2023}}~·~Baccalauréat NSI \& SES
+
+% ══ LANGUES & DIVERS ══════════════════════════════════════════════
+\cvsection{Langues \& Divers}
+
+\vspace{1pt}
+{\color{navy}\textbf{Français :}} Natif~·~%
+{\color{navy}\textbf{Anglais :}} B1 (professionnel)~·~%
+{\color{navy}\textbf{Espagnol :}} B2\\[3pt]
+{\color{navy}\textbf{Qualités :}} Rigueur · Curiosité · Autonomie · Détermination · Polyvalence
+
+\end{document}

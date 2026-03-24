@@ -33,7 +33,7 @@ L'objectif principal est de \textbf{simplifier la gestion budgétaire} via une i
 
 \subsection{Objectifs techniques}
 
-Le projet repose sur une architecture \textbf{3-tiers évolutive} : Front-end (React 18), Back-end (Node.js 20/Express), Base de données (MongoDB 6).
+Le projet repose sur une architecture \textbf{3-tiers évolutive} : Front-end (Next.js 15), Back-end (Node.js/Express), Base de données (PostgreSQL + MongoDB).
 
 \subsubsection{Exigences de performance (Non-fonctionnelles)}
 
@@ -62,7 +62,7 @@ Ce projet permet de valider les trois blocs de compétences du Titre Professionn
 
 \begin{itemize}
     \item \textbf{Concevoir et développer des composants d'interface :} Création d'un Design System, composants React réutilisables, respect normes WCAG 2.1.
-    \item \textbf{Concevoir et développer la persistance des données :} Modélisation NoSQL (MongoDB), validation des schémas, scripts de migration.
+    \item \textbf{Concevoir et développer la persistance des données :} Modélisation relationnelle (PostgreSQL) et documentaire (MongoDB), validation des schémas, scripts de migration.
     \item \textbf{Concevoir et développer une application multicouche :} Architecture API REST (OpenAPI), séparation des responsabilités, tests E2E.
 \end{itemize}
 
@@ -163,15 +163,18 @@ Deux profils types ont guidé la conception de l'expérience utilisateur (UX).
 
 \subsection{Schéma fonctionnel 3-tiers}
 
-\begin{center}
-\small$\rightarrow$~\textit{Architecture 3-tiers — voir Annexe~\ref{ann:figures}, figure~\ref{fig:architecture-3-tiers}}
-\end{center}
+\begin{figure}[H]
+    \centering
+    \safefig{chapters/assets/images/architecture_3_tiers.png}{0.90\textwidth}{architecture_3_tiers.png}
+    \caption{Architecture 3-tiers : Client Next.js \textrightarrow{} API Express \textrightarrow{} PostgreSQL + MongoDB}
+    \label{fig:architecture-3-tiers}
+\end{figure}
 
 \subsection{Responsabilités des couches}
 
 \subsubsection{Front-end (Client)}
 \begin{itemize}
-    \item \textbf{Tech :} React 18, Tailwind CSS, Recharts.
+    \item \textbf{Tech :} Next.js 15 (React 19), Tailwind CSS, Recharts.
     \item \textbf{Rôle :} Interface utilisateur, validations formulaires (Yup), gestion de l'état (Zustand).
 \end{itemize}
 
@@ -183,7 +186,7 @@ Deux profils types ont guidé la conception de l'expérience utilisateur (UX).
 
 \subsubsection{Data (Persistance)}
 \begin{itemize}
-    \item \textbf{Tech :} MongoDB, Mongoose ODM.
+    \item \textbf{Tech :} PostgreSQL (pg-promise) + MongoDB (Mongoose ODM).
     \item \textbf{Rôle :} Stockage flexible, indexation (\texttt{userId + date}), agrégations statistiques.
 \end{itemize}
 
@@ -197,13 +200,13 @@ Deux profils types ont guidé la conception de l'expérience utilisateur (UX).
 \hline
 \textbf{Back-end} & \textbf{Express.js} & NestJS & Légèreté, flexibilité et courbe d'apprentissage rapide. \\
 \hline
-\textbf{Front-end} & \textbf{React.js} & Vue.js & Écosystème riche, composants réutilisables. \\
+\textbf{Front-end} & \textbf{Next.js} & Vue.js & SSR/CSR hybride, écosystème React, optimisations performance intégrées. \\
 \hline
-\textbf{Base de données} & \textbf{MongoDB} & PostgreSQL & Flexibilité du schéma JSON (NoSQL) adaptée au MVP. \\
+\textbf{Base de données} & \textbf{PostgreSQL + MongoDB} & MySQL & PostgreSQL pour les données relationnelles, MongoDB pour les données non-structurées. \\
 \hline
 \textbf{Validation} & \textbf{Joi / Yup} & Zod & Maturité et intégration native Express. \\
 \hline
-\textbf{Hébergement} & \textbf{Render} & AWS EC2 & Simplicité du déploiement (PaaS) et coût faible. \\
+\textbf{Hébergement} & \textbf{AWS EC2} & Render & Contrôle total de l'infrastructure, pipeline CI/CD GitHub Actions intégré. \\
 \hline
 \end{tabular}
 \end{center}
@@ -211,7 +214,7 @@ Deux profils types ont guidé la conception de l'expérience utilisateur (UX).
 \begin{tcolorbox}[colback=green!5!white,colframe=green!60!black,title=\textbf{Validation technique — Métriques de production}]
 Après 2 mois d'utilisation sur le périmètre MVP :
 \begin{itemize}
-    \item \textbf{MongoDB :} Temps moyen requête simple = 42ms.
+    \item \textbf{PostgreSQL :} Temps moyen requête simple = 42ms. \textbf{MongoDB :} Temps moyen requête documentaire = 38ms.
     \item \textbf{API :} Temps d'agrégation dashboard = 156ms (pour 1800+ transactions).
     \item \textbf{Performance Front :} Score Lighthouse 92/100, Bundle size 890KB (Gzipped).
 \end{itemize}

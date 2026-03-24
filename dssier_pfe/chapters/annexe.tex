@@ -4,7 +4,7 @@
 % ============================================================
 
 % Commande de sécurité : affiche un cadre gris si l'image est absente
-\newcommand{\safefig}[3]{%
+\providecommand{\safefig}[3]{%
   \IfFileExists{#1}{%
     \includegraphics[width=#2]{#1}%
   }{%
@@ -30,14 +30,14 @@ Cette annexe regroupe l'ensemble des schémas, diagrammes et captures d'écran r
     \centering
     \safefig{chapters/assets/images/diagramme_context.png}{0.95\textwidth}{diagramme\_context.png}
     \caption{Diagramme de contexte de l'application My Smart Budget}
-    \label{fig:diagramme_contexte}
+    \label{fig:diagramme_contexte-ann}
 \end{figure}
 
 \begin{figure}[H]
     \centering
     \safefig{chapters/assets/images/cas-utilisation.png}{0.95\textwidth}{cas-utilisation.png}
     \caption{Diagramme de classes UML de l'application My Smart Budget}
-    \label{fig:diagramme_classes}
+    \label{fig:diagramme_classes-ann}
 \end{figure}
 
 % ============================================================
@@ -47,8 +47,8 @@ Cette annexe regroupe l'ensemble des schémas, diagrammes et captures d'écran r
 \begin{figure}[H]
     \centering
     \safefig{chapters/assets/images/architecture_3_tiers.png}{0.95\textwidth}{architecture\_3\_tiers.png}
-    \caption{Architecture 3-tiers : Client React \textrightarrow{} API Express \textrightarrow{} MongoDB}
-    \label{fig:architecture-3-tiers}
+    \caption{Architecture 3-tiers : Client Next.js \textrightarrow{} API Express \textrightarrow{} PostgreSQL + MongoDB}
+    \label{fig:architecture-3-tiers-ann}
 \end{figure}
 
 % ============================================================
@@ -58,64 +58,64 @@ Cette annexe regroupe l'ensemble des schémas, diagrammes et captures d'écran r
 \begin{figure}[H]
     \centering
     \safefig{chapters/assets/images/cas-utilisation.png}{0.95\textwidth}{cas-utilisation.png}
-    \caption{Diagramme de Cas d'Utilisation global — App Budget V3}
-    \label{fig:uml_global}
+    \caption{Diagramme de Cas d'Utilisation global — My Smart Budget}
+    \label{fig:uml_global-ann}
 \end{figure}
 
 \begin{figure}[H]
     \centering
     \safefig{chapters/assets/images/diagramme-packages.png}{0.95\textwidth}{diagramme-packages.png}
-    \caption{Architecture technique : Stack MERN et déploiement Docker}
-    \label{fig:architecture_tech}
+    \caption{Architecture technique : Stack Next.js/Express/PostgreSQL+MongoDB et déploiement Docker}
+    \label{fig:architecture_tech-ann}
 \end{figure}
 
 \begin{figure}[H]
     \centering
     \safefig{chapters/assets/images/github-velocity.png}{0.9\textwidth}{github-velocity.png}
     \caption{Graphique de vélocité GitHub Projects (Issues clôturées par Sprint)}
-    \label{fig:velocity}
+    \label{fig:velocity-ann}
 \end{figure}
 
 \begin{figure}[H]
     \centering
     \safefig{chapters/assets/images/github-milestones.png}{0.9\textwidth}{github-milestones.png}
     \caption{Suivi des Milestones sur GitHub}
-    \label{fig:milestones}
+    \label{fig:milestones-ann}
 \end{figure}
 
 \begin{figure}[H]
     \centering
     \safefig{chapters/assets/images/burndown-sprint3.png}{0.9\textwidth}{burndown-sprint3.png}
     \caption{Burndown Chart du Sprint 3 : visualisation du travail restant jour par jour}
-    \label{fig:burndown}
+    \label{fig:burndown-ann}
 \end{figure}
 
 \begin{figure}[H]
     \centering
     \safefig{chapters/assets/images/github-kanban-board.png}{0.95\textwidth}{github-kanban-board.png}
     \caption{Tableau Kanban : vue globale de l'avancement}
-    \label{fig:kanban}
+    \label{fig:kanban-ann}
 \end{figure}
 
 \begin{figure}[H]
     \centering
     \safefig{chapters/assets/images/github-issue-estimation.png}{0.95\textwidth}{github-issue-estimation.png}
     \caption{Issue détaillée avec estimation (Story Points) et critères d'acceptation}
-    \label{fig:issue}
+    \label{fig:issue-ann}
 \end{figure}
 
 \begin{figure}[H]
     \centering
     \safefig{chapters/assets/images/github-pr.png}{0.95\textwidth}{github-pr.png}
     \caption{Pull Request validée avec checklist et revue de code}
-    \label{fig:pr}
+    \label{fig:pr-ann}
 \end{figure}
 
 \begin{figure}[H]
     \centering
     \safefig{chapters/assets/images/github-actions-success.png}{0.95\textwidth}{github-actions-success.png}
     \caption{Pipeline CI/CD : tests passés avec succès avant merge}
-    \label{fig:ci_cd}
+    \label{fig:ci_cd-ann}
 \end{figure}
 
 % ============================================================
@@ -125,36 +125,36 @@ Cette annexe regroupe l'ensemble des schémas, diagrammes et captures d'écran r
 \begin{figure}[H]
     \centering
     \safefig{chapters/assets/images/usage_global.png}{0.95\textwidth}{usage\_global.png}
-    \caption{Diagramme de cas d'usage global — App Budget V3}
-    \label{fig:usage_global}
+    \caption{Diagramme de cas d'usage global — My Smart Budget}
+    \label{fig:usage_global-ann}
 \end{figure}
 
 \begin{figure}[H]
     \centering
     \safefig{chapters/assets/images/class-diagram-app-budget-v3.png}{0.95\textwidth}{class-diagram-app-budget-v3.png}
-    \caption{Diagramme de classes UML détaillé — App Budget V3}
-    \label{fig:class-diagram}
+    \caption{Diagramme de classes UML détaillé — My Smart Budget}
+    \label{fig:class-diagram-ann}
 \end{figure}
 
 \begin{figure}[H]
     \centering
     \safefig{chapters/assets/images/seq-auth-login.png}{0.95\textwidth}{seq-auth-login.png}
     \caption{Diagramme de séquence — Flux de connexion utilisateur (Login)}
-    \label{fig:seq-auth}
+    \label{fig:seq-auth-ann}
 \end{figure}
 
 \begin{figure}[H]
     \centering
     \safefig{chapters/assets/images/seq-create-transaction.png}{0.95\textwidth}{seq-create-transaction.png}
     \caption{Diagramme de séquence — Flux de création d'une transaction}
-    \label{fig:seq-transaction}
+    \label{fig:seq-transaction-ann}
 \end{figure}
 
 \begin{figure}[H]
     \centering
     \safefig{chapters/assets/images/seq-budget-alert.png}{0.95\textwidth}{seq-budget-alert.png}
     \caption{Diagramme de séquence — Flux automatique de déclenchement d'alertes}
-    \label{fig:seq-alert}
+    \label{fig:seq-alert-ann}
 \end{figure}
 
 \begin{figure}[H]
@@ -163,13 +163,13 @@ Cette annexe regroupe l'ensemble des schémas, diagrammes et captures d'écran r
         \centering
         \safefig{chapters/assets/images/wireframe-dashboard.png}{\textwidth}{wireframe-dashboard.png}
         \caption{Wireframe basse fidélité — Dashboard}
-        \label{fig:wireframe-dashboard}
+        \label{fig:wireframe-dashboard-ann}
     \end{minipage}\hfill
     \begin{minipage}{0.48\textwidth}
         \centering
         \safefig{chapters/assets/images/wireframe-transactions.png}{\textwidth}{wireframe-transactions.png}
         \caption{Wireframe — Page Transactions}
-        \label{fig:wireframe-transactions}
+        \label{fig:wireframe-transactions-ann}
     \end{minipage}
 \end{figure}
 
@@ -177,14 +177,14 @@ Cette annexe regroupe l'ensemble des schémas, diagrammes et captures d'écran r
     \centering
     \safefig{chapters/assets/images/mcd-app-budget-v3.png}{0.95\textwidth}{mcd-app-budget-v3.png}
     \caption{Modèle Conceptuel de Données (MCD) — entités et relations}
-    \label{fig:mcd}
+    \label{fig:mcd-ann}
 \end{figure}
 
 \begin{figure}[H]
     \centering
     \safefig{chapters/assets/images/arch-3tiers-app-budget-v3.png}{0.95\textwidth}{arch-3tiers-app-budget-v3.png}
-    \caption{Architecture 3-tiers : Next.js (Front) — NestJS (Back) — PostgreSQL (Data)}
-    \label{fig:arch-3tiers}
+    \caption{Architecture 3-tiers : Next.js (Front) — Express (Back) — PostgreSQL (Data)}
+    \label{fig:arch-3tiers-ann}
 \end{figure}
 
 % ============================================================
@@ -195,7 +195,7 @@ Cette annexe regroupe l'ensemble des schémas, diagrammes et captures d'écran r
     \centering
     \safefig{chapters/assets/images/architecture_3_tiers.png}{0.95\textwidth}{architecture\_3\_tiers.png}
     \caption{Flux de données implémenté dans l'architecture 3-tiers}
-    \label{fig:arch_impl}
+    \label{fig:arch_impl-ann}
 \end{figure}
 
 % ============================================================
@@ -206,7 +206,7 @@ Cette annexe regroupe l'ensemble des schémas, diagrammes et captures d'écran r
     \centering
     \safefig{chapters/assets/images/sonarqube-badge.png}{0.6\textwidth}{sonarqube-badge.png}
     \caption{Badge SonarQube — résumé qualité du code (My Smart Budget)}
-    \label{fig:sonarqube-badge}
+    \label{fig:sonarqube-badge-ann}
 \end{figure}
 
 % ============================================================
@@ -217,28 +217,28 @@ Cette annexe regroupe l'ensemble des schémas, diagrammes et captures d'écran r
     \centering
     \safefig{chapters/assets/images/question1.png}{0.7\textwidth}{question1.png}
     \caption{Onboarding — Étape 1 : Profil Personnel (nom, âge, situation matrimoniale)}
-    \label{fig:maquette-onboarding-1}
+    \label{fig:maquette-onboarding-1-ann}
 \end{figure}
 
 \begin{figure}[H]
     \centering
     \safefig{chapters/assets/images/question2.png}{0.7\textwidth}{question2.png}
     \caption{Onboarding — Étape 2 : Situation Professionnelle (statut, revenu mensuel)}
-    \label{fig:maquette-onboarding-2}
+    \label{fig:maquette-onboarding-2-ann}
 \end{figure}
 
 \begin{figure}[H]
     \centering
     \safefig{chapters/assets/images/question3.png}{0.7\textwidth}{question3.png}
     \caption{Onboarding — Étape 3 : Composition Familiale (enfants à charge, type de logement)}
-    \label{fig:maquette-onboarding-3}
+    \label{fig:maquette-onboarding-3-ann}
 \end{figure}
 
 \begin{figure}[H]
     \centering
     \safefig{chapters/assets/images/question4.png}{0.7\textwidth}{question4.png}
     \caption{Onboarding — Étape 4 : Vos Objectifs financiers (dernière étape)}
-    \label{fig:maquette-onboarding-4}
+    \label{fig:maquette-onboarding-4-ann}
 \end{figure}
 
 % ============================================================
@@ -249,40 +249,40 @@ Cette annexe regroupe l'ensemble des schémas, diagrammes et captures d'écran r
     \centering
     \safefig{chapters/assets/images/profilgen.png}{0.7\textwidth}{profilgen.png}
     \caption{Sélection du profil prédéfini (Célibataire, En couple, Famille, Retraité(e), Étudiant(e))}
-    \label{fig:maquette-profils-liste}
+    \label{fig:maquette-profils-liste-ann}
 \end{figure}
 
 \begin{figure}[H]
     \centering
     \safefig{chapters/assets/images/profil1.png}{0.7\textwidth}{profil1.png}
     \caption{Budget recommandé — Profil Jeune Célibataire (28 ans, 2\,500\,€/mois)}
-    \label{fig:maquette-budget-celibataire}
+    \label{fig:maquette-budget-celibataire-ann}
 \end{figure}
 
 \begin{figure}[H]
     \centering
     \safefig{chapters/assets/images/profil2.png}{0.7\textwidth}{profil2.png}
     \caption{Budget recommandé — Profil Famille Mariée (42 ans, 3\,500\,€/mois, 2 enfants)}
-    \label{fig:maquette-budget-famille}
+    \label{fig:maquette-budget-famille-ann}
 \end{figure}
 
 \begin{figure}[H]
     \centering
     \safefig{chapters/assets/images/profil3.png}{0.7\textwidth}{profil3.png}
     \caption{Budget recommandé — Profil Retraité(e) (68 ans, 1\,800\,€/mois)}
-    \label{fig:maquette-budget-retraite}
+    \label{fig:maquette-budget-retraite-ann}
 \end{figure}
 
 \begin{figure}[H]
     \centering
     \safefig{chapters/assets/images/profiletudiant.png}{0.7\textwidth}{profiletudiant.png}
     \caption{Budget recommandé — Profil Étudiant(e) (22 ans, 800\,€/mois)}
-    \label{fig:maquette-budget-etudiant}
+    \label{fig:maquette-budget-etudiant-ann}
 \end{figure}
 
 \begin{figure}[H]
     \centering
     \safefig{chapters/assets/images/tabBudget.png}{0.95\textwidth}{tabBudget.png}
     \caption{Tableau comparatif des budgets par profil (Célibataire, Famille, Retraité(e), Étudiant(e))}
-    \label{fig:maquette-tableau-comparatif}
+    \label{fig:maquette-tableau-comparatif-ann}
 \end{figure}

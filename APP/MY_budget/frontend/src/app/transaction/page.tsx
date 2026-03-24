@@ -1,7 +1,7 @@
 'use client';
 
-import Navbar from '../../../components/Navbar';
-import TransactionList from '../../../components/TransactionList';
+import Navbar from '../../../components/navbar';
+import TransactionList from '../../../components/transactionList';
 import { useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 

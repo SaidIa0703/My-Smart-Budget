@@ -92,7 +92,7 @@ app.post('/api/budgets', async (req, res) => {
 // GET tous les reports
 app.get('/api/reports', async (req, res) => {
   try {
-    const Report = require('./models/Report').default;
+    const Report = require('./models/report');
     const reports = await Report.find().sort({ createdAt: -1 });
     res.json(reports);
   } catch (err) {
@@ -104,7 +104,7 @@ app.get('/api/reports', async (req, res) => {
 // POST un nouveau report
 app.post('/api/reports', async (req, res) => {
   try {
-    const Report = require('./models/Report').default;
+    const Report = require('./models/report');
     const { userId, title, description, data, type } = req.body;
     const report = new Report({ userId, title, description, data, type });
     await report.save();

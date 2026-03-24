@@ -61,7 +61,9 @@ Thumbs.db
 # Keep fonts directory
 !fonts/
 !fonts/*.ttf
-node_modules/
-package-lock.json
-.next/
-.env.local
+**/node_modules/
+**/package-lock.json
+**/.next/
+**/.env
+**/.env.*
+**/.env.local

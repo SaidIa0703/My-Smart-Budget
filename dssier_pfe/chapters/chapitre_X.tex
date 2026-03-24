@@ -31,15 +31,6 @@ Sécurité 0 vulnérabilité & \mycheckmark Atteint & 0 & Objectif atteint \\
 \end{itemize}
 \end{exemple}
 
-\begin{conseil}
-\begin{itemize}
-    \item Analyser objectivement l'atteinte des objectifs
-    \item Identifier les causes des non-atteintes
-    \item Documenter les ajustements nécessaires
-    \item Prévoir les actions correctives pour v2.0
-    \item Communiquer les résultats aux parties prenantes
-\end{itemize}
-\end{conseil}
 
 \begin{jury}
 \begin{itemize}
@@ -53,7 +44,7 @@ Sécurité 0 vulnérabilité & \mycheckmark Atteint & 0 & Objectif atteint \\
 
 \section{Difficultés rencontrées et solutions}
 
-Les principales difficultés ont porté sur l'intégration des bases de données, la gestion des performances sous charge, et la configuration de l'environnement de déploiement. Par exemple, j'ai eu du mal au début avec la latence des requêtes PostgreSQL, et j'ai résolu ça en ajoutant des index composites et un cache Redis. Chaque problème a été analysé pour identifier la cause racine avant de chercher une solution.
+Les principales difficultés ont porté sur l'intégration des bases de données, la gestion des performances sous charge, et la configuration de l'environnement de déploiement. Par exemple, j'ai eu du mal au début avec la latence des requêtes PostgreSQL, et j'ai résolu ça en ajoutant des index composites et en optimisant les plans d'exécution SQL. Chaque problème a été analysé pour identifier la cause racine avant de chercher une solution.
 
 \begin{exemple}
 \textbf{Tableau risques \myarrow mitigation \myarrow résultat :}
@@ -62,8 +53,8 @@ Les principales difficultés ont porté sur l'intégration des bases de données
 \hline
 \textbf{Risque} & \textbf{Mitigation} & \textbf{Résultat} & \textbf{Apprentissage} \\
 \hline
-Performance DB & Index + cache Redis & Latence -60\% & Cache stratégique \\
-Intégration équipes & Daily standups & Communication +40\% & Processus agile \\
+Performance DB & Index composites SQL & Latence -60\% & Optimisation requêtes \\
+Organisation solo & Rituels Scrum adaptés & Rythme maintenu & Discipline individuelle \\
 Sécurité données & Chiffrement + audit & 0 incident & Sécurité by design \\
 Délais serrés & MVP + priorités & Livraison à temps & Focus sur l'essentiel \\
 Complexité technique & Architecture simple & Maintenance facile & KISS principle \\
@@ -85,7 +76,7 @@ Problème: Latence élevée des requêtes PostgreSQL
 +-- Solutions implémentées
 |   +-- Création d'index composites
 |   +-- Optimisation des requêtes
-|   +-- Mise en place de Redis cache
+|   +-- Optimisation des plans d'exécution SQL
 |   +-- Pagination des résultats
 +-- Résultat
     +-- Latence réduite à 200ms
@@ -94,15 +85,6 @@ Problème: Latence élevée des requêtes PostgreSQL
 \end{verbatim}
 \end{exemple}
 
-\begin{conseil}
-\begin{itemize}
-    \item Documenter toutes les difficultés rencontrées
-    \item Analyser les causes racines des problèmes
-    \item Rechercher des solutions existantes avant d'innover
-    \item Tester les solutions avant déploiement
-    \item Partager les apprentissages avec l'équipe
-\end{itemize}
-\end{conseil}
 
 \begin{jury}
 \begin{itemize}
@@ -116,7 +98,7 @@ Problème: Latence élevée des requêtes PostgreSQL
 
 \section{Dettes techniques et apprentissages}
 
-Les dettes techniques que j'ai identifiées concernent principalement la refactorisation de certains composants React, l'optimisation des requêtes MongoDB, et l'amélioration de la couverture de tests. Je les ai documentées avec des priorités et des estimations pour les traiter dans les prochaines itérations.
+Les dettes techniques que j'ai identifiées concernent principalement la refactorisation de certains composants Next.js, l'optimisation de certaines requêtes PostgreSQL complexes, et l'amélioration de la couverture de tests. Je les ai documentées avec des priorités et des estimations pour les traiter dans les prochaines itérations.
 
 Sur le plan des apprentissages, ce projet m'a surtout appris à gérer la complexité d'une stack complète seul, à prioriser sans perfectionnisme, et à ne pas sous-estimer le temps de débogage. Ces connaissances sont directement transférables à mes prochains projets.
 
@@ -127,8 +109,8 @@ Sur le plan des apprentissages, ce projet m'a surtout appris à gérer la comple
 \hline
 \textbf{Dette} & \textbf{Priorité} & \textbf{Effort} & \textbf{Impact} & \textbf{Planification} \\
 \hline
-Refactor composants React & Moyenne & 2 semaines & Maintenabilité & v1.2 \\
-Optimisation requêtes Mongo & Haute & 1 semaine & Performance & v1.1 \\
+Refactor composants Next.js & Moyenne & 2 semaines & Maintenabilité & v1.2 \\
+Optimisation requêtes PostgreSQL & Haute & 1 semaine & Performance & v1.1 \\
 Tests E2E manquants & Haute & 1 semaine & Qualité & v1.1 \\
 Documentation API & Basse & 3 jours & Développement & v1.3 \\
 Migration TypeScript & Moyenne & 3 semaines & Robustesse & v2.0 \\
@@ -175,15 +157,6 @@ const useProjects = () => {
 \end{lstlisting}
 \end{exemple}
 
-\begin{conseil}
-\begin{itemize}
-    \item Identifier et documenter toutes les dettes techniques
-    \item Prioriser les dettes selon leur impact et urgence
-    \item Planifier la résolution des dettes dans les futures versions
-    \item Capitaliser sur les apprentissages pour les futurs projets
-    \item Partager les bonnes pratiques avec l'équipe
-\end{itemize}
-\end{conseil}
 
 \begin{jury}
 \begin{itemize}
@@ -194,6 +167,33 @@ const useProjects = () => {
     \item Comment capitalisez-vous sur ces expériences ?
 \end{itemize}
 \end{jury}
+
+
+\section{Réflexivité sur les choix techniques}
+
+\begin{tcolorbox}[colback=blue!5!white,colframe=blue!60!black,title=\textbf{Retour critique sur les choix de stack}]
+\textbf{Ce qui a bien fonctionné :}
+\begin{itemize}
+    \item \textbf{Next.js 15 :} Le rendu hybride SSR/CSR a simplifié la gestion des performances sans configuration complexe. Le choix s'est avéré judicieux pour un projet solo.
+    \item \textbf{Express.js :} La légèreté d'Express m'a donné un contrôle total sur le middleware et la logique métier, sans la surcharge d'un framework comme NestJS.
+    \item \textbf{PostgreSQL + MongoDB (dual DB) :} La séparation données relationnelles / données non-structurées était la bonne approche. PostgreSQL garantit l'intégrité des transactions financières (ACID), MongoDB offre la flexibilité pour les logs et rapports.
+    \item \textbf{Docker + GitHub Actions :} Le pipeline CI/CD a réduit les erreurs de déploiement et m'a forcé à documenter les configurations d'environnement.
+\end{itemize}
+
+\textbf{Ce que je ferais différemment :}
+\begin{itemize}
+    \item \textbf{Modélisation PostgreSQL plus tôt :} J'ai ajusté le schéma plusieurs fois en cours de développement. Figer le MCD avant d'écrire la moindre ligne de code aurait évité des migrations coûteuses.
+    \item \textbf{Tests d'intégration dès le départ :} J'ai commencé par les tests unitaires et ajouté les tests d'intégration tardivement. En commençant par les tests d'intégration (API), j'aurais détecté les incohérences inter-couches plus tôt.
+    \item \textbf{Simplifier la dual-database :} Pour un MVP, tout PostgreSQL aurait suffi. L'ajout de MongoDB a complexifié la gestion des connexions et des transactions sans apport immédiat visible.
+\end{itemize}
+
+\textbf{Ce que ce projet m'a appris sur le travail solo :}
+\begin{itemize}
+    \item Prioriser sans perfectionnisme est une compétence technique à part entière.
+    \item La documentation écrite pendant le développement vaut infiniment mieux que la documentation rédigée après coup.
+    \item Le débogage prend toujours plus de temps qu'estimé — prévoir 30\% de marge systématiquement.
+\end{itemize}
+\end{tcolorbox}
 
 \section{Liens utiles}
 

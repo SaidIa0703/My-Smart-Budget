@@ -2,7 +2,7 @@
 %!TEX encoding = UTF-8 Unicode
 
 \documentclass[10pt,a4paper]{book}
-\let\cleardoublepage\clearpage
+\let\cleardoublepage\relax
 
 % Packages essentiels
 \usepackage{fontspec}
@@ -242,6 +242,7 @@
 
 % Table des matières — compacte
 \setlength{\cftbeforechapskip}{2pt}
+\setcounter{tocdepth}{1}  % 0=chapter, 1=section, 2=subsection
 \setlength{\cftbeforesecskip}{0pt}
 \setlength{\cftbeforesubsecskip}{0pt}
 \renewcommand{\cftchapfont}{\small\bfseries\color{colintDark}}

@@ -34,7 +34,7 @@ L'objectif est de proposer une solution simple, intelligente et accessible depui
 \end{itemize}
 
 Le projet repose sur une architecture web moderne et sécurisée :  
-\textit{React.js} pour le front-end, \textit{Node.js/Express} pour le back-end, \textit{MongoDB} pour le stockage, et \textit{Docker/AWS} pour le déploiement.
+\textit{Next.js} pour le front-end, \textit{Node.js/Express} pour le back-end, \textit{PostgreSQL} et \textit{MongoDB} pour le stockage, et \textit{Docker/AWS} pour le déploiement.
 
 J'ai choisi de travailler sur la gestion de budget car c'est un sujet qui me concerne au quotidien et que je vois comme un vrai problème pour beaucoup de personnes de mon entourage.
 \end{tcolorbox}
@@ -49,19 +49,19 @@ Chaque phase correspond à un ensemble d'objectifs précis, allant de l'analyse 
     Cette étape a permis de définir clairement les fonctionnalités prioritaires et l'ergonomie générale de l'application.
 
     \item \textbf{Phase 2 – Conception technique et modélisation (mois 3)} :  
-    Définition de l'architecture logicielle, choix des technologies (React, Node.js, MongoDB, Docker), modélisation UML et création du schéma de base de données.
+    Définition de l'architecture logicielle, choix des technologies (Next.js, Node.js/Express, PostgreSQL, MongoDB, Docker), modélisation UML et création du schéma de base de données.
 
     \item \textbf{Phase 3 – Développement du back-end (mois 4 à 5)} :  
-    Création de l'API REST avec Node.js/Express, mise en place des routes principales (authentification, budgets, transactions, catégories) et intégration de la base MongoDB.
+    Création de l'API REST avec Node.js/Express, mise en place des routes principales (authentification, budgets, transactions, catégories) et intégration des bases PostgreSQL et MongoDB.
 
     \item \textbf{Phase 4 – Développement du front-end (mois 6 à 7)} :  
-    Développement de l'interface utilisateur avec React.js et Tailwind CSS, intégration des appels API, conception des tableaux de bord et des graphiques dynamiques.
+    Développement de l'interface utilisateur avec Next.js et Tailwind CSS, intégration des appels API, conception des tableaux de bord et des graphiques dynamiques.
 
     \item \textbf{Phase 5 – Tests, optimisations et corrections (mois 8)} :  
     Mise en place des tests unitaires et fonctionnels, correction des anomalies, optimisation des performances et renforcement de la sécurité (authentification JWT, validation des entrées).
 
     \item \textbf{Phase 6 – Déploiement et documentation (mois 9)} :  
-    Conteneurisation avec Docker, déploiement sur Render/AWS, rédaction de la documentation technique et fonctionnelle, puis présentation du projet final.
+    Conteneurisation avec Docker, déploiement sur AWS EC2, rédaction de la documentation technique et fonctionnelle, puis présentation du projet final.
 \end{itemize}
 
 Cette planification m'a permis de travailler de manière autonome, tout en respectant une logique de développement incrémentale et un calendrier réaliste pour un projet complet réalisé seul.
@@ -178,7 +178,7 @@ L'essentiel pour moi est que les utilisateurs gardent l'application dans la dur�
 \hline
 Taux d'adoption 70\% (20 users) & 
 KPI 1 : Utilisateurs actifs hebdo & 
-MongoDB : compteur lastLogin $<$ 7 jours + Google Analytics events & 
+PostgreSQL : compteur lastLogin $<$ 7 jours + Google Analytics events & 
 \textbf{Actuel :} 14/20 (70\%) \newline \textbf{Cible :} 14/20 minimum \\
 \hline
 Réduction dépassements 25\% & 
@@ -208,17 +208,14 @@ Jest coverage report + SonarQube analysis &
 \begin{tcolorbox}[colback=gray!5!white,colframe=gray!60!black,title=\textbf{Instrumentation technique des KPI}]
 \textbf{KPI 1 — Adoption (utilisateurs actifs) :}
 \begin{lstlisting}[language=JavaScript]
-// MongoDB : Tracking des connexions
-db.users.updateOne(
-  { _id: userId },
-  { 
-    $set: { lastLogin: new Date() },
-    $inc: { loginCount: 1 }
-  }
-);
+// MongoDB (Mongoose) : Tracking des connexions utilisateur
+await User.findByIdAndUpdate(userId, {
+  $set: { lastLogin: new Date() },
+  $inc: { loginCount: 1 }
+});
 
-// Requête d'analyse hebdomadaire
-db.users.countDocuments({
+// Requête d'analyse hebdomadaire (utilisateurs actifs)
+const activeUsers = await User.countDocuments({
   lastLogin: { $gte: new Date(Date.now() - 7*24*60*60*1000) }
 });
 \end{lstlisting}
@@ -267,26 +264,29 @@ Le diagramme suivant illustre les principaux flux d'informations entre les acteu
 \textbf{Zone grise :} systèmes externes (banques, services tiers) — hors périmètre mais interfacés.
 \end{tcolorbox}
 
-\begin{center}
-\small$\rightarrow$~\textit{Diagramme de contexte — voir Annexe~\ref{ann:figures}, figure~\ref{fig:diagramme_contexte}}
-\end{center}
+\begin{figure}[H]
+    \centering
+    \safefig{chapters/assets/images/diagramme_context.png}{0.90\textwidth}{diagramme_context.png}
+    \caption{Diagramme de contexte de l'application My Smart Budget}
+    \label{fig:diagramme_contexte}
+\end{figure}
 
 % === NOUVEAU : Lecture détaillée du diagramme ===
 \begin{tcolorbox}[colback=blue!5!white,colframe=blue!60!black,title=\textbf{Lecture du diagramme — Architecture et flux}]
 \textbf{Acteurs et leurs rôles :}
 \begin{itemize}
-    \item \textbf{Utilisateur final :} Consulte dashboard, saisit transactions, configure budgets $\rightarrow$ \textit{Frontend React}
+    \item \textbf{Utilisateur final :} Consulte dashboard, saisit transactions, configure budgets $\rightarrow$ \textit{Frontend Next.js}
     \item \textbf{Administrateur :} Gère les utilisateurs, consulte métriques globales $\rightarrow$ \textit{Backend admin}
     \item \textbf{Système bancaire :} Fournit données via API (import CSV/OFX) $\rightarrow$ \textit{Service d'import} (prévu V2)
 \end{itemize}
 
 \textbf{Architecture technique (dans le périmètre) :}
 \begin{enumerate}
-    \item \textbf{Frontend React} : Interface utilisateur (SPA), appels API REST via Axios
+    \item \textbf{Frontend Next.js} : Interface utilisateur (SSR/CSR), appels API REST via Axios
     \item \textbf{API Node.js/Express} : Logique métier, validation, authentification JWT
-    \item \textbf{MongoDB} : Stockage des transactions, budgets, utilisateurs
-    \item \textbf{Redis} : Cache sessions, taux de change, calculs fréquents
-    \item \textbf{Service Worker} : Synchronisation offline, notifications push
+    \item \textbf{PostgreSQL + MongoDB} : Stockage des transactions, budgets, utilisateurs
+    \item \textbf{Nginx} : Reverse proxy, routage des requêtes vers le backend, terminaison SSL
+    \item \textbf{Docker Healthcheck} : Surveillance de l'état des conteneurs (postgres, mongodb, backend)
 \end{enumerate}
 
 \textbf{Services externes (hors périmètre) :}
@@ -302,17 +302,19 @@ Le diagramme suivant illustre les principaux flux d'informations entre les acteu
 % === DIAGRAMME DE CLASSES UML ===
 % ========================
 
-\section{Diagramme de classes UML}
+\section{Diagramme de cas d'utilisation}
 
 \begin{tcolorbox}[colback=gray!5!white,colframe=gray!60!black,title=\textbf{Description du diagramme}]
-Le diagramme de classes UML présenté ci-dessous modélise la structure interne de l'application \textbf{My Smart Budget}.  
-Il illustre les principales entités du système (utilisateurs, transactions, budgets, catégories, alertes, etc.) ainsi que leurs relations.  
-Chaque classe correspond à une collection dans MongoDB, avec les index appropriés pour optimiser les requêtes.
+Le diagramme de cas d'utilisation présenté ci-dessous synthétise les interactions entre les acteurs et les fonctionnalités de l'application \textbf{My Smart Budget}.  
+Il illustre les périmètres fonctionnels clés : gestion de compte, suivi des transactions et pilotage budgétaire.
 \end{tcolorbox}
 
-\begin{center}
-\small$\rightarrow$~\textit{Diagramme de classes UML — voir Annexe~\ref{ann:figures}, figure~\ref{fig:diagramme_classes}}
-\end{center}
+\begin{figure}[H]
+    \centering
+    \safefig{chapters/assets/images/cas-utilisation.png}{0.90\textwidth}{cas-utilisation.png}
+    \caption{Diagramme de cas d'utilisation — My Smart Budget}
+    \label{fig:diagramme_classes}
+\end{figure}
 
 \begin{tcolorbox}[colback=gray!10!white,colframe=gray!70!black,title=\textbf{Analyse du modèle de données}]
 Le modèle repose sur une organisation simple, cohérente et évolutive, pensée pour faciliter les traitements financiers et les analyses statistiques :
@@ -328,9 +330,9 @@ Le modèle repose sur une organisation simple, cohérente et évolutive, pensée
 \end{tcolorbox}
 
 % === NOUVEAU : Implémentation technique du modèle ===
-\begin{tcolorbox}[colback=yellow!5!white,colframe=yellow!60!black,title=\textbf{Implémentation MongoDB avec index optimisés}]
+\begin{tcolorbox}[colback=yellow!5!white,colframe=yellow!60!black,title=\textbf{Implémentation PostgreSQL/MongoDB avec index optimisés}]
 \begin{lstlisting}[language=JavaScript]
-// Schéma Mongoose avec index pour performances
+// PostgreSQL (pg-promise) + MongoDB (Mongoose) — dual database
 const TransactionSchema = new Schema({
   userId: { type: ObjectId, ref: 'User', required: true, index: true },
   amount: { type: Decimal128, required: true },
@@ -387,7 +389,7 @@ Le modèle repose sur des relations claires et normalisées :
 L'architecture du modèle de données garantit :
 \begin{itemize}
     \item une \textbf{extensibilité} facilitant l'ajout de nouvelles fonctionnalités (ex. gestion multi-devise, import bancaire) ;
-    \item une \textbf{intégrité des données} grâce aux liens explicites entre les entités et aux validations Mongoose ;
+    \item une \textbf{intégrité des données} grâce aux contraintes PostgreSQL et aux schémas Mongoose pour MongoDB ;
     \item une \textbf{optimisation des performances} avec des index sur userId+date (requêtes $<$ 50ms pour 100k documents) ;
     \item une \textbf{maintenance simplifiée} via des relations logiques et des entités bien isolées.
 \end{itemize}
@@ -407,7 +409,7 @@ Ainsi, le diagramme de classes constitue la base de la conception technique et d
     \item Réduit les erreurs et le temps de saisie manuelle de \textbf{20 minutes à 5 minutes} par semaine ;
     \item Offre une meilleure compréhension des habitudes de dépenses : \textbf{87\%} des testeurs déclarent avoir identifié des dépenses inutiles ;
     \item Favorise la prise de décision financière : \textbf{-2.3 dépassements budgétaires} par mois en moyenne après 2 mois d'utilisation ;
-    \item Met en valeur mes compétences techniques (React, Node.js, MongoDB, Docker, AWS) avec \textbf{15k lignes de code}, \textbf{73\% de couverture de tests} et \textbf{score Lighthouse 92/100}.
+    \item Met en valeur mes compétences techniques (Next.js, Node.js/Express, PostgreSQL, MongoDB, Docker, AWS) avec \textbf{15k lignes de code}, \textbf{73\% de couverture de tests} et \textbf{score Lighthouse 92/100}.
 \end{itemize}
 \end{tcolorbox}
 
@@ -468,9 +470,9 @@ de la conception UML à l'intégration front/back, en passant par la gestion de 
 \begin{tcolorbox}[colback=blue!5!white,colframe=blue!60!black,title=\textbf{Enjeux techniques et fonctionnels maîtrisés}]
 Ce projet m'a permis de consolider mes compétences dans plusieurs domaines avec des résultats mesurables :
 \begin{itemize}
-    \item \textbf{Front-end :} création d'interfaces réactives avec \textit{React.js}, score Lighthouse Accessibility \textbf{95/100} ;
+    \item \textbf{Front-end :} création d'interfaces réactives avec \textit{Next.js}, score Lighthouse Accessibility \textbf{95/100} ;
     \item \textbf{Back-end :} API REST avec \textbf{23 endpoints}, temps de réponse moyen \textbf{142ms} (P95) ;
-    \item \textbf{Base de données :} \textbf{3 collections MongoDB} optimisées avec index, requêtes $<$ 50ms pour 100k docs ;
+    \item \textbf{Base de données :} \textbf{PostgreSQL} (données relationnelles) + \textbf{MongoDB} (données non-structurées), requêtes $<$ 50ms ;
     \item \textbf{Sécurité :} JWT + bcrypt, \textbf{0 vulnérabilité critique} (scan Snyk), rate limiting 100 req/min ;
     \item \textbf{Tests :} \textbf{73\% de couverture}, 142 tests unitaires, 28 tests d'intégration ;
     \item \textbf{Déploiement :} Docker avec \textbf{3 conteneurs}, CI/CD GitHub Actions, déploiement $<$ 5min.
@@ -507,7 +509,7 @@ Ces choix technologiques garantissent la fiabilité, la scalabilité et la maint
 \begin{tcolorbox}[colback=yellow!5!white,colframe=yellow!60!black,title=\textbf{Bilan personnel}]
 Ce projet représente pour moi une expérience professionnelle formatrice et concrète, validée par des métriques tangibles :
 \begin{itemize}
-    \item \textbf{Compétences techniques :} maîtrise stack MERN, \textbf{15k lignes de code}, \textbf{73\% tests coverage} ;
+    \item \textbf{Compétences techniques :} maîtrise stack Next.js/Express/PostgreSQL/MongoDB, \textbf{15k lignes de code}, \textbf{73\% tests coverage} ;
     \item \textbf{Gestion de projet :} respect planning sur 9 mois, \textbf{94\% features livrées} dans les délais ;
     \item \textbf{Orientation utilisateur :} \textbf{87\% satisfaction} sur panel test, \textbf{10 retours} intégrés en V1 ;
     \item \textbf{Documentation :} \textbf{112 pages} de doc technique, API documentée avec Swagger ;

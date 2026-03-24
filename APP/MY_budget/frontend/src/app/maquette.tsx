@@ -7,14 +7,58 @@ import {
   Calendar, ChevronRight, X, Check, AlertCircle, ArrowUpRight,
   ArrowDownRight, Filter, Search, Eye, EyeOff, Menu, Trash2
 } from 'lucide-react';
+import Questionnaire from './Questionnaire';
 
+// ─── PAGE D'ACCUEIL PERSONNALISÉE ─────────────────────────────────────────────
+const WelcomePage = ({ user, answers, onEnter }) => {
+  const firstName = user?.name?.split(' ')[0] || 'toi';
+
+  const tips = [
+    answers?.objectifsEpargne?.includes('urgence') && { icon: '🛡️', text: "Commence par un fonds d'urgence de 1 000 €" },
+    answers?.objectifsEpargne?.includes('immobilier') && { icon: '🏡', text: "Prépare ton apport immobilier dès maintenant" },
+    answers?.profileType === 'etudiant' && { icon: '🎓', text: "Applique la règle 50/30/20 à tes revenus" },
+    answers?.dettes?.length > 0 && !answers?.dettes?.includes('aucune') && { icon: '🏦', text: "Priorise le remboursement de tes dettes à taux élevé" },
+    { icon: '💡', text: "Suis tes dépenses pendant 30 jours pour identifier les fuites" },
+  ].filter(Boolean).slice(0, 3);
+
+  return (
+    <div className="min-h-screen bg-gradient-to-br from-slate-900 via-indigo-950 to-purple-950 flex items-center justify-center p-4">
+      <div className="w-full max-w-lg text-center">
+        <div className="w-24 h-24 bg-gradient-to-br from-indigo-500 to-purple-600 rounded-full flex items-center justify-center text-white text-3xl font-bold shadow-2xl mx-auto mb-6 animate-bounce">
+          {user?.name?.split(' ').map(n => n[0]).join('') || 'U'}
+        </div>
+        <h1 className="text-4xl font-bold text-white mb-2">Bienvenue, {firstName} ! 🎉</h1>
+        <p className="text-indigo-300 mb-8">Ton espace budget est prêt. Voici tes premiers conseils personnalisés.</p>
+        <div className="space-y-3 mb-8 text-left">
+          {tips.map((tip, i) => (
+            <div key={i} className="flex items-center gap-4 p-4 bg-white/10 backdrop-blur rounded-2xl border border-white/10">
+              <span className="text-2xl">{tip.icon}</span>
+              <p className="text-white/80 text-sm">{tip.text}</p>
+            </div>
+          ))}
+        </div>
+        <button
+          onClick={onEnter}
+          className="w-full py-4 bg-gradient-to-r from-indigo-500 to-purple-600 text-white rounded-2xl font-bold text-lg shadow-2xl hover:shadow-indigo-500/30 transform hover:scale-[1.02] transition-all duration-300"
+        >
+          Accéder à mon dashboard →
+        </button>
+      </div>
+    </div>
+  );
+};
+
+// ─── COMPOSANT PRINCIPAL ──────────────────────────────────────────────────────
 const MySmartBudget = () => {
+  // ✅ CORRECTION 1 : screen state pour gérer le flux login → questionnaire → welcome → dashboard
+  const [screen, setScreen] = useState('loading');
   const [currentPage, setCurrentPage] = useState('dashboard');
   const [showBalance, setShowBalance] = useState(true);
   const [menuOpen, setMenuOpen] = useState(false);
   const [selectedCategory, setSelectedCategory] = useState(null);
   const [animateCards, setAnimateCards] = useState(false);
   const [user, setUser] = useState(null);
+  const [questionnaireAnswers, setQuestionnaireAnswers] = useState(null);
   const [transactions, setTransactions] = useState([]);
   const [loading, setLoading] = useState(true);
   const [showAddForm, setShowAddForm] = useState(false);
@@ -28,20 +72,43 @@ const MySmartBudget = () => {
   const [filterCategory, setFilterCategory] = useState('');
   const [message, setMessage] = useState('');
 
-  // ✅ CHARGER L'UTILISATEUR
+  // ✅ CORRECTION 2 : redirect vers /login si pas connecté + vérification questionnaire
   useEffect(() => {
+    if (typeof window === 'undefined') return;
     const userData = localStorage.getItem('user');
-    if (userData) {
-      setUser(JSON.parse(userData));
+    if (!userData) {
+      window.location.href = '/login';
+      return;
+    }
+    const parsedUser = JSON.parse(userData);
+    setUser(parsedUser);
+    const questionnaireDone = localStorage.getItem('questionnaire_done');
+    if (questionnaireDone) {
+      const savedAnswers = localStorage.getItem('questionnaire_answers');
+      if (savedAnswers) setQuestionnaireAnswers(JSON.parse(savedAnswers));
+      setScreen('dashboard');
+    } else {
+      setScreen('questionnaire');
     }
   }, []);
 
+  // ✅ Questionnaire terminé → page d'accueil
+  const handleQuestionnaireComplete = (answers: any) => {
+    localStorage.setItem('questionnaire_done', 'true');
+    localStorage.setItem('questionnaire_answers', JSON.stringify(answers));
+    setQuestionnaireAnswers(answers);
+    setScreen('welcome');
+  };
+
+  // ✅ Page d'accueil → dashboard
+  const handleEnterDashboard = () => setScreen('dashboard');
+
   // ✅ CHARGER LES TRANSACTIONS
   useEffect(() => {
-    if (user) {
+    if (user && screen === 'dashboard') {
       fetchTransactions();
     }
-  }, [user]);
+  }, [user, screen]);
 
   const fetchTransactions = async () => {
     try {
@@ -65,13 +132,12 @@ const MySmartBudget = () => {
     window.location.href = '/login';
   };
 
-  // ✅ AJOUTER UNE TRANSACTION
+  // ✅ CORRECTION 3 : template literal corrigé (backtick au lieu de quote)
   const handleAddTransaction = async (e: React.FormEvent) => {
     e.preventDefault();
     setMessage('');
-
     try {
-      const response = await fetch('${process.env.NEXT_PUBLIC_API_URL}/transactions/add', {
+      const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/transactions/add`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
@@ -80,7 +146,6 @@ const MySmartBudget = () => {
           amount: parseFloat(formData.amount)
         })
       });
-
       if (response.ok) {
         setMessage('✅ Transaction ajoutée!');
         setFormData({
@@ -99,7 +164,6 @@ const MySmartBudget = () => {
     }
   };
 
-  // ✅ SUPPRIMER UNE TRANSACTION
   const handleDeleteTransaction = async (id: number) => {
     try {
       const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/transactions/${id}`, {
@@ -113,7 +177,6 @@ const MySmartBudget = () => {
     }
   };
 
-  // ✅ CALCULER LES STATS
   const calculateStats = () => {
     const revenus = transactions.filter(t => t.amount > 0).reduce((sum, t) => sum + t.amount, 0);
     const depenses = Math.abs(transactions.filter(t => t.amount < 0).reduce((sum, t) => sum + t.amount, 0));
@@ -121,7 +184,6 @@ const MySmartBudget = () => {
     return { revenus, depenses, solde };
   };
 
-  // ✅ DONNÉES PAR CATÉGORIE
   const getCategories = () => {
     const categories: any = {};
     transactions.forEach(t => {
@@ -139,7 +201,6 @@ const MySmartBudget = () => {
     }));
   };
 
-  // ✅ FILTRER LES TRANSACTIONS
   const filteredTransactions = transactions.filter(t => {
     const matchSearch = t.name.toLowerCase().includes(searchText.toLowerCase());
     const matchCategory = !filterCategory || t.category === filterCategory;
@@ -148,6 +209,30 @@ const MySmartBudget = () => {
 
   const stats = calculateStats();
   const categories = getCategories();
+
+  // ─── ÉCRANS ───────────────────────────────────────────────────────────────
+
+  // ✅ CORRECTION 4 : spinner pendant le chargement (évite le flash du dashboard)
+  if (screen === 'loading') {
+    return (
+      <div className="min-h-screen bg-gradient-to-br from-gray-50 via-indigo-50 to-purple-50 flex items-center justify-center">
+        <div className="text-center">
+          <div className="inline-block animate-spin text-4xl mb-4">⏳</div>
+          <p className="text-gray-500 font-medium">Chargement...</p>
+        </div>
+      </div>
+    );
+  }
+
+  if (screen === 'questionnaire') {
+    return <Questionnaire currentUser={user} onComplete={handleQuestionnaireComplete} />;
+  }
+
+  if (screen === 'welcome') {
+    return <WelcomePage user={user} answers={questionnaireAnswers} onEnter={handleEnterDashboard} />;
+  }
+
+  // ─── DASHBOARD ────────────────────────────────────────────────────────────
 
   const NavItem = ({ icon: Icon, label, page }) => (
     <button
@@ -200,10 +285,11 @@ const MySmartBudget = () => {
           <p className="text-sm mt-4 text-emerald-100">Ce mois</p>
         </div>
 
+        {/* ✅ CORRECTION 5 : "Antoine" remplacé par "Dépenses" */}
         <div className={`bg-gradient-to-br from-rose-400 to-orange-400 rounded-3xl p-6 text-white shadow-2xl transform transition-all duration-500 hover:scale-105 delay-200 ${animateCards ? 'animate-slideInRight' : ''}`}>
           <div className="flex justify-between items-start">
             <div>
-              <p className="text-rose-100 text-sm font-medium">Antoine</p>
+              <p className="text-rose-100 text-sm font-medium">Dépenses</p>
               <h3 className="text-3xl font-bold mt-2">€{stats.depenses.toFixed(2)}</h3>
             </div>
             <div className="p-3 bg-white/20 rounded-2xl">
@@ -218,7 +304,8 @@ const MySmartBudget = () => {
       {categories.length > 0 && (
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
           <div className="bg-white rounded-3xl p-6 shadow-xl border border-gray-100">
-            <h3 className="text-xl font-bold mb-4">miam les chips</h3>
+            {/* ✅ CORRECTION 6 : titre "miam les chips" remplacé */}
+            <h3 className="text-xl font-bold mb-4">Répartition des dépenses</h3>
             <ResponsiveContainer width="100%" height={300}>
               <PieChart>
                 <Pie
@@ -299,196 +386,183 @@ const MySmartBudget = () => {
   );
 
   const TransactionsPage = () => (
-  <div className="space-y-6 animate-fadeIn">
-    {/* FORMULAIRE AJOUTER */}
-    {showAddForm && (
-      <div className="bg-white rounded-3xl p-6 shadow-xl border border-gray-100">
-        <div className="flex justify-between items-center mb-6">
-          <h2 className="text-2xl font-bold">Ajouter un Transaction</h2>
-          <button onClick={() => setShowAddForm(false)} className="p-2 hover:bg-gray-100 rounded-lg">
-            <X size={24} />
-          </button>
-        </div>
-
-        {message && (
-          <div className={`mb-4 p-4 rounded-lg ${message.includes('✅') ? 'bg-green-100 text-green-700' : 'bg-red-100 text-red-700'}`}>
-            {message}
-          </div>
-        )}
-
-        <form onSubmit={handleAddTransaction} className="space-y-4">
-          <input
-            type="text"
-            placeholder="Description"
-            value={formData.name}
-            onChange={(e) => setFormData({ ...formData, name: e.target.value })}
-            className="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500"
-            required
-          />
-
-          <select
-            value={formData.category}
-            onChange={(e) => setFormData({ ...formData, category: e.target.value })}
-            className="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500"
-            required
-          >
-            <option value="">Catégorie</option>
-            <option value="Alimentation">🛒 Alimentation</option>
-            <option value="Transport">🚗 Transport</option>
-            <option value="Loisirs">🎮 Loisirs</option>
-            <option value="Abonnements">📱 Abonnements</option>
-            <option value="Santé">⚕️ Santé</option>
-            <option value="Revenus">💰 Revenus</option>
-          </select>
-
-          <div className="grid grid-cols-2 gap-4">
-            <input
-              type="number"
-              placeholder="Montant (€)"
-              value={formData.amount}
-              onChange={(e) => setFormData({ ...formData, amount: e.target.value })}
-              className="px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500"
-              step="0.01"
-              required
-            />
-            <input
-              type="date"
-              value={formData.date}
-              onChange={(e) => setFormData({ ...formData, date: e.target.value })}
-              className="px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500"
-              required
-            />
-          </div>
-
-          <button
-            type="submit"
-            className="w-full px-4 py-3 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 transition font-medium flex items-center justify-center gap-2"
-          >
-            <Plus size={20} />
-            Ajouter
-          </button>
-        </form>
-      </div>
-    )}
-
-    {/* RECHERCHE ET FILTRE - AMÉLIORÉ */}
-    <div className="bg-white rounded-3xl p-6 shadow-xl border border-gray-100">
-      <div className="flex flex-col gap-4 mb-6">
-        {/* BARRE DE RECHERCHE GRANDE */}
-        <div className="relative">
-          <Search className="absolute left-4 top-1/2 transform -translate-y-1/2 text-indigo-500" size={24} />
-          <input
-            type="text"
-            placeholder="🔍 Rechercher une transaction (nom, catégorie...)"
-            value={searchText}
-            onChange={(e) => setSearchText(e.target.value)}
-            className="w-full pl-14 pr-4 py-4 bg-gradient-to-r from-indigo-50 to-purple-50 border-2 border-indigo-200 rounded-2xl focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent text-lg font-medium"
-          />
-          {searchText && (
-            <button
-              onClick={() => setSearchText('')}
-              className="absolute right-4 top-1/2 transform -translate-y-1/2 p-2 hover:bg-gray-200 rounded-lg"
-            >
-              <X size={20} className="text-gray-600" />
+    <div className="space-y-6 animate-fadeIn">
+      {showAddForm && (
+        <div className="bg-white rounded-3xl p-6 shadow-xl border border-gray-100">
+          <div className="flex justify-between items-center mb-6">
+            <h2 className="text-2xl font-bold">Ajouter une Transaction</h2>
+            <button onClick={() => setShowAddForm(false)} className="p-2 hover:bg-gray-100 rounded-lg">
+              <X size={24} />
             </button>
+          </div>
+
+          {message && (
+            <div className={`mb-4 p-4 rounded-lg ${message.includes('✅') ? 'bg-green-100 text-green-700' : 'bg-red-100 text-red-700'}`}>
+              {message}
+            </div>
           )}
+
+          <form onSubmit={handleAddTransaction} className="space-y-4">
+            <input
+              type="text"
+              placeholder="Description"
+              value={formData.name}
+              onChange={(e) => setFormData({ ...formData, name: e.target.value })}
+              className="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500"
+              required
+            />
+            <select
+              value={formData.category}
+              onChange={(e) => setFormData({ ...formData, category: e.target.value })}
+              className="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500"
+              required
+            >
+              <option value="">Catégorie</option>
+              <option value="Alimentation">🛒 Alimentation</option>
+              <option value="Transport">🚗 Transport</option>
+              <option value="Loisirs">🎮 Loisirs</option>
+              <option value="Abonnements">📱 Abonnements</option>
+              <option value="Santé">⚕️ Santé</option>
+              <option value="Revenus">💰 Revenus</option>
+            </select>
+            <div className="grid grid-cols-2 gap-4">
+              <input
+                type="number"
+                placeholder="Montant (€)"
+                value={formData.amount}
+                onChange={(e) => setFormData({ ...formData, amount: e.target.value })}
+                className="px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                step="0.01"
+                required
+              />
+              <input
+                type="date"
+                value={formData.date}
+                onChange={(e) => setFormData({ ...formData, date: e.target.value })}
+                className="px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                required
+              />
+            </div>
+            <button
+              type="submit"
+              className="w-full px-4 py-3 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 transition font-medium flex items-center justify-center gap-2"
+            >
+              <Plus size={20} />
+              Ajouter
+            </button>
+          </form>
         </div>
+      )}
 
-        {/* FILTRES */}
-        <div className="flex flex-col md:flex-row gap-3">
-          <select
-            value={filterCategory}
-            onChange={(e) => setFilterCategory(e.target.value)}
-            className="flex-1 px-4 py-3 bg-gradient-to-r from-indigo-50 to-purple-50 border-2 border-indigo-200 rounded-2xl focus:outline-none focus:ring-2 focus:ring-indigo-500 font-medium"
-          >
-            <option value="">📂 Toutes catégories</option>
-            <option value="Alimentation">🛒 Alimentation</option>
-            <option value="Transport">🚗 Transport</option>
-            <option value="Loisirs">🎮 Loisirs</option>
-            <option value="Abonnements">📱 Abonnements</option>
-            <option value="Santé">⚕️ Santé</option>
-            <option value="Revenus">💰 Revenus</option>
-          </select>
-
-          <button
-            onClick={() => setShowAddForm(!showAddForm)}
-            className="px-6 py-3 bg-gradient-to-r from-indigo-600 to-purple-600 text-white rounded-2xl font-medium shadow-lg hover:shadow-xl transform hover:scale-105 transition-all duration-300 flex items-center justify-center gap-2 md:w-auto"
-          >
-            <Plus size={20} />
-            Ajouter Transaction
-          </button>
-        </div>
-
-        {/* AFFICHAGE DU NOMBRE DE RÉSULTATS */}
-        {(searchText || filterCategory) && (
-          <div className="p-3 bg-indigo-100 border border-indigo-300 rounded-xl">
-            <p className="text-indigo-700 font-medium">
-              🔎 {filteredTransactions.length} résultat{filteredTransactions.length !== 1 ? 's' : ''} trouvé{filteredTransactions.length !== 1 ? 's' : ''}
-            </p>
-          </div>
-        )}
-      </div>
-
-      {/* LISTE TRANSACTIONS */}
-      <div className="space-y-3">
-        {loading ? (
-          <div className="text-center py-12">
-            <div className="inline-block animate-spin">⏳</div>
-            <p className="text-gray-500 mt-2">Chargement des transactions...</p>
-          </div>
-        ) : filteredTransactions.length === 0 ? (
-          <div className="text-center py-12 bg-gradient-to-br from-gray-50 to-gray-100 rounded-2xl">
-            <Search size={48} className="mx-auto text-gray-400 mb-4" />
-            <h3 className="text-xl font-bold text-gray-700 mb-2">Aucune transaction trouvée</h3>
-            <p className="text-gray-600 mb-4">
-              {searchText ? `Aucune transaction ne correspond à "${searchText}"` : 'Ajoute ta première transaction!'}
-            </p>
-            {(searchText || filterCategory) && (
+      <div className="bg-white rounded-3xl p-6 shadow-xl border border-gray-100">
+        <div className="flex flex-col gap-4 mb-6">
+          <div className="relative">
+            <Search className="absolute left-4 top-1/2 transform -translate-y-1/2 text-indigo-500" size={24} />
+            <input
+              type="text"
+              placeholder="🔍 Rechercher une transaction (nom, catégorie...)"
+              value={searchText}
+              onChange={(e) => setSearchText(e.target.value)}
+              className="w-full pl-14 pr-4 py-4 bg-gradient-to-r from-indigo-50 to-purple-50 border-2 border-indigo-200 rounded-2xl focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent text-lg font-medium"
+            />
+            {searchText && (
               <button
-                onClick={() => {
-                  setSearchText('');
-                  setFilterCategory('');
-                }}
-                className="px-4 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700"
+                onClick={() => setSearchText('')}
+                className="absolute right-4 top-1/2 transform -translate-y-1/2 p-2 hover:bg-gray-200 rounded-lg"
               >
-                ✕ Réinitialiser les filtres
+                <X size={20} className="text-gray-600" />
               </button>
             )}
           </div>
-        ) : (
-          filteredTransactions.map((transaction, i) => (
-            <div
-              key={transaction.id}
-              className={`group flex items-center justify-between p-5 rounded-2xl bg-gradient-to-r from-gray-50 to-transparent hover:from-indigo-50 hover:to-purple-50 transition-all duration-300 cursor-pointer transform hover:scale-[1.02] border border-gray-200 hover:border-indigo-300 animate-slideInRight`}
-              style={{ animationDelay: `${i * 50}ms` }}
+
+          <div className="flex flex-col md:flex-row gap-3">
+            <select
+              value={filterCategory}
+              onChange={(e) => setFilterCategory(e.target.value)}
+              className="flex-1 px-4 py-3 bg-gradient-to-r from-indigo-50 to-purple-50 border-2 border-indigo-200 rounded-2xl focus:outline-none focus:ring-2 focus:ring-indigo-500 font-medium"
             >
-              <div className="flex items-center gap-4 flex-1">
-                <div className="text-4xl">
-                  {transaction.amount > 0 ? '💰' : transaction.category === 'Alimentation' ? '🛒' : transaction.category === 'Transport' ? '🚗' : transaction.category === 'Loisirs' ? '🎮' : transaction.category === 'Abonnements' ? '📱' : transaction.category === 'Santé' ? '⚕️' : '💸'}
-                </div>
-                <div className="flex-1">
-                  <p className="font-bold text-gray-800 text-lg">{transaction.name}</p>
-                  <p className="text-sm text-gray-500">{transaction.category} • {new Date(transaction.date).toLocaleDateString('fr-FR')}</p>
-                </div>
-              </div>
-              <div className="flex items-center gap-4">
-                <p className={`font-bold text-2xl whitespace-nowrap ${transaction.amount > 0 ? 'text-green-500' : 'text-red-500'}`}>
-                  {transaction.amount > 0 ? '+' : ''}€{Math.abs(transaction.amount).toFixed(2)}
-                </p>
-                <button
-                  onClick={() => handleDeleteTransaction(transaction.id)}
-                  className="p-2 text-red-600 hover:bg-red-50 rounded-lg transition opacity-0 group-hover:opacity-100"
-                >
-                  <Trash2 size={20} />
-                </button>
-              </div>
+              <option value="">📂 Toutes catégories</option>
+              <option value="Alimentation">🛒 Alimentation</option>
+              <option value="Transport">🚗 Transport</option>
+              <option value="Loisirs">🎮 Loisirs</option>
+              <option value="Abonnements">📱 Abonnements</option>
+              <option value="Santé">⚕️ Santé</option>
+              <option value="Revenus">💰 Revenus</option>
+            </select>
+            <button
+              onClick={() => setShowAddForm(!showAddForm)}
+              className="px-6 py-3 bg-gradient-to-r from-indigo-600 to-purple-600 text-white rounded-2xl font-medium shadow-lg hover:shadow-xl transform hover:scale-105 transition-all duration-300 flex items-center justify-center gap-2 md:w-auto"
+            >
+              <Plus size={20} />
+              Ajouter Transaction
+            </button>
+          </div>
+
+          {(searchText || filterCategory) && (
+            <div className="p-3 bg-indigo-100 border border-indigo-300 rounded-xl">
+              <p className="text-indigo-700 font-medium">
+                🔎 {filteredTransactions.length} résultat{filteredTransactions.length !== 1 ? 's' : ''} trouvé{filteredTransactions.length !== 1 ? 's' : ''}
+              </p>
             </div>
-          ))
-        )}
+          )}
+        </div>
+
+        <div className="space-y-3">
+          {loading ? (
+            <div className="text-center py-12">
+              <div className="inline-block animate-spin">⏳</div>
+              <p className="text-gray-500 mt-2">Chargement des transactions...</p>
+            </div>
+          ) : filteredTransactions.length === 0 ? (
+            <div className="text-center py-12 bg-gradient-to-br from-gray-50 to-gray-100 rounded-2xl">
+              <Search size={48} className="mx-auto text-gray-400 mb-4" />
+              <h3 className="text-xl font-bold text-gray-700 mb-2">Aucune transaction trouvée</h3>
+              <p className="text-gray-600 mb-4">
+                {searchText ? `Aucune transaction ne correspond à "${searchText}"` : 'Ajoute ta première transaction!'}
+              </p>
+              {(searchText || filterCategory) && (
+                <button
+                  onClick={() => { setSearchText(''); setFilterCategory(''); }}
+                  className="px-4 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700"
+                >
+                  ✕ Réinitialiser les filtres
+                </button>
+              )}
+            </div>
+          ) : (
+            filteredTransactions.map((transaction, i) => (
+              <div
+                key={transaction.id}
+                className={`group flex items-center justify-between p-5 rounded-2xl bg-gradient-to-r from-gray-50 to-transparent hover:from-indigo-50 hover:to-purple-50 transition-all duration-300 cursor-pointer transform hover:scale-[1.02] border border-gray-200 hover:border-indigo-300 animate-slideInRight`}
+                style={{ animationDelay: `${i * 50}ms` }}
+              >
+                <div className="flex items-center gap-4 flex-1">
+                  <div className="text-4xl">
+                    {transaction.amount > 0 ? '💰' : transaction.category === 'Alimentation' ? '🛒' : transaction.category === 'Transport' ? '🚗' : transaction.category === 'Loisirs' ? '🎮' : transaction.category === 'Abonnements' ? '📱' : transaction.category === 'Santé' ? '⚕️' : '💸'}
+                  </div>
+                  <div className="flex-1">
+                    <p className="font-bold text-gray-800 text-lg">{transaction.name}</p>
+                    <p className="text-sm text-gray-500">{transaction.category} • {new Date(transaction.date).toLocaleDateString('fr-FR')}</p>
+                  </div>
+                </div>
+                <div className="flex items-center gap-4">
+                  <p className={`font-bold text-2xl whitespace-nowrap ${transaction.amount > 0 ? 'text-green-500' : 'text-red-500'}`}>
+                    {transaction.amount > 0 ? '+' : ''}€{Math.abs(transaction.amount).toFixed(2)}
+                  </p>
+                  <button
+                    onClick={() => handleDeleteTransaction(transaction.id)}
+                    className="p-2 text-red-600 hover:bg-red-50 rounded-lg transition opacity-0 group-hover:opacity-100"
+                  >
+                    <Trash2 size={20} />
+                  </button>
+                </div>
+              </div>
+            ))
+          )}
+        </div>
       </div>
     </div>
-  </div>
-);
+  );
 
   const BudgetPage = () => {
     const categoryBudgets = [
@@ -501,7 +575,6 @@ const MySmartBudget = () => {
       <div className="space-y-6 animate-fadeIn">
         <div className="bg-white rounded-3xl p-6 shadow-xl border border-gray-100">
           <h3 className="text-2xl font-bold mb-6 bg-gradient-to-r from-indigo-600 to-purple-600 bg-clip-text text-transparent">Budgets par Catégorie</h3>
-          
           <div className="space-y-4">
             {categoryBudgets.map((category, i) => {
               const percentage = category.budget > 0 ? (category.spent / category.budget) * 100 : 0;
@@ -528,7 +601,6 @@ const MySmartBudget = () => {
                       {Math.round(percentage)}%
                     </div>
                   </div>
-                  
                   <div className="relative h-3 bg-gray-200 rounded-full overflow-hidden">
                     <div
                       className={`absolute left-0 top-0 h-full rounded-full transition-all duration-1000 ease-out`}
@@ -539,7 +611,6 @@ const MySmartBudget = () => {
                       }}
                     />
                   </div>
-
                   {selectedCategory === i && (
                     <div className="mt-4 pt-4 border-t border-gray-200 animate-slideDown">
                       <p className="text-sm text-gray-600">Budget restant: <span className="font-bold text-green-600">€{Math.max(0, category.budget - category.spent).toFixed(2)}</span></p>
@@ -577,7 +648,6 @@ const MySmartBudget = () => {
           <h3 className="text-2xl font-bold text-gray-800">{user?.name}</h3>
           <p className="text-gray-500">{user?.email}</p>
         </div>
-
         <div className="space-y-4">
           {[
             { icon: Bell, label: 'Notifications', value: 'Activées' },
@@ -601,7 +671,6 @@ const MySmartBudget = () => {
           ))}
         </div>
       </div>
-
       <button 
         onClick={logout}
         className="w-full py-4 bg-gradient-to-r from-red-500 to-pink-500 text-white rounded-3xl font-bold shadow-xl hover:shadow-2xl transform hover:scale-[1.02] transition-all duration-300">
@@ -612,8 +681,6 @@ const MySmartBudget = () => {
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-gray-50 via-indigo-50 to-purple-50">
-
-      {/* Header */}
       <header className="bg-white shadow-lg sticky top-0 z-50 border-b border-gray-100">
         <div className="max-w-7xl mx-auto px-4 py-4 flex items-center justify-between">
           <div className="flex items-center gap-3">
@@ -628,8 +695,7 @@ const MySmartBudget = () => {
                 MSB
               </div>
               <h1 className="text-2xl font-bold bg-gradient-to-r from-indigo-600 to-purple-600 bg-clip-text text-transparent">
-                My Smart Budget 
-
+                My Smart Budget
               </h1>
             </div>
           </div>
@@ -649,7 +715,6 @@ const MySmartBudget = () => {
       </header>
 
       <div className="max-w-7xl mx-auto px-4 py-6 flex flex-col md:flex-row gap-6">
-        {/* Sidebar Navigation */}
         <aside className={`md:w-64 bg-white rounded-3xl p-6 shadow-xl border border-gray-100 ${menuOpen ? 'block' : 'hidden md:block'}`}>
           <nav className="space-y-2">
             <NavItem icon={Home} label="Dashboard" page="dashboard" />
@@ -658,7 +723,6 @@ const MySmartBudget = () => {
             <NavItem icon={Target} label="Objectifs" page="goals" />
             <NavItem icon={User} label="Profil" page="profile" />
           </nav>
-
           <div className="mt-8 p-4 bg-gradient-to-br from-indigo-100 to-purple-100 rounded-2xl">
             <h4 className="font-bold text-indigo-900 mb-2">💎 Premium</h4>
             <p className="text-sm text-indigo-700 mb-3">Fonctionnalités avancées!</p>
@@ -668,7 +732,6 @@ const MySmartBudget = () => {
           </div>
         </aside>
 
-        {/* Main Content */}
         <main className="flex-1">
           {currentPage === 'dashboard' && <DashboardPage />}
           {currentPage === 'transactions' && <TransactionsPage />}
@@ -679,6 +742,6 @@ const MySmartBudget = () => {
       </div>
     </div>
   );
-};
+}; 
 
 export default MySmartBudget;

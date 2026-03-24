@@ -19,7 +19,7 @@ La stratégie de tests de \textbf{My Smart Budget} suit la pyramide de tests ave
                     +===================================+
                     |     TESTS D'INTEGRATION (25%)     |
                     |      (Jest/Supertest - 87 tests)  |
-                    |       API endpoints, MongoDB      |
+                    |    API endpoints, PostgreSQL      |
                     |       Temps: ~30s / Push          |
                     +===================================+
                               |
@@ -51,14 +51,14 @@ describe('BudgetCalculatorService', () => {
   let mockBudgetModel;
 
   beforeEach(() => {
-    // Mocks des modèles MongoDB
+    // Mocks des accès base de données (pg-promise)
     mockTransactionModel = {
-      aggregate: jest.fn(),
-      find: jest.fn()
+      query: jest.fn(),  // pg-promise db.any()
+      queryOne: jest.fn() // pg-promise db.one()
     };
     mockBudgetModel = {
-      findById: jest.fn(),
-      findOne: jest.fn()
+      query: jest.fn(),
+      queryOne: jest.fn()
     };
     
     budgetCalculator = new BudgetCalculatorService(
@@ -70,11 +70,11 @@ describe('BudgetCalculatorService', () => {
   describe('calculateRemainingBudget', () => {
     it('should calculate remaining budget correctly', async () => {
       // Arrange
-      const budgetId = 'budget123';
-      const userId = 'user456';
+      const budgetId = 1;
+      const userId = 42;
       const budget = {
-        _id: budgetId,
-        userId,
+        id: budgetId,
+        user_id: userId,
         monthlyLimit: 500,
         categoryId: 'cat789',
         startDate: new Date('2024-01-01')
@@ -86,7 +86,7 @@ describe('BudgetCalculatorService', () => {
         { amount: 25, type: 'expense', date: new Date('2024-01-15') }
       ];
       
-      mockBudgetModel.findById.mockResolvedValue(budget);
+      mockBudgetModel.queryOne.mockResolvedValue(budget);
       mockTransactionModel.find.mockResolvedValue(transactions);
 
       // Act
@@ -124,7 +124,7 @@ describe('BudgetCalculatorService', () => {
         { amount: 85, type: 'expense' }
       ];
       
-      mockBudgetModel.findById.mockResolvedValue(budget);
+      mockBudgetModel.queryOne.mockResolvedValue(budget);
       mockTransactionModel.find.mockResolvedValue(transactions);
 
       // Act
@@ -146,7 +146,7 @@ describe('BudgetCalculatorService', () => {
         { amount: 120, type: 'expense' }
       ];
       
-      mockBudgetModel.findById.mockResolvedValue(budget);
+      mockBudgetModel.queryOne.mockResolvedValue(budget);
       mockTransactionModel.find.mockResolvedValue(transactions);
 
       // Act
@@ -160,9 +160,9 @@ describe('BudgetCalculatorService', () => {
 
     it('should handle empty transactions', async () => {
       // Arrange
-      mockBudgetModel.findById.mockResolvedValue({
-        _id: 'budget123',
-        monthlyLimit: 500
+      mockBudgetModel.queryOne.mockResolvedValue({
+        id: 1,
+        monthly_limit: 500
       });
       mockTransactionModel.find.mockResolvedValue([]);
 
@@ -183,10 +183,10 @@ describe('BudgetCalculatorService', () => {
       const userId = 'user123';
       const currentMonth = new Date();
       
-      // Mock agrégation MongoDB
-      mockTransactionModel.aggregate.mockResolvedValue([
-        { _id: 'income', total: 2500 },
-        { _id: 'expense', total: 1800 }
+      // Mock requête SQL agrégat
+      mockTransactionModel.query.mockResolvedValue([
+        { type: 'income', total: 2500 },
+        { type: 'expense', total: 1800 }
       ]);
       
       mockBudgetModel.find.mockResolvedValue([
@@ -225,11 +225,10 @@ Les tests d'intégration valident que les couches communiquent bien entre elles.
 \begin{lstlisting}[language=JavaScript]
 // tests/integration/api/transactions.test.js
 const request = require('supertest');
-const mongoose = require('mongoose');
+const { db } = require('../../../src/db');
 const app = require('../../../src/app');
-const User = require('../../../src/models/User');
-const Transaction = require('../../../src/models/Transaction');
-const Category = require('../../../src/models/Category');
+const bcrypt = require('bcryptjs');
+const jwt = require('jsonwebtoken');
 
 describe('Transactions API Integration Tests', () => {
   let authToken;
@@ -237,37 +236,33 @@ describe('Transactions API Integration Tests', () => {
   let testCategory;
 
   beforeAll(async () => {
-    // Connexion à la base de test
-    await mongoose.connect(process.env.MONGODB_TEST_URI);
-    
-    // Création utilisateur de test
-    testUser = await User.create({
-      email: 'test@mysmartbudget.com',
-      password: await bcrypt.hash('Test123!@#', 12),
-      firstName: 'Test',
-      lastName: 'User'
-    });
+    // Création utilisateur de test (PostgreSQL)
+    testUser = await db.one(
+      `INSERT INTO users(email, password_hash, first_name, last_name)
+       VALUES($1,$2,$3,$4) RETURNING *`,
+      ['test@mysmartbudget.com', await bcrypt.hash('Test123!@#', 12),
+       'Test', 'User']
+    );
     
     // Génération token JWT
     authToken = jwt.sign(
-      { userId: testUser._id, role: 'user' },
+      { userId: testUser.id, role: 'user' },
       process.env.JWT_SECRET,
       { expiresIn: '1h' }
     );
     
     // Création catégorie de test
-    testCategory = await Category.create({
-      name: 'Alimentation',
-      icon: 'shopping-cart',
-      color: '#4CAF50'
-    });
+    testCategory = await db.one(
+      `INSERT INTO categories(name, icon, color) VALUES($1,$2,$3) RETURNING *`,
+      ['Alimentation', 'shopping-cart', '#4CAF50']
+    );
   });
 
   afterAll(async () => {
-    await User.deleteMany({});
-    await Transaction.deleteMany({});
-    await Category.deleteMany({});
-    await mongoose.connection.close();
+    await db.none('DELETE FROM transactions');
+    await db.none('DELETE FROM categories');
+    await db.none('DELETE FROM users');
+    await db.$pool.end();
   });
 
   describe('POST /api/transactions', () => {
@@ -275,7 +270,7 @@ describe('Transactions API Integration Tests', () => {
       const transactionData = {
         amount: 45.50,
         type: 'expense',
-        categoryId: testCategory._id.toString(),
+        category_id: testCategory.id,
         description: 'Courses Carrefour',
         date: new Date().toISOString()
       };
@@ -287,15 +282,15 @@ describe('Transactions API Integration Tests', () => {
         .expect(201);
 
       expect(response.body).toMatchObject({
-        _id: expect.any(String),
+        id: expect.any(Number),
         amount: 45.50,
         type: 'expense',
         description: 'Courses Carrefour',
-        userId: testUser._id.toString()
+        user_id: testUser.id
       });
 
       // Vérification en base
-      const savedTransaction = await Transaction.findById(response.body._id);
+      const savedTransaction = await db.oneOrNone('SELECT * FROM transactions WHERE id = $1', [response.body.id]);
       expect(savedTransaction).toBeTruthy();
       expect(savedTransaction.amount).toBe(45.50);
     });
@@ -314,9 +309,9 @@ describe('Transactions API Integration Tests', () => {
       expect(response.body.error).toContain('Montant invalide');
     });
 
-    it('should prevent MongoDB injection attempts', async () => {
+    it('should prevent SQL injection attempts', async () => {
       const maliciousData = {
-        amount: { $gt: 0 }, // Tentative d'injection
+        amount: "1; DROP TABLE transactions; --", // Tentative d'injection SQL
         type: 'expense',
         categoryId: testCategory._id.toString()
       };
@@ -341,22 +336,12 @@ describe('Transactions API Integration Tests', () => {
   describe('GET /api/transactions', () => {
     beforeEach(async () => {
       // Créer des transactions de test
-      await Transaction.create([
-        {
-          userId: testUser._id,
-          amount: 100,
-          type: 'expense',
-          categoryId: testCategory._id,
-          date: new Date('2024-01-15')
-        },
-        {
-          userId: testUser._id,
-          amount: 200,
-          type: 'income',
-          categoryId: testCategory._id,
-          date: new Date('2024-01-10')
-        }
-      ]);
+      await db.none(
+        `INSERT INTO transactions(user_id, amount, type, category_id, date)
+         VALUES($1,100,'expense',$2,'2024-01-15'),
+               ($1,200,'income',$2,'2024-01-10')`,
+        [testUser.id, testCategory.id]
+      );
     });
 
     it('should return paginated transactions', async () => {
@@ -388,17 +373,15 @@ describe('Transactions API Integration Tests', () => {
 
     it('should return only user\'s own transactions', async () => {
       // Créer un autre utilisateur avec des transactions
-      const otherUser = await User.create({
-        email: 'other@test.com',
-        password: 'password'
-      });
-      
-      await Transaction.create({
-        userId: otherUser._id,
-        amount: 999,
-        type: 'expense',
-        categoryId: testCategory._id
-      });
+      const otherUser = await db.one(
+        `INSERT INTO users(email, password_hash) VALUES($1,$2) RETURNING *`,
+        ['other@test.com', 'hashedpwd']
+      );
+      await db.none(
+        `INSERT INTO transactions(user_id, amount, type, category_id)
+         VALUES($1,999,'expense',$2)`,
+        [otherUser.id, testCategory.id]
+      );
 
       const response = await request(app)
         .get('/api/transactions')
@@ -413,6 +396,70 @@ describe('Transactions API Integration Tests', () => {
 });
 \end{lstlisting}
 \end{exemple}
+
+\begin{exemple}
+\textbf{Tests d'intégration — Rapports analytiques (MongoDB/Mongoose) :}
+\begin{lstlisting}[language=JavaScript]
+// tests/integration/api/reports.test.js
+// Les rapports mensuels et logs d'audit sont stockes dans MongoDB
+const mongoose = require('mongoose');
+const MonthlyReport = require('../../../src/models/MonthlyReport');
+const AuditLog = require('../../../src/models/AuditLog');
+
+describe('Monthly Reports - MongoDB Integration', () => {
+  beforeAll(async () => {
+    await mongoose.connect(process.env.MONGO_URI_TEST);
+  });
+
+  afterAll(async () => {
+    await MonthlyReport.deleteMany({});
+    await AuditLog.deleteMany({});
+    await mongoose.connection.close();
+  });
+
+  it('should persist monthly report with category breakdown', async () => {
+    const report = await MonthlyReport.create({
+      userId: 42, // FK vers PostgreSQL users.id
+      period: { month: 1, year: 2025 },
+      metrics: {
+        totalExpenses: 1800,
+        savingsRate: 28,
+        categoryBreakdown: [
+          { categoryName: 'Alimentation', amount: 450, percentage: 25 },
+          { categoryName: 'Transport', amount: 180, percentage: 10 }
+        ]
+      }
+    });
+
+    expect(report._id).toBeDefined();
+    expect(report.metrics.categoryBreakdown).toHaveLength(2);
+    expect(report.metrics.savingsRate).toBe(28);
+  });
+
+  it('should log audit events for sensitive operations', async () => {
+    await AuditLog.create({
+      userId: 42,
+      action: 'LOGIN_SUCCESS',
+      metadata: { ip: '127.0.0.1', userAgent: 'Jest/Test' },
+      timestamp: new Date()
+    });
+
+    const log = await AuditLog.findOne({ userId: 42, action: 'LOGIN_SUCCESS' });
+    expect(log).toBeTruthy();
+    expect(log.metadata.ip).toBe('127.0.0.1');
+  });
+});
+\end{lstlisting}
+\end{exemple}
+
+\begin{tcolorbox}[colback=blue!5!white,colframe=blue!60!black,title=\textbf{Stratégie de tests Polyglot (PostgreSQL + MongoDB)}]
+L'architecture dual-database implique deux stratégies de tests distinctes :
+\begin{itemize}
+    \item \textbf{pg-promise (PostgreSQL)} : tests des données critiques (transactions, budgets, utilisateurs) — contraintes ACID, intégrité référentielle, requêtes paramétrées.
+    \item \textbf{Mongoose (MongoDB)} : tests des données non-structurées (rapports mensuels, logs d'audit) — schémas flexibles, agrégations analytiques, TTL index.
+\end{itemize}
+Les deux suites de tests s'exécutent en parallèle dans le pipeline CI/CD, chacune avec sa propre base de test isolée.
+\end{tcolorbox}
 
 \subsection{Tests End-to-End - Parcours utilisateur complets}
 
@@ -535,7 +582,7 @@ describe('Budget Creation Flow', () => {
 \hline
 \textbf{Utils} & 98.1\% & 96.4\% & 100\% & 98.2\% & 89 \\
 \hline
-\textbf{Components React} & 76.8\% & 71.2\% & 78.3\% & 77.1\% & 234 \\
+\textbf{Components Next.js} & 76.8\% & 71.2\% & 78.3\% & 77.1\% & 234 \\
 \hline
 \hline
 \textbf{TOTAL} & \textbf{85.3\%} & \textbf{81.2\%} & \textbf{87.4\%} & \textbf{85.7\%} & \textbf{684} \\
@@ -791,8 +838,8 @@ GET /budgets & 142 & 389 & 623 & 2,947 \\
 
 \textbf{Optimisations appliquées suite aux tests :}
 \begin{itemize}
-    \item ✅ Mise en cache Redis pour dashboard (gain 40\% sur P95)
-    \item ✅ Index MongoDB optimisés sur userId + date (gain 60\% sur queries)
+    \item ✅ Requêtes SQL optimisées avec index composites (gain 40\% sur P95)
+    \item ✅ Index PostgreSQL optimisés sur user\_id + date (gain 60\% sur queries)
     \item ✅ Pagination côté serveur (limit 50 transactions)
     \item ✅ Compression gzip activée (réduction 70\% payload)
     \item ✅ CDN pour assets statiques (gain 200ms sur First Paint)
@@ -842,7 +889,12 @@ sonar.issue.ignore.multicriteria.e2.resourceKey=**/*.jsx
 
 \begin{tcolorbox}[colback=green!5!white,colframe=green!60!black,title=\textbf{Dashboard SonarQube - My Smart Budget (15 décembre 2024)}]
 \begin{center}
-\begin{center}\small\textit{\textrightarrow{} Badge SonarQube — voir Annexe~\ref{ann:figures}, figure~\ref{fig:sonarqube-badge}}\end{center}
+\begin{figure}[H]
+    \centering
+    \safefig{chapters/assets/images/sonarqube-badge.png}{0.70\textwidth}{sonarqube-badge.png}
+    \caption{Badge SonarQube — résumé qualité du code (My Smart Budget)}
+    \label{fig:sonarqube-badge}
+\end{figure}
 \end{center}
 
 \begin{center}
@@ -992,12 +1044,16 @@ jobs:
   test:
     runs-on: ubuntu-latest
     services:
-      mongodb:
-        image: mongo:6
+      postgres:
+        image: postgres:16-alpine
         ports:
-          - 27017:27017
+          - 5432:5432
+        env:
+          POSTGRES_USER: smart_user
+          POSTGRES_PASSWORD: smart_password
+          POSTGRES_DB: smart_budget_test
         options: >-
-          --health-cmd mongosh
+          --health-cmd pg_isready
           --health-interval 10s
           --health-timeout 5s
           --health-retries 5
@@ -1020,13 +1076,13 @@ jobs:
       - name: Run unit tests
         run: npm run test:unit -- --coverage
         env:
-          MONGODB_URI: mongodb://localhost:27017/test
+          DATABASE_URL: postgresql://smart_user:smart_password@localhost:5432/smart_budget_test
           JWT_SECRET: test-secret-key
       
       - name: Run integration tests
         run: npm run test:integration
         env:
-          MONGODB_URI: mongodb://localhost:27017/test-integration
+          DATABASE_URL: postgresql://smart_user:smart_password@localhost:5432/smart_budget_test
       
       - name: Upload coverage to Codecov
         uses: codecov/codecov-action@v3
@@ -1075,7 +1131,7 @@ jobs:
       - name: Build application
         run: npm run build
         env:
-          REACT_APP_API_URL: http://localhost:3001
+          NEXT_PUBLIC_API_URL: http://localhost:3001
       
       - name: Start servers
         run: |
@@ -1234,11 +1290,11 @@ Vulnérabilités bloquantes & 0 & → 0 \\
 \begin{tcolorbox}[colback=yellow!5!white,colframe=yellow!60!black,title=\textbf{Plan d'amélioration Q1 2025}]
 \textbf{Objectifs prioritaires :}
 \begin{enumerate}
-    \item \textbf{Augmenter la couverture à 90\%} — Mon objectif personnel est de concentrer l'effort sur les composants React (actuellement 76,8\%) et d'ajouter des tests de mutation (Stryker.js).
+    \item \textbf{Augmenter la couverture à 90\%} — Mon objectif personnel est de concentrer l'effort sur les composants Next.js (actuellement 76,8\%) et d'ajouter des tests de mutation (Stryker.js).
     
     \item \textbf{Réduire le temps du pipeline à moins de 10 minutes} — Je prévois de paralléliser les tests E2E et d'activer le cache Docker pour ne pas freiner mon rythme de développement.
     
-    \item \textbf{Améliorer la performance P99} — Objectif P99 < 1500ms (actuellement 1842ms) via l'optimisation des requêtes MongoDB et un cache Redis sur les endpoints lourds.
+    \item \textbf{Améliorer la performance P99} — Objectif P99 < 1500ms (actuellement 1842ms) via l'optimisation des requêtes PostgreSQL (index, query plans) et la mise en cache HTTP sur les endpoints lourds.
     
     \item \textbf{Zero Code Smell} — Refactoring des 47 code smells restants identifiés par SonarQube.
 \end{enumerate}
@@ -1252,19 +1308,9 @@ Vulnérabilités bloquantes & 0 & → 0 \\
     \item \textbf{k6 Performance Testing :} \url{https://k6.io/docs/}
     \item \textbf{SonarQube Rules :} \url{https://rules.sonarsource.com/javascript}
     \item \textbf{Lighthouse CI :} \url{https://github.com/GoogleChrome/lighthouse-ci}
-    \item \textbf{MongoDB Performance :} \url{https://docs.mongodb.com/manual/administration/analyzing-mongodb-performance/}
+    \item \textbf{PostgreSQL Performance :} \url{https://www.postgresql.org/docs/current/performance-tips.html}
 \end{itemize}
 
-\begin{conseil}
-\textbf{Points clés pour le jury CDA :}
-\begin{itemize}
-    \item Montrer une vraie stratégie de tests (pyramide)
-    \item Présenter des métriques concrètes et mesurées
-    \item Démontrer l'automatisation complète (CI/CD)
-    \item Avoir des seuils de qualité définis et respectés
-    \item Montrer l'amélioration continue avec un plan d'action
-\end{itemize}
-\end{conseil}
 
 \begin{jury}
 \textbf{Questions fréquentes du jury :}

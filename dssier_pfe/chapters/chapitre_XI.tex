@@ -2,7 +2,7 @@
 
 \section{Synthèse du projet}
 
-Ce projet de développement d'une application de \textbf{gestion de budget personnel} m'a permis de mettre en pratique les compétences acquises en alternance CDA dans un contexte concret et fonctionnel. L'architecture 3-tiers avec React, Node.js, PostgreSQL et MongoDB a démontré sa robustesse. Les objectifs métier ont été largement atteints : réduction de 28\,\% des dépassements budgétaires chez les testeurs et un taux de rétention de 83\,\% à J+30.
+Ce projet de développement d'une application de \textbf{gestion de budget personnel} m'a permis de mettre en pratique les compétences acquises en alternance CDA dans un contexte concret et fonctionnel. L'architecture 3-tiers avec Next.js, Node.js/Express, PostgreSQL et MongoDB a démontré sa robustesse. Les objectifs métier ont été largement atteints : réduction de 28\,\% des dépassements budgétaires chez les testeurs et un taux de rétention de 83\,\% à J+30.
 
 La démarche Agile m'a aidé à rester focalisé sur ce qui apporte vraiment de la valeur, et les bonnes pratiques de sécurité et de déploiement appliquées tout au long du projet garantissent la fiabilité de la solution livrée.
 
@@ -25,23 +25,14 @@ Temps de reporting & -42\% & -40\% \\
 
 \textbf{Technologies maîtrisées :}
 \begin{itemize}
-    \item \textbf{Frontend :} React 18, TypeScript, Redux Toolkit
-    \item \textbf{Backend :} Node.js, Express.js, Prisma ORM
-    \item \textbf{Bases de données :} PostgreSQL, MongoDB, Redis
+    \item \textbf{Frontend :} Next.js 15, React 19, TypeScript
+    \item \textbf{Backend :} Node.js, Express.js, pg-promise
+    \item \textbf{Bases de données :} PostgreSQL 16 (pg-promise), MongoDB 7 (Mongoose)
     \item \textbf{DevOps :} Docker, GitHub Actions, SonarQube
     \item \textbf{Sécurité :} JWT, Argon2, OWASP Top 10
 \end{itemize}
 \end{exemple}
 
-\begin{conseil}
-\begin{itemize}
-    \item Synthétiser les résultats quantitatifs et qualitatifs
-    \item Mettre en avant les compétences développées
-    \item Identifier les points forts et les axes d'amélioration
-    \item Préparer la présentation des résultats au jury
-    \item Documenter les apprentissages pour la suite du parcours
-\end{itemize}
-\end{conseil}
 
 \begin{jury}
 \begin{itemize}
@@ -73,7 +64,7 @@ Q2 2025: Intelligence artificielle
 +-- Chatbot support utilisateur
 
 Q3 2025: Évolutions technologiques
-+-- Migration vers React Server Components
++-- Migration vers Next.js Server Actions
 +-- Mise à jour Node.js 20 LTS
 +-- PostgreSQL 16 nouvelles fonctionnalités
 +-- Monitoring avancé avec Grafana
@@ -89,15 +80,6 @@ Q3 2025: Évolutions technologiques
 \end{itemize}
 \end{exemple}
 
-\begin{conseil}
-\begin{itemize}
-    \item Définir une vision claire pour l'évolution du projet
-    \item Identifier les technologies émergentes pertinentes
-    \item Planifier les compétences à développer
-    \item Anticiper les besoins métier futurs
-    \item Maintenir la veille technologique
-\end{itemize}
-\end{conseil}
 
 \begin{jury}
 \begin{itemize}
@@ -119,19 +101,10 @@ Je tiens à remercier sincèrement toutes les personnes qui ont contribué à ce
     \item \textbf{Mon tuteur entreprise :} pour ses conseils techniques réguliers et sa disponibilité lors des phases de déploiement.
     \item \textbf{Les utilisateurs testeurs :} pour leurs retours honnêtes sur l'ergonomie et leur patience face aux premières versions.
     \item \textbf{Les formateurs CDA :} pour la transmission des fondamentaux techniques et méthodologiques qui ont structuré ce travail.
-    \item \textbf{La communauté open source :} pour les outils (React, Node.js, Docker, SonarQube) sans lesquels ce projet n'aurait pas été possible.
+    \item \textbf{La communauté open source :} pour les outils (Next.js, Express.js, Docker, SonarQube, PostgreSQL) sans lesquels ce projet n'aurait pas été possible.
 \end{itemize}
 \end{exemple}
 
-\begin{conseil}
-\begin{itemize}
-    \item Exprimer sa gratitude de manière sincère et personnalisée
-    \item Reconnaître l'apport spécifique de chaque personne
-    \item Mettre en avant les apprentissages tirés des interactions
-    \item Maintenir les relations professionnelles établies
-    \item Préparer la suite du parcours avec confiance
-\end{itemize}
-\end{conseil}
 
 \begin{jury}
 \begin{itemize}
@@ -195,28 +168,38 @@ services:
       - "3000:3000"
     environment:
       - NODE_ENV=production
-      - DATABASE_URL=postgresql://user:pass@postgres:5432/projectdb
+      - DB_HOST=postgres
+      - DB_PORT=5432
+      - DB_USER=smart_user
+      - DB_PASSWORD=smart_password
+      - DB_NAME=smart_budget
+      - MONGO_URI=mongodb://mongodb:27017/smart_budget
     depends_on:
       - postgres
-      - redis
+      - mongodb
     restart: unless-stopped
 
   postgres:
-    image: postgres:15-alpine
+    image: postgres:16-alpine
     environment:
-      - POSTGRES_DB=projectdb
-      - POSTGRES_USER=user
-      - POSTGRES_PASSWORD=pass
+      - POSTGRES_DB=smart_budget
+      - POSTGRES_USER=smart_user
+      - POSTGRES_PASSWORD=smart_password
     volumes:
       - postgres_data:/var/lib/postgresql/data
     restart: unless-stopped
 
-  redis:
-    image: redis:7-alpine
+  mongodb:
+    image: mongo:7
+    environment:
+      - MONGO_INITDB_DATABASE=smart_budget
+    volumes:
+      - mongodb_data:/data/db
     restart: unless-stopped
 
 volumes:
   postgres_data:
+  mongodb_data:
 \end{lstlisting}
 \end{exemple}
 
@@ -227,10 +210,10 @@ Le repository est organisé pour séparer clairement le frontend, le backend et 
 \begin{exemple}
 \textbf{Structure du repository :}
 \begin{verbatim}
-project-management-app/
+My-Smart-Budget/
 +-- src/                          # Code source
-|   +-- frontend/                 # Application React
-|   +-- backend/                  # API Node.js
+|   +-- frontend/                 # Application Next.js
+|   +-- backend/                  # API Express
 |   +-- shared/                   # Code partagé
 +-- docs/                         # Documentation
 |   +-- api/                      # Documentation API
@@ -320,17 +303,17 @@ L'API est entièrement documentée avec OpenAPI 3.0, accessible à l'adresse \te
 \begin{lstlisting}[language=yaml]
 openapi: 3.0.0
 info:
-  title: Project Management API
+  title: My Smart Budget API
   version: 1.0.0
-  description: API pour la gestion des projets
+  description: API de gestion budgétaire personnelle
 
 paths:
-  /projects:
+  /transactions:
     get:
-      summary: Liste des projets
+      summary: Liste des transactions
       responses:
         '200':
-          description: Liste des projets
+          description: Liste paginée des transactions
           content:
             application/json:
               schema:
@@ -339,35 +322,28 @@ paths:
                   data:
                     type: array
                     items:
-                      $ref: '#/components/schemas/Project'
+                      $ref: '#/components/schemas/Transaction'
 
 components:
   schemas:
-    Project:
+    Transaction:
       type: object
       properties:
         id:
+          type: integer
+        user_id:
+          type: integer
+        amount:
+          type: number
+        type:
           type: string
-          format: uuid
-        name:
-          type: string
-        description:
-          type: string
-        createdAt:
+          enum: [income, expense]
+        date:
           type: string
           format: date-time
 \end{lstlisting}
 \end{exemple}
 
-\begin{conseil}
-\begin{itemize}
-    \item Documenter complètement votre API avec Swagger
-    \item Intégrer SonarQube dans votre pipeline CI/CD
-    \item Organiser votre code source de manière claire
-    \item Automatiser tous les aspects du déploiement
-    \item Maintenir la documentation à jour
-\end{itemize}
-\end{conseil}
 
 \begin{jury}
 \begin{itemize}

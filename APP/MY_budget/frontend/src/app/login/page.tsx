@@ -1,8 +1,11 @@
 'use client';
 import { useState } from 'react';
+import { useRouter } from 'next/navigation';
 import { Eye, EyeOff, Wallet, Mail, Lock, User, ArrowRight } from 'lucide-react';
+import { saveSession } from '../utils/storage';
 
 export default function LoginPage() {
+  const router = useRouter();
   const [mode, setMode] = useState<'login' | 'register'>('login');
   const [showPassword, setShowPassword] = useState(false);
   const [loading, setLoading] = useState(false);
@@ -38,14 +41,13 @@ export default function LoginPage() {
         return;
       }
 
-      // ✅ Stocker le user et le token dans localStorage
-      localStorage.setItem('user', JSON.stringify(data.user));
-      localStorage.setItem('token', data.token);
+      saveSession(data.token, data.user);
 
-      // ✅ Rediriger vers le dashboard
-      window.location.href = '/dashboard';
+      // Rediriger vers le dashboard
+      router.push('/dashboard');
 
-    } catch (err) {
+    } catch (err: unknown) {
+      console.error('Login error:', err);
       setError('Erreur serveur — vérifie ta connexion');
     } finally {
       setLoading(false);

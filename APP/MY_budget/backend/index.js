@@ -7,7 +7,12 @@ const transactionsRoutes = require('./routes/transactions');
 const app = express();
 
 // Middleware
-app.use(cors());
+app.disable('x-powered-by');
+app.use(cors({
+  origin: process.env.CORS_ORIGIN || 'http://localhost:3000',
+  methods: ['GET', 'POST', 'PUT', 'DELETE'],
+  allowedHeaders: ['Content-Type', 'Authorization'],
+}));
 app.use('/api/profile', profileRoutes);
 app.use(express.json());
 app.use('/api/transactions', transactionsRoutes);
@@ -100,7 +105,8 @@ app.get('/api/reports', async (req, res) => {
 app.post('/api/reports', async (req, res) => {
   try {
     const Report = require('./models/Report').default;
-    const report = new Report(req.body);
+    const { userId, title, description, data, type } = req.body;
+    const report = new Report({ userId, title, description, data, type });
     await report.save();
     res.status(201).json(report);
   } catch (err) {

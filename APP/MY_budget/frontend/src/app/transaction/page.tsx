@@ -1,7 +1,7 @@
 'use client';
 
 import Navbar from '../../../components/Navbar';
-import MySmartBudget from '../../../components/Dashboard';
+import TransactionList from '../../../components/TransactionList';
 import { useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 
@@ -18,7 +18,7 @@ export default function TransactionsPage() {
   return (
     <>
       <Navbar />
-      <MySmartBudget />
+      <TransactionList />
     </>
   );
 }

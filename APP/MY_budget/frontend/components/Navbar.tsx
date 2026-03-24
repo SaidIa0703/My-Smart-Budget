@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { usePathname } from "next/navigation";
+import { usePathname, useRouter } from "next/navigation";
 import { useState, useEffect } from "react";
 
 const links = [
@@ -15,6 +15,7 @@ const links = [
 
 export default function Navbar() {
   const pathname = usePathname();
+  const router = useRouter();
   const [open, setOpen] = useState(false);
   const [user, setUser] = useState(null);
 
@@ -27,7 +28,7 @@ export default function Navbar() {
 
   const logout = () => {
     localStorage.clear();
-    window.location.href = '/login';
+    router.push('/login');
   };
 
   return (

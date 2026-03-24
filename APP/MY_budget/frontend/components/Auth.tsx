@@ -1,10 +1,12 @@
 'use client';
 
-
 import React, { useState } from 'react';
+import { useRouter } from 'next/navigation';
+import { saveSession } from '../src/app/utils/storage';
 import { Mail, Lock, User, Eye, EyeOff, AlertCircle, CheckCircle } from 'lucide-react';
 
 export default function AuthComponent() {
+  const router = useRouter();
   const [isLogin, setIsLogin] = useState(true);
   const [showPassword, setShowPassword] = useState(false);
   const [loading, setLoading] = useState(false);
@@ -13,13 +15,13 @@ export default function AuthComponent() {
 
 const [formData, setFormData] = useState<{
   email: string;
-  password: string;
-  confirmPassword: string;
+  secret: string;
+  confirmSecret: string;
   name: string;
 }>({
   email: '',
-  password: '',
-  confirmPassword: '',
+  secret: '',
+  confirmSecret: '',
   name: '',
 });
 
@@ -28,7 +30,7 @@ const [errors, setErrors] = useState<Record<string, string>>({});
 
   // Validation email
   const validateEmail = (email: string) => {
-    const regex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    const regex = /^[^\s@]{1,64}@[^\s@]{1,255}\.[^\s@]{1,63}$/;
     return regex.test(email);
   };
 
@@ -40,8 +42,8 @@ const [errors, setErrors] = useState<Record<string, string>>({});
       newErrors.email = 'Email valide requis';
     }
 
-    if (!formData.password || formData.password.length < 6) {
-      newErrors.password = 'Au minimum 6 caractères';
+    if (!formData.secret || formData.secret.length < 6) {
+      newErrors.strength = 'Au minimum 6 caractères';
     }
 
     if (!isLogin) {
@@ -49,8 +51,8 @@ const [errors, setErrors] = useState<Record<string, string>>({});
         newErrors.name = 'Nom requis (min 2 caractères)';
       }
 
-      if (formData.password !== formData.confirmPassword) {
-        newErrors.confirmPassword = 'Les mots de passe ne correspondent pas';
+      if (formData.secret !== formData.confirmSecret) {
+        newErrors.mismatch = 'Les mots de passe ne correspondent pas';
       }
     }
 
@@ -85,10 +87,10 @@ const [errors, setErrors] = useState<Record<string, string>>({});
 
     try {
       // ✅ NOUVEAU
-const endpoint = isLogin ? 'http://localhost:5001/api/auth/login' : 'http://localhost:5001/api/auth/register';
+const endpoint = isLogin ? `${process.env.NEXT_PUBLIC_API_URL}/auth/login` : `${process.env.NEXT_PUBLIC_API_URL}/auth/register`;
       const payload = isLogin
-        ? { email: formData.email, password: formData.password }
-        : { email: formData.email, password: formData.password, name: formData.name };
+        ? { email: formData.email, password: formData.secret }
+        : { email: formData.email, password: formData.secret, name: formData.name };
 
       const response = await fetch(endpoint, {
         method: 'POST',
@@ -101,18 +103,13 @@ if (response.ok) {
   setMessageType('success');
   setMessage(isLogin ? '✓ Connexion réussie!' : '✓ Inscription réussie!');
   
-  // ✅ SAUVEGARDE IMMÉDIATEMENT
-  localStorage.setItem('token', data.token);
-  localStorage.setItem('user', JSON.stringify(data.user));
+  saveSession(data.token, data.user);
   
-  console.log('User saved:', data.user); // Debug
-  
-  setFormData({ email: '', password: '', confirmPassword: '', name: '' });
+  setFormData({ email: '', secret: '', confirmSecret: '', name: '' });
 
   // ✅ Attends un peu que tout soit sauvegardé
   setTimeout(() => {
-    console.log('Redirecting, localStorage user:', localStorage.getItem('user'));
-    window.location.href = '/';
+    router.push('/dashboard');
   }, 1500);
 } else {
   setMessageType('error');
@@ -155,9 +152,9 @@ if (response.ok) {
             <button
               onClick={() => setIsLogin(false)}
               className={`flex-1 py-2 px-4 rounded font-medium transition ${
-                !isLogin
-                  ? 'bg-indigo-600 text-white'
-                  : 'text-gray-600 hover:text-gray-800'
+                isLogin
+                  ? 'text-gray-600 hover:text-gray-800'
+                  : 'bg-indigo-600 text-white'
               }`}
             >
               Inscription
@@ -188,13 +185,14 @@ if (response.ok) {
             {/* Name Field (Register only) */}
             {!isLogin && (
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">
+                <label htmlFor="name" className="block text-sm font-medium text-gray-700 mb-2">
                   Nom complet
                 </label>
                 <div className="relative">
                   <User className="absolute left-3 top-3 text-gray-400" size={20} />
                   <input
                     type="text"
+                    id="name"
                     name="name"
                     value={formData.name}
                     onChange={handleChange}
@@ -214,13 +212,14 @@ if (response.ok) {
 
             {/* Email Field */}
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">
+              <label htmlFor="email" className="block text-sm font-medium text-gray-700 mb-2">
                 Email
               </label>
               <div className="relative">
                 <Mail className="absolute left-3 top-3 text-gray-400" size={20} />
                 <input
                   type="email"
+                  id="email"
                   name="email"
                   value={formData.email}
                   onChange={handleChange}
@@ -239,19 +238,20 @@ if (response.ok) {
 
             {/* Password Field */}
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">
+              <label htmlFor="current-password" className="block text-sm font-medium text-gray-700 mb-2">
                 Mot de passe
               </label>
               <div className="relative">
                 <Lock className="absolute left-3 top-3 text-gray-400" size={20} />
                 <input
                   type={showPassword ? 'text' : 'password'}
-                  name="password"
-                  value={formData.password}
+                  id="current-password"
+                  name="secret"
+                  value={formData.secret}
                   onChange={handleChange}
                   placeholder="••••••"
                   className={`w-full pl-10 pr-10 py-2 border rounded-lg focus:outline-none focus:ring-2 ${
-                    errors.password
+                    errors.strength
                       ? 'border-red-400 focus:ring-red-200'
                       : 'border-gray-300 focus:ring-indigo-200'
                   }`}
@@ -264,34 +264,35 @@ if (response.ok) {
                   {showPassword ? <EyeOff size={20} /> : <Eye size={20} />}
                 </button>
               </div>
-              {errors.password && (
-                <p className="text-red-600 text-sm mt-1">{errors.password}</p>
+              {errors.strength && (
+                <p className="text-red-600 text-sm mt-1">{errors.strength}</p>
               )}
             </div>
 
             {/* Confirm Password Field (Register only) */}
             {!isLogin && (
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">
+                <label htmlFor="confirm-password" className="block text-sm font-medium text-gray-700 mb-2">
                   Confirmer le mot de passe
                 </label>
                 <div className="relative">
                   <Lock className="absolute left-3 top-3 text-gray-400" size={20} />
                   <input
                     type={showPassword ? 'text' : 'password'}
-                    name="confirmPassword"
-                    value={formData.confirmPassword}
+                    id="confirm-password"
+                    name="confirmSecret"
+                    value={formData.confirmSecret}
                     onChange={handleChange}
                     placeholder="••••••"
                     className={`w-full pl-10 pr-4 py-2 border rounded-lg focus:outline-none focus:ring-2 ${
-                      errors.confirmPassword
+                      errors.mismatch
                         ? 'border-red-400 focus:ring-red-200'
                         : 'border-gray-300 focus:ring-indigo-200'
                     }`}
                   />
                 </div>
-                {errors.confirmPassword && (
-                  <p className="text-red-600 text-sm mt-1">{errors.confirmPassword}</p>
+                {errors.mismatch && (
+                  <p className="text-red-600 text-sm mt-1">{errors.mismatch}</p>
                 )}
               </div>
             )}
@@ -299,29 +300,34 @@ if (response.ok) {
             {/* Forgot Password Link (Login only) */}
             {isLogin && (
               <div className="flex justify-end">
-                <a href="#" className="text-sm text-indigo-600 hover:text-indigo-700">
+                <button type="button" className="text-sm text-indigo-600 hover:text-indigo-700">
                   Mot de passe oublié?
-                </a>
+                </button>
               </div>
             )}
 
             {/* Submit Button */}
-            <button
-              type="submit"
-              disabled={loading}
-              className="w-full bg-indigo-600 text-white font-medium py-2 rounded-lg hover:bg-indigo-700 transition disabled:opacity-50 disabled:cursor-not-allowed"
-            >
-              {loading ? 'Chargement...' : isLogin ? 'Se connecter' : "S'inscrire"}
-            </button>
+            {(() => {
+              const submitLabel = isLogin ? 'Se connecter' : "S'inscrire";
+              return (
+                <button
+                  type="submit"
+                  disabled={loading}
+                  className="w-full bg-indigo-600 text-white font-medium py-2 rounded-lg hover:bg-indigo-700 transition disabled:opacity-50 disabled:cursor-not-allowed"
+                >
+                  {loading ? 'Chargement...' : submitLabel}
+                </button>
+              );
+            })()}
           </form>
 
           {/* Terms (Register only) */}
           {!isLogin && (
             <p className="text-center text-sm text-gray-600 mt-6">
               En vous inscrivant, vous acceptez nos{' '}
-              <a href="#" className="text-indigo-600 hover:underline">
+              <button type="button" className="text-indigo-600 hover:underline">
                 conditions d'utilisation
-              </a>
+              </button>
             </p>
           )}
         </div>

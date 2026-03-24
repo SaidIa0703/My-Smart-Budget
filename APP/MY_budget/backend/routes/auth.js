@@ -4,7 +4,7 @@ const jwt = require('jsonwebtoken');
 const { db } = require('../db');
 
 const router = express.Router();
-const JWT_SECRET = process.env.JWT_SECRET || 'your-secret-key-change-in-prod';
+const JWT_SECRET = process.env.JWT_SECRET;
 
 // REGISTER
 router.post('/register', async (req, res) => {

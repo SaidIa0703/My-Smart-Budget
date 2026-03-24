@@ -7,7 +7,7 @@ interface Props {
   onTransactionAdded?: () => void;
 }
 
-export default function AddTransaction({ onTransactionAdded }: Props) {
+export default function AddTransaction({ onTransactionAdded }: Readonly<Props>) {
   const [formData, setFormData] = useState({
     name: '',
     category: '',
@@ -31,12 +31,12 @@ export default function AddTransaction({ onTransactionAdded }: Props) {
         body: JSON.stringify({
           userId: user.id,
           ...formData,
-          amount: parseFloat(formData.amount)
+          amount: Number.parseFloat(formData.amount)
         })
       });
 
       if (response.ok) {
-        setMessage('✅ Transaction ajoutée!');
+        setMessage('Transaction ajoutée!');
         setFormData({
           name: '',
           category: '',
@@ -51,10 +51,10 @@ export default function AddTransaction({ onTransactionAdded }: Props) {
           }
         }, 500);
       } else {
-        setMessage('❌ Erreur');
+        setMessage('Erreur');
       }
     } catch (error) {
-      setMessage('❌ Erreur serveur');
+      setMessage('Erreur serveur');
       console.error(error);
     }
     setLoading(false);
@@ -65,15 +65,16 @@ export default function AddTransaction({ onTransactionAdded }: Props) {
       <h2 className="text-2xl font-bold mb-6">Ajouter une Transaction</h2>
 
       {message && (
-        <div className={`mb-4 p-4 rounded-lg ${message.includes('✅') ? 'bg-green-100 text-green-700' : 'bg-red-100 text-red-700'}`}>
+        <div className={`mb-4 p-4 rounded-lg ${message.startsWith('Transaction') ? 'bg-green-100 text-green-700' : 'bg-red-100 text-red-700'}`}>
           {message}
         </div>
       )}
 
       <form onSubmit={handleSubmit} className="space-y-4">
         <div>
-          <label className="block text-sm font-medium mb-2">Description</label>
+          <label htmlFor="description" className="block text-sm font-medium mb-2">Description</label>
           <input
+            id="description"
             type="text"
             placeholder="Ex: Carrefour, Salaire..."
             value={formData.name}
@@ -84,8 +85,9 @@ export default function AddTransaction({ onTransactionAdded }: Props) {
         </div>
 
         <div>
-          <label className="block text-sm font-medium mb-2">Catégorie</label>
+          <label htmlFor="category" className="block text-sm font-medium mb-2">Catégorie</label>
           <select
+            id="category"
             value={formData.category}
             onChange={(e) => setFormData({ ...formData, category: e.target.value })}
             className="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500"
@@ -103,8 +105,9 @@ export default function AddTransaction({ onTransactionAdded }: Props) {
 
         <div className="grid grid-cols-2 gap-4">
           <div>
-            <label className="block text-sm font-medium mb-2">Montant (€)</label>
+            <label htmlFor="amount" className="block text-sm font-medium mb-2">Montant (€)</label>
             <input
+              id="amount"
               type="number"
               placeholder="0.00"
               value={formData.amount}
@@ -116,8 +119,9 @@ export default function AddTransaction({ onTransactionAdded }: Props) {
           </div>
 
           <div>
-            <label className="block text-sm font-medium mb-2">Date</label>
+            <label htmlFor="date" className="block text-sm font-medium mb-2">Date</label>
             <input
+              id="date"
               type="date"
               value={formData.date}
               onChange={(e) => setFormData({ ...formData, date: e.target.value })}

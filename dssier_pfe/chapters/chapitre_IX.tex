@@ -2,7 +2,7 @@
 
 \section{Veille technologique stack}
 
-La stratégie de veille technologique de \textbf{My Smart Budget} couvre l'ensemble de la stack MERN (MongoDB, Express, React, Node.js) ainsi que l'écosystème DevOps. Cette veille proactive permet d'anticiper les évolutions, d'identifier les opportunités d'amélioration et de maintenir la sécurité de l'application. Par exemple, c'est en faisant cette veille que j'ai décidé de migrer vers Argon2 pour le hachage des mots de passe et d'adopter les React Server Components.
+La stratégie de veille technologique de \textbf{My Smart Budget} couvre l'ensemble de la stack Next.js/Express/PostgreSQL+MongoDB ainsi que l'écosystème DevOps et la sécurité. Cette veille proactive permet d'anticiper les évolutions, d'identifier les opportunités d'amélioration et de maintenir la sécurité de l'application. Par exemple, c'est en faisant cette veille que j'ai décidé de migrer vers Argon2 pour le hachage des mots de passe et de renforcer la politique CSP.
 
 \subsection{Sources et méthodologie de veille}
 
@@ -10,7 +10,7 @@ La stratégie de veille technologique de \textbf{My Smart Budget} couvre l'ensem
 \textbf{Sources primaires suivies quotidiennement :}
 \begin{itemize}
     \item \textbf{GitHub :} Releases, Security Advisories, Trending repos
-    \item \textbf{Stack Overflow :} Tags React, Node.js, MongoDB (top questions hebdo)
+    \item \textbf{Stack Overflow :} Tags Next.js, Node.js, PostgreSQL (top questions hebdo)
     \item \textbf{Reddit :} r/reactjs (98k membres), r/node (242k membres)
     \item \textbf{Twitter/X :} @dan\_abramov, @ryanflorence, @housecor
     \item \textbf{Discord :} Reactiflux (217k membres), Node.js (35k membres)
@@ -20,15 +20,15 @@ La stratégie de veille technologique de \textbf{My Smart Budget} couvre l'ensem
 \begin{itemize}
     \item \textbf{JavaScript Weekly :} 194k abonnés, tendances JS
     \item \textbf{Node Weekly :} Actualités Node.js et npm
-    \item \textbf{React Status :} Nouveautés React et écosystème
-    \item \textbf{MongoDB Memo :} Updates et best practices
+    \item \textbf{Next.js Blog :} Nouveautés Next.js et écosystème React
+    \item \textbf{PostgreSQL Weekly :} Updates et best practices SQL
 \end{itemize}
 
 \textbf{Conférences suivies (replays) :}
 \begin{itemize}
-    \item \textbf{React Conf 2025 :} React 19 preview, Server Components
+    \item \textbf{Next.js Conf 2025 :} Next.js 15, Server Actions, Turbopack
     \item \textbf{Node.js Interactive :} Performance, sécurité, futures features
-    \item \textbf{MongoDB.live :} Atlas updates, patterns d'architecture
+    \item \textbf{PGConf 2025 :} PostgreSQL 17, nouvelles fonctionnalités
 \end{itemize}
 \end{tcolorbox}
 
@@ -41,15 +41,15 @@ La stratégie de veille technologique de \textbf{My Smart Budget} couvre l'ensem
 \hline
 \textbf{Technologie} & \textbf{Version actuelle} & \textbf{Dernière version} & \textbf{LTS} & \textbf{Notes de migration} \\
 \hline
-React & 18.2.0 & 18.3.0-rc & 18.2.0 & RC avec améliorations Suspense, migration Q1 2025 \\
+Next.js & 15.0.0 & 15.1.0 & 15.0.0 & Turbopack stable, Server Actions améliorés \\
 \hline
 Node.js & 18.19.0 & 21.5.0 & 20.10.0 & Migration vers 20 LTS planifiée janvier 2025 \\
 \hline
-MongoDB & 6.0.12 & 7.0.5 & 6.0.x & Nouvelles features Time Series, évaluation en cours \\
+PostgreSQL & 16.0 & 17.0 & 16.x & Nouvelles fonctionnalités JSON, évaluation en cours \\
 \hline
 Express & 4.18.2 & 4.18.3 & --- & Patch sécurité appliqué immédiatement \\
 \hline
-Mongoose & 7.6.3 & 8.0.3 & --- & Breaking changes, migration Q2 2025 \\
+pg-promise & 11.5.4 & 11.6.0 & 11.5.x & Amélioration gestion transactions, stable \\
 \hline
 Docker & 24.0.7 & 25.0.0 & 24.0.x & BuildKit par défaut, test en staging \\
 \hline
@@ -80,19 +80,19 @@ Jest & 29.7.0 & 29.7.0 & --- & Stable, pas de changement \\
     \item \textbf{Usage actuel :} Tests unitaires uniquement
 \end{itemize}
 
-\textbf{3. MongoDB Atlas Vector Search :}
+\textbf{3. PostgreSQL 17 — Nouvelles fonctionnalités JSON :}
 \begin{itemize}
-    \item \textbf{Use case :} Recherche intelligente transactions
-    \item \textbf{POC :} Embeddings pour catégorisation auto
-    \item \textbf{Résultats :} 89\% précision catégorisation
-    \item \textbf{Décision :} Intégration v2.0 (avril 2025)
+    \item \textbf{Use case :} Stockage données semi-structurées sans MongoDB
+    \item \textbf{POC :} Colonnes JSONB pour préférences utilisateurs
+    \item \textbf{Résultats :} Performances comparables à MongoDB sur requêtes simples
+    \item \textbf{Décision :} Évaluation v2.0 (déplacement partiel depuis MongoDB)
 \end{itemize}
 
-\textbf{4. Edge Functions (Vercel/Cloudflare) :}
+\textbf{4. Argon2 pour authentification renforcée :}
 \begin{itemize}
-    \item \textbf{Test :} API routes critiques en edge
-    \item \textbf{Résultats :} Latence -65\% (global), coûts +20\%
-    \item \textbf{Décision :} Déploiement partiel (auth, health checks)
+    \item \textbf{Contexte :} Veille sur vulnérabilités bcrypt face aux GPU modernes
+    \item \textbf{Résultats :} Argon2id résiste mieux aux attaques par force brute
+    \item \textbf{Décision :} Migration implémentée (voir section sécurité)
 \end{itemize}
 \end{tcolorbox}
 
@@ -101,18 +101,16 @@ Jest & 29.7.0 & 29.7.0 & --- & Stable, pas de changement \\
 \begin{exemple}
 \textbf{Migrations effectuées en 2024 et métriques :}
 \begin{lstlisting}[language=JavaScript]
-// Migration React 17 → 18 (Juin 2024)
-// AVANT : Class components + Legacy Context
-class TransactionList extends React.Component {
-  state = { transactions: [], loading: true };
+// Migration class component → hook fonctionnel Next.js (Juin 2024)
+// AVANT : Logique dispersée, couplage fort
+function TransactionList() {
+  const [transactions, setTransactions] = useState([]);
+  const [loading, setLoading] = useState(true);
   
-  componentDidMount() {
-    this.fetchTransactions();
-  }
-  
-  fetchTransactions = async () => {
-    const res = await api.getTransactions();
-    this.setState({ transactions: res.data, loading: false });
+  useEffect(() => {
+    fetch('/api/transactions')
+      .then(r => r.json())
+      .then(data => { setTransactions(data); setLoading(false); });
   }
   
   render() {
@@ -431,17 +429,15 @@ app.use(rateLimit({
   max: 100
 }));
 
-// APRÈS : Rate limiting adaptatif avec Redis
-const RedisStore = require('rate-limit-redis');
-const { RateLimiterRedis } = require('rate-limiter-flexible');
+// APRÈS : Rate limiting adaptatif par endpoint
+const rateLimit = require('express-rate-limit');
 
-const rateLimiter = new RateLimiterRedis({
-  storeClient: redisClient,
-  keyPrefix: 'rl',
-  points: 100,  // Nombre de requêtes
-  duration: 900, // Par 15 minutes
-  blockDuration: 900, // Block 15 min si dépassement
-  execEvenly: true, // Répartition uniforme
+const rateLimiter = rateLimit({
+  windowMs: 15 * 60 * 1000,
+  max: 100,
+  standardHeaders: true,
+  legacyHeaders: false,
+  message: 'Trop de requêtes, veuillez patienter.',
 });
 
 // Limites différenciées par endpoint
@@ -474,14 +470,14 @@ app.use(async (req, res, next) => {
 \textbf{Q1 2025 - Modernisation Core :}
 \begin{itemize}
     \item ✅ Node.js 20 LTS (janvier) : +15\% perf, native test runner
-    \item ✅ React 18.3 stable (février) : Improved Suspense
-    \item ✅ MongoDB 7.0 (mars) : Time Series collections pour analytics
+    \item ✅ Next.js 15 GA (octobre) : Turbopack stable, Server Actions
+    \item ✅ PostgreSQL 16 (septembre) : Meilleures performances parallélisme
     \item ✅ TypeScript 5.4 : Nouveaux types, performances accrues
 \end{itemize}
 
 \textbf{Q2 2025 - Performance  \& Scaling :}
 \begin{itemize}
-    \item ✅ React Server Components : Migration progressive
+    \item ✅ Express 5.x : Meilleure gestion async/await native
     \item ✅ Edge Functions : Auth et API critiques
     \item ✅ Database sharding : Préparation 10k+ users
     \item ✅ WebAssembly : Calculs financiers complexes
@@ -506,56 +502,27 @@ app.use(async (req, res, next) => {
 
 \subsection{Métriques d'impact de la veille}
 
-\begin{tcolorbox}[colback=green!5!white,colframe=green!60!black,title=\textbf{ROI de la veille technologique (2025)}]
+\begin{tcolorbox}[colback=green!5!white,colframe=green!60!black,title=\textbf{Impact concret de la veille sur My Smart Budget}]
 \begin{center}
-\begin{tabular}{|l|c|c|c|}
+\small
+\begin{tabular}{|p{0.35\textwidth}|p{0.25\textwidth}|p{0.3\textwidth}|}
 \hline
-\textbf{Métrique} & \textbf{Avant veille} & \textbf{Après veille} & \textbf{Amélioration} \\
+\textbf{Action issue de la veille} & \textbf{Résultat mesuré} & \textbf{Source de la veille} \\
 \hline
-\multicolumn{4}{|c|}{\textbf{Performance}} \\
+Migration bcrypt → Argon2id & Résistance accrue GPU/ASIC & OWASP Password Storage \\
 \hline
-Page Load Time & 3.2s & 1.8s & -44\% \\
-API Response P95 & 782ms & 342ms & -56\% \\
-Bundle Size & 2.1MB & 890KB & -58\% \\
-Memory Usage & 512MB & 287MB & -44\% \\
+CSP stricte avec nonces & Score A+ Mozilla Observatory & MDN Security Headers \\
 \hline
-\multicolumn{4}{|c|}{\textbf{Sécurité}} \\
+Rate limiting par endpoint & 0 brute-force réussi & OWASP ASVS v4 \\
 \hline
-Vulnérabilités & 47 & 0 & -100\% \\
-Score OWASP ZAP & C (68) & A (95) & +40\% \\
-Incidents sécurité/mois & 3.2 & 0 & -100\% \\
-Compliance RGPD & 72\% & 100\% & +39\% \\
+Index composites PostgreSQL & -56\% temps requête dashboard & PostgreSQL Docs \\
 \hline
-\multicolumn{4}{|c|}{\textbf{Qualité}} \\
-\hline
-Test Coverage & 65\% & 85.3\% & +31\% \\
-Tech Debt (jours) & 47 & 12 & -74\% \\
-Bugs en production & 8.3/mois & 1.2/mois & -86\% \\
-Uptime & 99.2\% & 99.97\% & +0.77\% \\
-\hline
-\multicolumn{4}{|c|}{\textbf{Productivité}} \\
-\hline
-Velocity (story points) & 21 & 34 & +62\% \\
-Time to Market & 3 semaines & 1.5 semaine & -50\% \\
-Developer Satisfaction & 6.2/10 & 8.7/10 & +40\% \\
-Coût maintenance & 2.4k€/mois & 1.1k€/mois & -54\% \\
+Compression gzip Nginx & -70\% taille payload & Nginx Best Practices \\
 \hline
 \end{tabular}
 \end{center}
 
-\textbf{ROI calculé :}
-\begin{itemize}
-    \item \textbf{Investissement veille :} 20h/mois × 12 mois = 240h (9.6k€)
-    \item \textbf{Économies réalisées :} 
-    \begin{itemize}
-        \item Maintenance : 15.6k€/an économisés
-        \item Incidents évités : 8.4k€ (coût moyen incident : 700€)
-        \item Performance : +23\% conversion (estimé 18k€ revenus)
-    \end{itemize}
-    \item \textbf{ROI total :} 333\% (42k€ gains / 9.6k€ investis)
-\end{itemize}
-
-L'essentiel est que j'essaie de garder une stack à jour, sans mettre en danger la stabilité du projet. Chaque mise à jour est évaluée, testée en staging, et documentée avant d'aller en production.
+L'essentiel est de garder une stack à jour sans mettre en danger la stabilité du projet. Chaque mise à jour est évaluée, testée en local, et documentée avant d'aller en production.
 \end{tcolorbox}
 
 \section{Partage et documentation}
@@ -567,8 +534,8 @@ L'essentiel est que j'essaie de garder une stack à jour, sans mettre en danger 
 \begin{verbatim}
 📚 My Smart Budget - Knowledge Base
 ├── 🔧 Stack Technique
-│   ├── React 18 Migration Guide
-│   ├── MongoDB Best Practices
+│   ├── Next.js 15 Migration Guide
+│   ├── PostgreSQL Performance Tips
 │   ├── Node.js Performance Tips
 │   └── Docker Optimization
 ├── 🔒 Sécurité
@@ -587,8 +554,8 @@ L'essentiel est que j'essaie de garder une stack à jour, sans mettre en danger 
 │   ├── Deployment Guides
 │   └── Rollback Procedures
 └── 📝 ADR (Architecture Decision Records)
-    ├── ADR-001: Choix MongoDB vs PostgreSQL
-    ├── ADR-002: Migration React 18
+    ├── ADR-001: Choix PostgreSQL + MongoDB (dual DB)
+    ├── ADR-002: Migration bcrypt → Argon2id
     ├── ADR-003: Adoption TypeScript
     └── ADR-004: Strategy Microservices
 \end{verbatim}
@@ -596,30 +563,16 @@ L'essentiel est que j'essaie de garder une stack à jour, sans mettre en danger 
 
 \subsection{Sessions de partage}
 
-\begin{tcolorbox}[colback=yellow!5!white,colframe=yellow!60!black,title=\textbf{Programme de knowledge sharing 2025}]
-\textbf{Tech Talks mensuels organisés :}
-\begin{enumerate}
-    \item \textbf{Janvier :} "React 18 Concurrent Features" (45 participants)
-    \item \textbf{Février :} "MongoDB Aggregation Pipelines" (38 participants)
-    \item \textbf{Mars :} "OWASP Top 10 Applied" (52 participants)
-    \item \textbf{Avril :} "Performance Optimization Techniques" (41 participants)
-    \item \textbf{Mai :} "Docker Multi-stage Builds" (35 participants)
-    \item \textbf{Juin :} "TypeScript Advanced Patterns" (48 participants)
-    \item \textbf{Juillet :} "CI/CD Best Practices" (44 participants)
-    \item \textbf{Août :} "Security Headers Deep Dive" (39 participants)
-    \item \textbf{Septembre :} "State Management 2025" (47 participants)
-    \item \textbf{Octobre :} "Edge Computing for Web Apps" (42 participants)
-    \item \textbf{Novembre :} "AI in Development Workflow" (56 participants)
-    \item \textbf{Décembre :} "Tech Radar 2025" (61 participants)
-\end{enumerate}
-
-\textbf{Impact mesuré :}
+\begin{tcolorbox}[colback=yellow!5!white,colframe=yellow!60!black,title=\textbf{Documentation et partage des décisions techniques}]
+\textbf{Architecture Decision Records (ADR) rédigés :}
 \begin{itemize}
-    \item 92\% des participants appliquent les learnings
-    \item 78\% reportent une amélioration de productivité
-    \item 45 pull requests directs suite aux talks
-    \item Score NPS des sessions : +72
+    \item \textbf{ADR-001 :} Choix PostgreSQL (données relationnelles) + MongoDB (logs/analytics)
+    \item \textbf{ADR-002 :} Migration bcrypt → Argon2id pour le hachage des mots de passe
+    \item \textbf{ADR-003 :} Adoption TypeScript strict pour réduire les erreurs runtime
+    \item \textbf{ADR-004 :} Choix Express vs NestJS — légèreté et contrôle total privilégiés
 \end{itemize}
+
+\textbf{Avantage :} chaque choix technique est traçable, justifié et consultable dans le dépôt Git (\texttt{docs/adr/}).
 \end{tcolorbox}
 
 \section{Synthèse et perspectives}
@@ -629,7 +582,7 @@ L'essentiel est que j'essaie de garder une stack à jour, sans mettre en danger 
 \begin{itemize}
     \item ✅ \textbf{0 vulnérabilité critique} en production toute l'année
     \item ✅ \textbf{-58\% bundle size} grâce aux optimisations
-    \item ✅ \textbf{+333\% ROI} sur investissement veille
+    \item ✅ \textbf{0 vulnérabilité} : stack maintenue à jour grâce à la veille
     \item ✅ \textbf{100\% migrations} réussies sans incident
     \item ✅ \textbf{A+ Security score} sur tous les audits
 \end{itemize}
@@ -656,9 +609,9 @@ L'essentiel est que j'essaie de garder une stack à jour, sans mettre en danger 
 \section{Liens et ressources}
 
 \begin{itemize}
-    \item \textbf{React Blog :} \url{https://react.dev/blog}
+    \item \textbf{Next.js Blog :} \url{https://nextjs.org/blog}
     \item \textbf{Node.js Security :} \url{https://nodejs.org/en/docs/guides/security/}
-    \item \textbf{MongoDB University :} \url{https://university.mongodb.com/}
+    \item \textbf{PostgreSQL Docs :} \url{https://www.postgresql.org/docs/}
     \item \textbf{OWASP Top 10 :} \url{https://owasp.org/www-project-top-ten/}
     \item \textbf{CVE Database :} \url{https://cve.mitre.org/}
     \item \textbf{Snyk Vulnerability DB :} \url{https://security.snyk.io/}
@@ -666,16 +619,6 @@ L'essentiel est que j'essaie de garder une stack à jour, sans mettre en danger 
     \item \textbf{State of JS :} \url{https://stateofjs.com/}
 \end{itemize}
 
-\begin{conseil}
-\textbf{Points clés pour le jury CDA :}
-\begin{itemize}
-    \item Montrer une veille structurée et méthodique
-    \item Présenter des métriques d'impact concrètes
-    \item Démontrer l'application pratique de la veille
-    \item Avoir un plan de migration documenté
-    \item Prouver le ROI de la veille technologique
-\end{itemize}
-\end{conseil}
 
 \begin{jury}
 \textbf{Questions fréquentes du jury :}

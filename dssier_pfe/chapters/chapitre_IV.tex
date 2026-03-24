@@ -1,10 +1,10 @@
 \chapter{Conception fonctionnelle et technique}
 
-\textbf{Note :} Cette phase de conception est cruciale et a été complètement terminée avant le démarrage du développement. Pour \textbf{App Budget V3}, j'ai construit une conception fonctionnelle et technique détaillée, validée itérativement, qui sert de référence unique au développement, aux tests et à la soutenance.
+\textbf{Note :} Cette phase de conception est cruciale et a été complètement terminée avant le démarrage du développement. Pour \textbf{My Smart Budget}, j'ai construit une conception fonctionnelle et technique détaillée, validée itérativement, qui sert de référence unique au développement, aux tests et à la soutenance.
 
 \section{Méthodologie de conception}
 
-La conception d'\textbf{App Budget V3} s'est déroulée en plusieurs étapes structurées :
+La conception d'\textbf{My Smart Budget} s'est déroulée en plusieurs étapes structurées :
 
 \begin{enumerate}
     \item \textbf{Cadrage fonctionnel :} Identification des besoins critiques à partir des personae.
@@ -12,33 +12,11 @@ La conception d'\textbf{App Budget V3} s'est déroulée en plusieurs étapes str
     \item \textbf{Diagrammes UML :} Cas d'utilisation, Classes et Séquences pour les flux critiques.
     \item \textbf{Conception UI/UX :} Zoning, Wireframes et Maquettes Figma haute fidélité.
     \item \textbf{Modélisation des données :} MCD $\rightarrow$ MLD $\rightarrow$ MPD (PostgreSQL).
-    \item \textbf{Architecture 3-tiers :} Formalisation de la stack Next.js / NestJS / PostgreSQL.
+    \item \textbf{Architecture 3-tiers :} Formalisation de la stack Next.js / Express / PostgreSQL + MongoDB.
     \item \textbf{Plan de tests :} Définition des critères d'acceptation par User Story.
     \item \textbf{Validation :} Relecture globale avant implémentation.
 \end{enumerate}
 
-\begin{conseil}
-\textbf{Pourquoi la conception est-elle stratégique ?}
-
-Pour ce projet, j'ai veillé à respecter plusieurs principes qui m'ont réellement fait gagner du temps :
-\begin{itemize}
-    \item \textbf{Éviter les refactorisations :} le modèle de données a été figé avant le code.
-    \item \textbf{Guider le développement :} 1 User Story = 1 Use Case + 1 Séquence + 1 Maquette.
-    \item \textbf{Faciliter les tests :} les flux UML servent de base aux scénarios E2E Playwright.
-    \item \textbf{Réduire les risques :} anticipation des cas d'erreurs (CSV invalide, Auth failed).
-\end{itemize}
-
-\textbf{Éléments réalisés avant le démarrage du développement :}
-\begin{itemize}
-    \item[\mycheckmark] Diagrammes de cas d'usage (Use Cases) validés
-    \item[\mycheckmark] Diagramme de classes UML complet
-    \item[\mycheckmark] Diagrammes de séquence critiques (Auth, Transaction, Import)
-    \item[\mycheckmark] Modèle de données PostgreSQL défini
-    \item[\mycheckmark] Architecture technique Dockerisée validée
-    \item[\mycheckmark] Maquettes Figma (Desktop + Mobile) terminées
-    \item[\mycheckmark] Plan de tests (Unitaires, E2E) établi
-\end{itemize}
-\end{conseil}
 
 % ============================================================
 % USE CASES
@@ -65,9 +43,12 @@ Les interactions du système sont définies par trois acteurs principaux :
     \item \textbf{UC06 -- Export :} Portabilité des données (RGPD).
 \end{itemize}
 
-\begin{center}
-\small$\rightarrow$~\textit{Diagramme de cas d'usage global — voir Annexe~\ref{ann:figures}, figure~\ref{fig:usage_global}}
-\end{center}
+\begin{figure}[H]
+    \centering
+    \safefig{chapters/assets/images/usage_global.png}{0.92\textwidth}{usage_global.png}
+    \caption{Diagramme de cas d'usage global — My Smart Budget}
+    \label{fig:usage_global}
+\end{figure}
 
 \begin{jury}
 \textbf{Points de vigilance contrôlés :}
@@ -84,28 +65,35 @@ Les interactions du système sont définies par trois acteurs principaux :
 
 \section{Modélisation statique : Diagramme de Classes}
 
-Ce diagramme structure les données manipulées par l'application et sert de référence pour le développement Back-end (NestJS) et la base de données.
+Ce diagramme structure les données manipulées par l'application et sert de référence pour le développement Back-end (Express.js) et la base de données.
 
-\begin{center}
-\small$\rightarrow$~\textit{Diagramme de classes UML détaillé — voir Annexe~\ref{ann:figures}, figure~\ref{fig:class-diagram}}
-\end{center}
+\begin{figure}[H]
+    \centering
+    \safefig{chapters/assets/images/class-diagram-app-budget-v3.png}{0.95\textwidth}{class-diagram-app-budget-v3.png}
+    \caption{Diagramme de classes UML détaillé — My Smart Budget}
+    \label{fig:class-diagram}
+\end{figure}
 
-\begin{tcolorbox}[colback=blue!5!white,colframe=blue!60!black,title=\textbf{Mapping UML $\leftrightarrow$ Prisma (Code)}]
-Chaque classe UML est traduite en modèle Prisma pour assurer la cohérence. Cela m'a évité des incohérences entre la théorie (UML) et ce que j'ai réellement codé :
+\begin{tcolorbox}[colback=blue!5!white,colframe=blue!60!black,title=\textbf{Mapping UML $\leftrightarrow$ Code (pg-promise)}]
+Chaque classe UML est traduite en table PostgreSQL et requêtes pg-promise. Cela m'a évité des incohérences entre la théorie (UML) et ce que j'ai réellement codé :
 
-\begin{lstlisting}[language=JavaScript]
-// Classe UML User -> Modele Prisma
-model User {
-  id           Int       @id @default(autoincrement())
-  email        String    @unique
-  passwordHash String
-  role         UserRole  @default(USER)
-  currency     String    @default("EUR")
-  
-  // Relations definies dans le diagramme
-  transactions Transaction[]
-  envelopes    BudgetEnvelope[]
-}
+\begin{lstlisting}[language=SQL]
+-- Classe UML User -> Table PostgreSQL
+CREATE TABLE users (
+  id           SERIAL PRIMARY KEY,
+  email        VARCHAR(255) UNIQUE NOT NULL,
+  password_hash TEXT NOT NULL,
+  role         VARCHAR(20) DEFAULT 'USER',
+  currency     VARCHAR(10) DEFAULT 'EUR',
+  created_at   TIMESTAMPTZ DEFAULT NOW()
+);
+
+-- Relations definies dans le diagramme UML
+CREATE TABLE transactions (
+  id           SERIAL PRIMARY KEY,
+  user_id      INTEGER NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+  category_id  INTEGER NOT NULL REFERENCES categories(id)
+);
 \end{lstlisting}
 \end{tcolorbox}
 
@@ -119,9 +107,12 @@ Les séquences détaillent les interactions temporelles entre le Frontend, l'API
 
 \subsection{Séquence 1 : Authentification (US-01)}
 
-\begin{center}
-\small$\rightarrow$~\textit{Séquence — Connexion utilisateur — voir Annexe~\ref{ann:figures}, figure~\ref{fig:seq-auth}}
-\end{center}
+\begin{figure}[H]
+    \centering
+    \safefig{chapters/assets/images/seq-auth-login.png}{0.92\textwidth}{seq-auth-login.png}
+    \caption{Diagramme de séquence — Flux de connexion utilisateur (Login)}
+    \label{fig:seq-auth}
+\end{figure}
 
 \textbf{Déroulement nominal :}
 \begin{enumerate}
@@ -136,19 +127,25 @@ Pour l'utilisateur, cela se traduit par une connexion fluide en moins de 2 secon
 
 \subsection{Séquence 2 : Création de Transaction (US-03)}
 
-\begin{center}
-\small$\rightarrow$~\textit{Séquence — Création de transaction — voir Annexe~\ref{ann:figures}, figure~\ref{fig:seq-transaction}}
-\end{center}
+\begin{figure}[H]
+    \centering
+    \safefig{chapters/assets/images/seq-create-transaction.png}{0.92\textwidth}{seq-create-transaction.png}
+    \caption{Diagramme de séquence — Flux de création d'une transaction}
+    \label{fig:seq-transaction}
+\end{figure}
 
-Ce diagramme illustre la validation des données par le \texttt{TransactionsService} avant l'insertion en base via Prisma, garantissant l'intégrité des données financières.
+Ce diagramme illustre la validation des données par le \texttt{TransactionController} Express avant l'insertion en base via pg-promise, garantissant l'intégrité des données financières.
 
 Pour l'utilisateur, cela signifie qu'une transaction mal saisie est rejetée immédiatement, avec un message d'erreur clair, avant tout enregistrement.
 
 \subsection{Séquence 3 : Alertes Budgétaires (US-07)}
 
-\begin{center}
-\small$\rightarrow$~\textit{Séquence — Alertes budgétaires — voir Annexe~\ref{ann:figures}, figure~\ref{fig:seq-alert}}
-\end{center}
+\begin{figure}[H]
+    \centering
+    \safefig{chapters/assets/images/seq-budget-alert.png}{0.92\textwidth}{seq-budget-alert.png}
+    \caption{Diagramme de séquence — Flux automatique de déclenchement d'alertes}
+    \label{fig:seq-alert}
+\end{figure}
 
 % ============================================================
 % UI / UX
@@ -181,9 +178,21 @@ Exemple de structuration de la page \textbf{Dashboard} :
 
 \subsection{Wireframes et Maquettes (Figma)}
 
-\begin{center}
-\small$\rightarrow$~\textit{Wireframe Basse Fidélité — voir Annexe~\ref{ann:figures}}
-\end{center}
+\begin{figure}[H]
+    \centering
+    \begin{minipage}{0.48\textwidth}
+        \centering
+        \safefig{chapters/assets/images/wireframe-dashboard.png}{\textwidth}{wireframe-dashboard.png}
+        \caption{Wireframe basse fidélité — Dashboard}
+        \label{fig:wireframe-dashboard}
+    \end{minipage}\hfill
+    \begin{minipage}{0.48\textwidth}
+        \centering
+        \safefig{chapters/assets/images/wireframe-transactions.png}{\textwidth}{wireframe-transactions.png}
+        \caption{Wireframe — Page Transactions}
+        \label{fig:wireframe-transactions}
+    \end{minipage}
+\end{figure}
 
 Les maquettes Haute Fidélité intègrent la charte graphique finale, les interactions (hover, focus) et les composants réutilisables du Design System.
 
@@ -218,13 +227,16 @@ Le modèle de données a été conçu selon la méthode Merise (MCD/MLD/MPD) pui
 
 \subsection{Modèle Conceptuel (MCD)}
 
-\begin{center}
-\small$\rightarrow$~\textit{MCD — Entités et relations — voir Annexe~\ref{ann:figures}, figure~\ref{fig:mcd}}
-\end{center}
+\begin{figure}[H]
+    \centering
+    \safefig{chapters/assets/images/mcd-app-budget-v3.png}{0.95\textwidth}{mcd-app-budget-v3.png}
+    \caption{Modèle Conceptuel de Données (MCD) — entités et relations}
+    \label{fig:mcd}
+\end{figure}
 
 \subsection{Implémentation Physique (SQL)}
 
-Extrait du script de création des tables (généré et géré par Prisma Migrate) :
+Extrait du script de création des tables (écrit et exécuté via pg-promise au démarrage du serveur) :
 
 \begin{lstlisting}[language=SQL]
 -- Table des transactions avec contraintes
@@ -251,14 +263,17 @@ CREATE INDEX idx_transactions_user_date ON transactions(user_id, date DESC);
 
 L'application repose sur une séparation stricte des responsabilités.
 
-\begin{center}
-\small$\rightarrow$~\textit{Architecture Next.js / NestJS / PostgreSQL — voir Annexe~\ref{ann:figures}, figure~\ref{fig:arch-3tiers}}
-\end{center}
+\begin{figure}[H]
+    \centering
+    \safefig{chapters/assets/images/arch-3tiers-app-budget-v3.png}{0.92\textwidth}{arch-3tiers-app-budget-v3.png}
+    \caption{Architecture 3-tiers : Next.js (Front) — Express (Back) — PostgreSQL (Data)}
+    \label{fig:arch-3tiers}
+\end{figure}
 
 \begin{itemize}
-    \item \textbf{Tier 1 (Présentation) :} \textbf{Next.js 14}. Rendu hybride (SSR/CSR), composants React, validation formulaires (Zod).
-    \item \textbf{Tier 2 (Métier) :} \textbf{NestJS 10}. API RESTful, Auth Guards, Services métier, Validation DTO.
-    \item \textbf{Tier 3 (Données) :} \textbf{PostgreSQL 15}. Base relationnelle robuste, intégrité référentielle, gérée via Prisma ORM.
+    \item \textbf{Tier 1 (Présentation) :} \textbf{Next.js 15}. Rendu hybride (SSR/CSR), composants React, validation formulaires.
+    \item \textbf{Tier 2 (Métier) :} \textbf{Node.js/Express}. API RESTful, middlewares JWT, logique métier, validation des requêtes.
+    \item \textbf{Tier 3 (Données) :} \textbf{PostgreSQL 16} (pg-promise) + \textbf{MongoDB} (Mongoose). Données relationnelles et non-structurées, intégrité référentielle et schémas flexibles.
 \end{itemize}
 
 \section{Matrice de Cohérence Globale}
@@ -296,7 +311,7 @@ $\rightarrow$ \textbf{UI :} Page \texttt{/transactions/new}
 
 \begin{itemize}
     \item \textbf{UML \& Merise :} \url{https://www.uml-diagrams.org/}
-    \item \textbf{Frameworks :} \url{https://nextjs.org/} (Front), \url{https://nestjs.com/} (Back)
+    \item \textbf{Frameworks :} \url{https://nextjs.org/} (Front), \url{https://expressjs.com/} (Back)
     \item \textbf{Base de données :} \url{https://www.postgresql.org/docs/}
     \item \textbf{Outils :} Figma (UI), Draw.io (Diagrammes)
 \end{itemize}

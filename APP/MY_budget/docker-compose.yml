@@ -54,6 +54,7 @@ services:
       DB_NAME: smart_budget
       MONGO_URI: mongodb://smart_user:smart_password@mongodb:27017/smart_budget?authSource=admin
       CORS_ORIGIN: https://smarterbudget.net
+      JWT_SECRET: your-very-secret-key-change-this-in-production-12345
     depends_on:
       postgres:
         condition: service_healthy

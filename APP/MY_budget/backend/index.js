@@ -8,8 +8,11 @@ const app = express();
 
 // Middleware
 app.disable('x-powered-by');
+const allowedOrigins = process.env.CORS_ORIGIN
+  ? [process.env.CORS_ORIGIN, `https://www.${process.env.CORS_ORIGIN.replace('https://', '')}`]
+  : ['http://localhost:3000'];
 app.use(cors({
-  origin: process.env.CORS_ORIGIN || 'http://localhost:3000',
+  origin: allowedOrigins,
   methods: ['GET', 'POST', 'PUT', 'DELETE'],
   allowedHeaders: ['Content-Type', 'Authorization'],
 }));

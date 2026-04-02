@@ -465,6 +465,7 @@ const MySmartBudget = () => {
               <option value="Loisirs">🎮 Loisirs</option>
               <option value="Abonnements">📱 Abonnements</option>
               <option value="Santé">⚕️ Santé</option>
+              <option value="Prélèvement">🏦 Prélèvement</option>
               <option value="Revenus">💰 Revenus</option>
             </select>
             <div className="grid grid-cols-2 gap-4">
@@ -535,7 +536,8 @@ const MySmartBudget = () => {
                 <option value="Loisirs">🎮 Loisirs</option>
                 <option value="Abonnements">📱 Abonnements</option>
                 <option value="Santé">⚕️ Santé</option>
-                <option value="Revenus">💰 Revenus</option>
+                <option value="Prélèvement">🏦 Prélèvement</option>
+              <option value="Revenus">💰 Revenus</option>
               </select>
               <div className="grid grid-cols-2 gap-4">
                 <input
@@ -612,6 +614,7 @@ const MySmartBudget = () => {
               <option value="Loisirs">🎮 Loisirs</option>
               <option value="Abonnements">📱 Abonnements</option>
               <option value="Santé">⚕️ Santé</option>
+              <option value="Prélèvement">🏦 Prélèvement</option>
               <option value="Revenus">💰 Revenus</option>
             </select>
             <button

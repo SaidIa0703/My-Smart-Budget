@@ -67,7 +67,9 @@ const MySmartBudget = () => {
     category: '',
     amount: '',
     date: new Date().toISOString().split('T')[0],
+    is_recurring: false,
   });
+  const [editingTransaction, setEditingTransaction] = useState<any>(null);
   const [searchText, setSearchText] = useState('');
   const [filterCategory, setFilterCategory] = useState('');
   const [message, setMessage] = useState('');
@@ -157,6 +159,7 @@ const MySmartBudget = () => {
           category: '',
           amount: '',
           date: new Date().toISOString().split('T')[0],
+          is_recurring: false,
         });
         setShowAddForm(false);
         fetchTransactions();
@@ -179,6 +182,30 @@ const MySmartBudget = () => {
       }
     } catch (error) {
       console.error('Erreur:', error);
+    }
+  };
+
+  const handleEditTransaction = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!editingTransaction) return;
+    try {
+      const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/transactions/${editingTransaction.id}`, {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          name: editingTransaction.name,
+          category: editingTransaction.category,
+          amount: Number.parseFloat(editingTransaction.amount),
+          date: editingTransaction.date,
+          is_recurring: editingTransaction.is_recurring ?? false,
+        }),
+      });
+      if (response.ok) {
+        setEditingTransaction(null);
+        fetchTransactions();
+      }
+    } catch (error) {
+      console.error('Erreur modification:', error);
     }
   };
 
@@ -458,6 +485,15 @@ const MySmartBudget = () => {
                 required
               />
             </div>
+            <label className="flex items-center gap-3 p-3 bg-indigo-50 rounded-lg cursor-pointer hover:bg-indigo-100 transition">
+              <input
+                type="checkbox"
+                checked={formData.is_recurring}
+                onChange={(e) => setFormData({ ...formData, is_recurring: e.target.checked })}
+                className="w-5 h-5 accent-indigo-600"
+              />
+              <span className="text-sm font-medium text-indigo-700">🔄 Prélèvement récurrent (mensuel)</span>
+            </label>
             <button
               type="submit"
               className="w-full px-4 py-3 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 transition font-medium flex items-center justify-center gap-2"
@@ -466,6 +502,80 @@ const MySmartBudget = () => {
               Ajouter
             </button>
           </form>
+        </div>
+      )}
+
+      {editingTransaction && (
+        <div className="fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4">
+          <div className="bg-white rounded-3xl p-6 shadow-2xl w-full max-w-md">
+            <div className="flex justify-between items-center mb-6">
+              <h2 className="text-xl font-bold text-slate-900">Modifier la transaction</h2>
+              <button onClick={() => setEditingTransaction(null)} className="p-2 hover:bg-gray-100 rounded-lg">
+                <X size={22} />
+              </button>
+            </div>
+            <form onSubmit={handleEditTransaction} className="space-y-4">
+              <input
+                type="text"
+                placeholder="Description"
+                value={editingTransaction.name}
+                onChange={(e) => setEditingTransaction({ ...editingTransaction, name: e.target.value })}
+                className="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 text-black"
+                required
+              />
+              <select
+                value={editingTransaction.category}
+                onChange={(e) => setEditingTransaction({ ...editingTransaction, category: e.target.value })}
+                className="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 text-black"
+                required
+              >
+                <option value="">Catégorie</option>
+                <option value="Alimentation">🛒 Alimentation</option>
+                <option value="Transport">🚗 Transport</option>
+                <option value="Loisirs">🎮 Loisirs</option>
+                <option value="Abonnements">📱 Abonnements</option>
+                <option value="Santé">⚕️ Santé</option>
+                <option value="Revenus">💰 Revenus</option>
+              </select>
+              <div className="grid grid-cols-2 gap-4">
+                <input
+                  type="number"
+                  placeholder="Montant (€)"
+                  value={editingTransaction.amount}
+                  onChange={(e) => setEditingTransaction({ ...editingTransaction, amount: e.target.value })}
+                  className="px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 text-black"
+                  step="0.01"
+                  required
+                />
+                <input
+                  type="date"
+                  value={editingTransaction.date?.split('T')[0]}
+                  onChange={(e) => setEditingTransaction({ ...editingTransaction, date: e.target.value })}
+                  className="px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 text-black"
+                  required
+                />
+              </div>
+              <label className="flex items-center gap-3 p-3 bg-indigo-50 rounded-lg cursor-pointer hover:bg-indigo-100 transition">
+                <input
+                  type="checkbox"
+                  checked={editingTransaction.is_recurring ?? false}
+                  onChange={(e) => setEditingTransaction({ ...editingTransaction, is_recurring: e.target.checked })}
+                  className="w-5 h-5 accent-indigo-600"
+                />
+                <span className="text-sm font-medium text-indigo-700">🔄 Prélèvement récurrent (mensuel)</span>
+              </label>
+              <div className="flex gap-3">
+                <button type="button" onClick={() => setEditingTransaction(null)}
+                  className="flex-1 px-4 py-3 border border-gray-300 rounded-lg hover:bg-gray-50 transition font-medium text-slate-900">
+                  Annuler
+                </button>
+                <button type="submit"
+                  className="flex-1 px-4 py-3 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 transition font-medium">
+                  Enregistrer
+                </button>
+              </div>
+            </form>
+          </div>
         </div>
       )}
 
@@ -556,17 +666,30 @@ const MySmartBudget = () => {
                     {getCategoryIcon(transaction.amount, transaction.category)}
                   </div>
                   <div className="flex-1">
-                    <p className="font-bold text-slate-900 text-lg">{transaction.name}</p>
+                    <div className="flex items-center gap-2">
+                      <p className="font-bold text-slate-900 text-lg">{transaction.name}</p>
+                      {transaction.is_recurring && (
+                        <span className="text-xs bg-indigo-100 text-indigo-700 px-2 py-0.5 rounded-full font-medium">🔄 Récurrent</span>
+                      )}
+                    </div>
                     <p className="text-sm text-violet-500">{transaction.category} • {new Date(transaction.date).toLocaleDateString('fr-FR')}</p>
                   </div>
                 </div>
-                <div className="flex items-center gap-4">
+                <div className="flex items-center gap-2">
                   <p className={`font-bold text-2xl whitespace-nowrap ${transaction.amount > 0 ? 'text-green-500' : 'text-red-500'}`}>
                     {transaction.amount > 0 ? '+' : ''}€{Math.abs(transaction.amount).toFixed(2)}
                   </p>
                   <button
+                    onClick={() => setEditingTransaction({ ...transaction, amount: String(transaction.amount) })}
+                    className="p-2 text-indigo-600 hover:bg-indigo-50 rounded-lg transition opacity-0 group-hover:opacity-100"
+                    title="Modifier"
+                  >
+                    <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
+                  </button>
+                  <button
                     onClick={() => handleDeleteTransaction(transaction.id)}
                     className="p-2 text-red-600 hover:bg-red-50 rounded-lg transition opacity-0 group-hover:opacity-100"
+                    title="Supprimer"
                   >
                     <Trash2 size={20} />
                   </button>

@@ -8,11 +8,16 @@ CREATE TABLE IF NOT EXISTS users (
 CREATE TABLE IF NOT EXISTS transactions (
   id SERIAL PRIMARY KEY,
   user_id INT REFERENCES users(id) ON DELETE CASCADE,
-  label VARCHAR(255) NOT NULL,
+  name VARCHAR(255) NOT NULL,
+  category VARCHAR(255) NOT NULL,
   amount DECIMAL(10, 2) NOT NULL,
-  type VARCHAR(50) NOT NULL CHECK (type IN ('income', 'expense')),
+  date DATE NOT NULL DEFAULT CURRENT_DATE,
+  is_recurring BOOLEAN DEFAULT FALSE,
   created_at TIMESTAMP DEFAULT NOW()
 );
+
+-- Migration : ajout colonne is_recurring si elle n'existe pas encore
+ALTER TABLE transactions ADD COLUMN IF NOT EXISTS is_recurring BOOLEAN DEFAULT FALSE;
 
 CREATE TABLE IF NOT EXISTS budgets (
   id SERIAL PRIMARY KEY,

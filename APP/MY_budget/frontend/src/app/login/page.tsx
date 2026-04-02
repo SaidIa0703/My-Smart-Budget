@@ -43,8 +43,8 @@ export default function LoginPage() {
 
       saveSession(data.token, data.user);
 
-      // Rediriger vers le dashboard
-      router.push('/dashboard');
+      // Rediriger vers l'app (gestion questionnaire + dashboard dans maquette.tsx)
+      router.push('/');
 
     } catch (err: unknown) {
       console.error('Login error:', err);

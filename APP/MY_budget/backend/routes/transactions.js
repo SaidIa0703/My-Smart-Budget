@@ -37,7 +37,28 @@ router.get('/:userId', async (req, res) =>{
     }
 });
 
-//suprimer une transactions 
+// modifier une transaction
+router.put('/:id', async (req, res) => {
+    try {
+        const { id } = req.params;
+        const { name, category, amount, date, is_recurring } = req.body;
+
+        if (!name || !category || !amount) {
+            return res.status(400).json({ message: 'Champs requis manquants' });
+        }
+
+        const transaction = await db.one(
+            'UPDATE transactions SET name=$1, category=$2, amount=$3, date=$4, is_recurring=$5 WHERE id=$6 RETURNING *',
+            [name, category, amount, date, is_recurring ?? false, id]
+        );
+        res.json(transaction);
+    } catch (error) {
+        console.error('Error:', error);
+        res.status(500).json({ message: 'Erreur serveur' });
+    }
+});
+
+//suprimer une transactions
 router.delete('/:id', async (req, res) => {
     try{
         const {id} = req.params;

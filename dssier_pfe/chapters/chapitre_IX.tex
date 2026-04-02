@@ -201,6 +201,7 @@ CVE-2024-45590 & 5.3 & body-parser & Prototype pollution & ✅ Patché 1.20.3 \\
 
 \subsection{Automatisation de la sécurité}
 
+\iffalse % BLOC COMPRESSE — security pipeline YAML
 \begin{exemple}
 \textbf{Pipeline de sécurité automatisé :}
 \begin{lstlisting}[language=yaml]
@@ -321,6 +322,9 @@ jobs:
             frontend-vulnerabilities.json
 \end{lstlisting}
 \end{exemple}
+\fi % fin bloc compressé
+
+Le pipeline exécute quotidiennement : \textbf{npm audit}, \textbf{Snyk} (CVE), \textbf{OWASP ZAP} (DAST) et \textbf{Trivy} (images Docker). Tout résultat critique bloque le merge.
 
 \subsection{Métriques de sécurité}
 
@@ -367,138 +371,27 @@ MTTR incident & N/A & < 1h & ✅ \\
 \subsection{Évolutions appliquées suite à la veille}
 
 \begin{exemple}
-\textbf{Améliorations concrètes implémentées :}
+\textbf{3 améliorations concrètes issues de la veille :}
 \begin{lstlisting}[language=JavaScript]
-// 1. Migration Argon2 suite à veille crypto (Octobre 2025)
-// AVANT : bcrypt (vulnérable aux attaques GPU)
-const bcrypt = require('bcrypt');
-const hashedPassword = await bcrypt.hash(password, 10);
+// 1. bcrypt → Argon2id (Oct 2025) : résistance GPU/ASIC +400%
+const hashedPwd = await argon2.hash(password,
+  { type: argon2.argon2id, memoryCost: 2**16, timeCost: 3 });
 
-// APRÈS : Argon2id (résistant GPU/ASIC, winner PHC)
-const argon2 = require('argon2');
-const hashedPassword = await argon2.hash(password, {
-  type: argon2.argon2id,
-  memoryCost: 2 ** 16,  // 64 MB
-  timeCost: 3,          // 3 iterations
-  parallelism: 1,
-  saltLength: 32
-});
-// Résultat : +400% résistance brute force
+// 2. CSP avec nonces (Nov 2025) : score A+ Observatory, 0 XSS
+res.locals.nonce = crypto.randomBytes(16).toString('base64');
+helmet.contentSecurityPolicy({ directives: {
+  scriptSrc: ["'self'", (req, res) => `'nonce-${res.locals.nonce}'`]
+}});
 
-// 2. Content Security Policy renforcée (Novembre 2025)
-// AVANT : CSP basique
-app.use(helmet.contentSecurityPolicy({
-  directives: {
-    defaultSrc: ["'self'"],
-    scriptSrc: ["'self'", "'unsafe-inline'"]  // Dangereux
-  }
-}));
-
-// APRÈS : CSP stricte avec nonces
-app.use((req, res, next) => {
-  res.locals.nonce = crypto.randomBytes(16).toString('base64');
-  next();
-});
-
-app.use(helmet.contentSecurityPolicy({
-  directives: {
-    defaultSrc: ["'self'"],
-    scriptSrc: [
-      "'self'",
-      (req, res) => `'nonce-${res.locals.nonce}'`
-    ],
-    styleSrc: ["'self'", "'unsafe-inline'"],  // CSS uniquement
-    imgSrc: ["'self'", "data:", "https:"],
-    connectSrc: ["'self'"],
-    fontSrc: ["'self'"],
-    objectSrc: ["'none'"],
-    mediaSrc: ["'none'"],
-    frameSrc: ["'none'"],
-    sandbox: ['allow-forms', 'allow-scripts', 'allow-same-origin'],
-    reportUri: '/api/csp-report',
-    upgradeInsecureRequests: []
-  }
-}));
-// Résultat : 0 XSS possible, score A+ Observatory
-
-// 3. Rate limiting intelligent (Décembre 2025)
-// AVANT : Rate limit fixe
-const rateLimit = require('express-rate-limit');
-app.use(rateLimit({
-  windowMs: 15 * 60 * 1000,
-  max: 100
-}));
-
-// APRÈS : Rate limiting adaptatif par endpoint
-const rateLimit = require('express-rate-limit');
-
-const rateLimiter = rateLimit({
-  windowMs: 15 * 60 * 1000,
-  max: 100,
-  standardHeaders: true,
-  legacyHeaders: false,
-  message: 'Trop de requêtes, veuillez patienter.',
-});
-
-// Limites différenciées par endpoint
+// 3. Rate limiting adaptatif par endpoint (Déc 2025) : -94% brute force
 const endpointLimits = {
-  '/api/auth/login': { points: 5, duration: 900 },
-  '/api/auth/register': { points: 3, duration: 3600 },
-  '/api/transactions': { points: 50, duration: 60 },
-  '/api/import': { points: 1, duration: 300 }
+  '/api/auth/login':    { points: 5,   duration: 900 },
+  '/api/auth/register': { points: 3,   duration: 3600 },
+  '/api/transactions':  { points: 50,  duration: 60 },
+  '/api/import':        { points: 1,   duration: 300 },
 };
-
-app.use(async (req, res, next) => {
-  try {
-    const limit = endpointLimits[req.path] || { points: 100, duration: 900 };
-    await rateLimiter.consume(req.ip, limit.points);
-    next();
-  } catch (rejRes) {
-    res.status(429).json({
-      error: 'Too many requests',
-      retryAfter: Math.round(rejRes.msBeforeNext / 1000)
-    });
-  }
-});
-// Résultat : -94% attaques brute force, 0 DoS réussi
 \end{lstlisting}
 \end{exemple}
-
-\subsection{Roadmap technologique 2025}
-
-\begin{tcolorbox}[colback=blue!5!white,colframe=blue!60!black,title=\textbf{Plan de migration et évolutions planifiées}]
-\textbf{Q1 2025 - Modernisation Core :}
-\begin{itemize}
-    \item ✅ Node.js 20 LTS (janvier) : +15\% perf, native test runner
-    \item ✅ Next.js 15 GA (octobre) : Turbopack stable, Server Actions
-    \item ✅ PostgreSQL 16 (septembre) : Meilleures performances parallélisme
-    \item ✅ TypeScript 5.4 : Nouveaux types, performances accrues
-\end{itemize}
-
-\textbf{Q2 2025 - Performance  \& Scaling :}
-\begin{itemize}
-    \item ✅ Express 5.x : Meilleure gestion async/await native
-    \item ✅ Edge Functions : Auth et API critiques
-    \item ✅ Database sharding : Préparation 10k+ users
-    \item ✅ WebAssembly : Calculs financiers complexes
-\end{itemize}
-
-\textbf{Q3 2025 - Intelligence  \& Automation :}
-\begin{itemize}
-    \item ✅ Vector Search : Recherche sémantique transactions
-    \item ✅ ML Pipeline : Catégorisation automatique
-    \item ✅ Predictive Analytics : Prévisions budgétaires
-    \item ✅ GitHub Copilot : Intégration développement
-\end{itemize}
-
-\textbf{Q4 2025 - Next Generation :}
-\begin{itemize}
-    \item ✅ Bun runtime : Tests puis migration progressive
-    \item ✅ Rust services : Modules critiques performance
-    \item ✅ Blockchain : Audit trail immutable (POC)
-    \item ✅ Quantum-ready crypto : Préparation post-quantum
-\end{itemize}
-\end{tcolorbox}
 
 \subsection{Métriques d'impact de la veille}
 
@@ -606,29 +499,3 @@ L'essentiel est de garder une stack à jour sans mettre en danger la stabilité 
 \end{itemize}
 \end{tcolorbox}
 
-\section{Liens et ressources}
-
-\begin{itemize}
-    \item \textbf{Next.js Blog :} \url{https://nextjs.org/blog}
-    \item \textbf{Node.js Security :} \url{https://nodejs.org/en/docs/guides/security/}
-    \item \textbf{PostgreSQL Docs :} \url{https://www.postgresql.org/docs/}
-    \item \textbf{OWASP Top 10 :} \url{https://owasp.org/www-project-top-ten/}
-    \item \textbf{CVE Database :} \url{https://cve.mitre.org/}
-    \item \textbf{Snyk Vulnerability DB :} \url{https://security.snyk.io/}
-    \item \textbf{Tech Radar Thoughtworks :} \url{https://www.thoughtworks.com/radar}
-    \item \textbf{State of JS :} \url{https://stateofjs.com/}
-\end{itemize}
-
-
-\begin{jury}
-\textbf{Questions fréquentes du jury :}
-\begin{itemize}
-    \item Comment organisez-vous votre veille technologique ?
-    \item Quelles CVE avez-vous traitées récemment ?
-    \item Comment mesurez-vous l'impact de votre veille ?
-    \item Votre veille influence-t-elle vos choix techniques ?
-    \item Comment partagez-vous les connaissances acquises ?
-    \item Avez-vous un plan de migration technologique ?
-    \item Quel est le ROI de votre veille ?
-\end{itemize}
-\end{jury}

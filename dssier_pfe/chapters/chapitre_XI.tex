@@ -33,17 +33,6 @@ Temps de reporting & -42\% & -40\% \\
 \end{itemize}
 \end{exemple}
 
-
-\begin{jury}
-\begin{itemize}
-    \item Pouvez-vous résumer les résultats de votre projet ?
-    \item Quelles compétences avez-vous développées ?
-    \item Quels sont vos points forts et faibles ?
-    \item Comment évaluez-vous votre progression ?
-    \item Quels sont vos objectifs pour la suite ?
-\end{itemize}
-\end{jury}
-
 \section{Perspectives d'évolution}
 
 La v2.0 de \textbf{My Smart Budget} s'articulera autour de trois axes qui me semblent vraiment utiles pour les utilisateurs : la synchronisation bancaire automatique (pour éliminer la saisie manuelle), une application mobile (pour consulter son budget partout), et des prévisions intelligentes basées sur l'historique. L'architecture actuelle a été pensée pour supporter ces évolutions sans refactoring majeur.
@@ -80,17 +69,6 @@ Q3 2025: Évolutions technologiques
 \end{itemize}
 \end{exemple}
 
-
-\begin{jury}
-\begin{itemize}
-    \item Quelles sont vos perspectives d'évolution ?
-    \item Comment prévoyez-vous l'évolution technique ?
-    \item Quelles compétences souhaitez-vous développer ?
-    \item Comment anticipez-vous les besoins futurs ?
-    \item Votre projet est-il évolutif ?
-\end{itemize}
-\end{jury}
-
 \section{Remerciements}
 
 Je tiens à remercier sincèrement toutes les personnes qui ont contribué à ce projet et à ma formation.
@@ -105,17 +83,6 @@ Je tiens à remercier sincèrement toutes les personnes qui ont contribué à ce
 \end{itemize}
 \end{exemple}
 
-
-\begin{jury}
-\begin{itemize}
-    \item Qui souhaitez-vous remercier particulièrement ?
-    \item Quels apprentissages tirez-vous de ces interactions ?
-    \item Comment envisagez-vous la suite de votre parcours ?
-    \item Quelles relations professionnelles avez-vous nouées ?
-    \item Comment comptez-vous maintenir ces relations ?
-\end{itemize}
-\end{jury}
-
 \section{Déploiement et documentation}
 
 Dans cette section, je présente la stratégie de déploiement et la documentation technique de \textbf{My Smart Budget}. L'ensemble du cycle — du code au serveur — est automatisé et documenté pour garantir la reproductibilité et la maintenabilité.
@@ -124,84 +91,9 @@ Dans cette section, je présente la stratégie de déploiement et la documentati
 
 La containerisation repose sur une approche multi-stage décrite en détail au chapitre 8. Les images de production sont légères (< 120 MB), sécurisées (utilisateur non-root) et déployées via Docker Compose.
 
-\subsubsection{Conteneurisation}
+\subsubsection{Conteneurisation et Compose}
 
-\begin{exemple}
-\textbf{Dockerfile multi-stage :}
-\begin{lstlisting}[language=dockerfile]
-# Stage 1: Build
-FROM node:18-alpine AS builder
-WORKDIR /app
-COPY package*.json ./
-RUN npm ci --only=production
-COPY . .
-RUN npm run build
-
-# Stage 2: Production
-FROM node:18-alpine AS production
-RUN addgroup -g 1001 -S nodejs
-RUN adduser -S nextjs -u 1001
-WORKDIR /app
-COPY --from=builder /app/node_modules ./node_modules
-COPY --from=builder /app/dist ./dist
-COPY --from=builder /app/package*.json ./
-RUN chown -R nextjs:nodejs /app
-USER nextjs
-EXPOSE 3000
-ENV NODE_ENV=production
-CMD ["node", "dist/index.js"]
-\end{lstlisting}
-\end{exemple}
-
-\subsubsection{Compose}
-
-Le fichier Docker Compose orchestre les trois services (application, base de données, cache) en un seul environnement reproductible :
-
-\begin{exemple}
-\textbf{Docker Compose pour l'environnement complet :}
-\begin{lstlisting}[language=yaml]
-version: '3.8'
-services:
-  app:
-    build: .
-    ports:
-      - "3000:3000"
-    environment:
-      - NODE_ENV=production
-      - DB_HOST=postgres
-      - DB_PORT=5432
-      - DB_USER=smart_user
-      - DB_PASSWORD=smart_password
-      - DB_NAME=smart_budget
-      - MONGO_URI=mongodb://mongodb:27017/smart_budget
-    depends_on:
-      - postgres
-      - mongodb
-    restart: unless-stopped
-
-  postgres:
-    image: postgres:16-alpine
-    environment:
-      - POSTGRES_DB=smart_budget
-      - POSTGRES_USER=smart_user
-      - POSTGRES_PASSWORD=smart_password
-    volumes:
-      - postgres_data:/var/lib/postgresql/data
-    restart: unless-stopped
-
-  mongodb:
-    image: mongo:7
-    environment:
-      - MONGO_INITDB_DATABASE=smart_budget
-    volumes:
-      - mongodb_data:/data/db
-    restart: unless-stopped
-
-volumes:
-  postgres_data:
-  mongodb_data:
-\end{lstlisting}
-\end{exemple}
+Les images Docker multi-stage (node:20-alpine, build + production) et le fichier Docker Compose orchestrant les trois services (app, PostgreSQL 16, MongoDB 7) sont détaillés au \textbf{Chapitre 8}. Les images de production pèsent moins de 120 MB et tournent avec un utilisateur non-root.
 
 \subsection{GitHub (code source)}
 
@@ -228,49 +120,7 @@ My-Smart-Budget/
 
 \subsection{CI/CD}
 
-Chaque commit déclenche automatiquement les tests, l'analyse SonarQube et, si tout passe, le déploiement. Rien ne part en production sans avoir validé le pipeline complet :
-
-\begin{exemple}
-\textbf{Pipeline CI/CD GitHub Actions :}
-\begin{lstlisting}[language=yaml]
-name: CI/CD Pipeline
-on:
-  push:
-    branches: [main, develop]
-  pull_request:
-    branches: [main, develop]
-
-jobs:
-  test:
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v4
-      - name: Setup Node.js
-        uses: actions/setup-node@v4
-        with:
-          node-version: '18'
-      - name: Install dependencies
-        run: npm ci
-      - name: Run tests
-        run: npm test -- --coverage
-
-  deploy-staging:
-    runs-on: ubuntu-latest
-    needs: test
-    if: github.ref == 'refs/heads/develop'
-    steps:
-      - name: Deploy to staging
-        run: ./scripts/deploy.sh staging
-
-  deploy-production:
-    runs-on: ubuntu-latest
-    needs: test
-    if: github.ref == 'refs/heads/main'
-    steps:
-      - name: Deploy to production
-        run: ./scripts/deploy.sh production
-\end{lstlisting}
-\end{exemple}
+Chaque commit déclenche automatiquement les tests, l'analyse SonarQube et, si tout passe, le déploiement. Le pipeline complet (7 jobs : lint, test unitaires, test intégration, E2E, SonarQube, build Docker, deploy) est détaillé au \textbf{Chapitre 8}. Rien ne part en production sans Quality Gate validé.
 
 \subsection{SonarQube}
 
@@ -296,73 +146,5 @@ Sécurité & A & A & \mycheckmark \\
 
 \subsection{Swagger}
 
-L'API est entièrement documentée avec OpenAPI 3.0, accessible à l'adresse \texttt{/api/docs}. Chaque endpoint est décrit avec ses paramètres, ses réponses et ses codes d'erreur :
+L'API est entièrement documentée avec OpenAPI 3.0, accessible à \texttt{/api/docs}. La spécification complète (authentification, transactions, budgets, schémas et sécurité JWT) est détaillée au \textbf{Chapitre 8}.
 
-\begin{exemple}
-\textbf{Documentation API Swagger :}
-\begin{lstlisting}[language=yaml]
-openapi: 3.0.0
-info:
-  title: My Smart Budget API
-  version: 1.0.0
-  description: API de gestion budgétaire personnelle
-
-paths:
-  /transactions:
-    get:
-      summary: Liste des transactions
-      responses:
-        '200':
-          description: Liste paginée des transactions
-          content:
-            application/json:
-              schema:
-                type: object
-                properties:
-                  data:
-                    type: array
-                    items:
-                      $ref: '#/components/schemas/Transaction'
-
-components:
-  schemas:
-    Transaction:
-      type: object
-      properties:
-        id:
-          type: integer
-        user_id:
-          type: integer
-        amount:
-          type: number
-        type:
-          type: string
-          enum: [income, expense]
-        date:
-          type: string
-          format: date-time
-\end{lstlisting}
-\end{exemple}
-
-
-\begin{jury}
-\begin{itemize}
-    \item Comment organisez-vous votre code source ?
-    \item Votre pipeline CI/CD est-il complet ?
-    \item Comment mesurez-vous la qualité de votre code ?
-    \item Votre API est-elle documentée ?
-    \item Comment gérez-vous les déploiements ?
-\end{itemize}
-\end{jury}
-
-\section{Liens utiles}
-
-\begin{itemize}
-    \item Dockerfile reference: \url{https://docs.docker.com/reference/dockerfile/}
-    \item Docker Compose: \url{https://docs.docker.com/compose/}
-    \item GitHub Actions: \url{https://docs.github.com/actions}
-    \item SonarQube: \url{https://docs.sonarsource.com/sonarqube/latest/}
-    \item Swagger/OpenAPI: \url{https://swagger.io/specification/}
-    \item CDA Formation: \url{https://www.cda.asso.fr/}
-    \item Colint.school: \url{https://colint.school/}
-\end{itemize}

@@ -101,7 +101,6 @@ const TransactionForm = ({ onSubmit, categories, budget }) => {
 
 Ce composant garantit que l'utilisateur est averti avant tout dépassement de budget, sans bloquer l'action si elle est confirmée.
 
-
 \section{Couche Logique Métier (Backend)}
 
 Le serveur API, développé avec Express.js, centralise la logique métier. Il agit comme chef d'orchestre entre le client et les bases de données.
@@ -258,16 +257,6 @@ encryptData(text) {
   return { encrypted, iv: iv.toString('hex'), tag: cipher.getAuthTag() };
 }
 \end{lstlisting}
-
-\begin{jury}
-\textbf{Questions potentielles lors de la soutenance :}
-\begin{itemize}
-    \item \textit{"Pourquoi avoir mélangé PostgreSQL et MongoDB ?"} \\
-    $\rightarrow$ Réponse : PostgreSQL garantit la cohérence des transactions financières (ACID), tandis que MongoDB offre la flexibilité et la rapidité d'écriture pour les logs et les données analytiques non structurées.
-    \item \textit{"Comment gérez-vous les erreurs d'arrondi sur les montants ?"} \\
-    $\rightarrow$ Réponse : Utilisation du type \texttt{DECIMAL} en base de données et manipulation des montants en centimes (entiers) côté serveur avant conversion.
-\end{itemize}
-\end{jury}
 
 \section{Bilan de la réalisation}
 

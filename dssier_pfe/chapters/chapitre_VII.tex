@@ -38,177 +38,42 @@ La stratégie de tests de \textbf{My Smart Budget} suit la pyramide de tests ave
 L'exemple ci-dessous montre un test unitaire typique du service de calcul budgétaire. Il vérifie que les alertes sont déclenchées aux bons seuils et que les cas limites (budget à zéro, dépassement) sont correctement gérés :
 
 \begin{exemple}
-\textbf{Test unitaire du service de calcul budgétaire :}
+\textbf{Test unitaire — BudgetCalculatorService (cas nominaux et limites) :}
 \begin{lstlisting}[language=JavaScript]
 // tests/unit/services/budget-calculator.test.js
-const BudgetCalculatorService = require('../../../src/services/budget-calculator');
-const Transaction = require('../../../src/models/Transaction');
-const Budget = require('../../../src/models/Budget');
-
 describe('BudgetCalculatorService', () => {
-  let budgetCalculator;
-  let mockTransactionModel;
-  let mockBudgetModel;
-
   beforeEach(() => {
-    // Mocks des accès base de données (pg-promise)
-    mockTransactionModel = {
-      query: jest.fn(),  // pg-promise db.any()
-      queryOne: jest.fn() // pg-promise db.one()
-    };
-    mockBudgetModel = {
-      query: jest.fn(),
-      queryOne: jest.fn()
-    };
-    
-    budgetCalculator = new BudgetCalculatorService(
-      mockTransactionModel,
-      mockBudgetModel
-    );
+    mockBudgetModel  = { queryOne: jest.fn() };
+    mockTxModel      = { query: jest.fn(), find: jest.fn() };
+    svc = new BudgetCalculatorService(mockTxModel, mockBudgetModel);
   });
 
-  describe('calculateRemainingBudget', () => {
-    it('should calculate remaining budget correctly', async () => {
-      // Arrange
-      const budgetId = 1;
-      const userId = 42;
-      const budget = {
-        id: budgetId,
-        user_id: userId,
-        monthlyLimit: 500,
-        categoryId: 'cat789',
-        startDate: new Date('2024-01-01')
-      };
-      
-      const transactions = [
-        { amount: 50, type: 'expense', date: new Date('2024-01-05') },
-        { amount: 75, type: 'expense', date: new Date('2024-01-10') },
-        { amount: 25, type: 'expense', date: new Date('2024-01-15') }
-      ];
-      
-      mockBudgetModel.queryOne.mockResolvedValue(budget);
-      mockTransactionModel.find.mockResolvedValue(transactions);
-
-      // Act
-      const result = await budgetCalculator.calculateRemainingBudget(budgetId);
-
-      // Assert
-      expect(result).toEqual({
-        budgetId,
-        monthlyLimit: 500,
-        totalSpent: 150,
-        remaining: 350,
-        percentageUsed: 30,
-        status: 'healthy' // < 80% = healthy
-      });
-      
-      expect(mockTransactionModel.find).toHaveBeenCalledWith({
-        userId,
-        categoryId: 'cat789',
-        type: 'expense',
-        date: {
-          $gte: expect.any(Date),
-          $lte: expect.any(Date)
-        }
-      });
-    });
-
-    it('should return warning status when budget > 80%', async () => {
-      // Arrange
-      const budget = {
-        _id: 'budget123',
-        monthlyLimit: 100,
-        categoryId: 'cat789'
-      };
-      const transactions = [
-        { amount: 85, type: 'expense' }
-      ];
-      
-      mockBudgetModel.queryOne.mockResolvedValue(budget);
-      mockTransactionModel.find.mockResolvedValue(transactions);
-
-      // Act
-      const result = await budgetCalculator.calculateRemainingBudget('budget123');
-
-      // Assert
-      expect(result.percentageUsed).toBe(85);
-      expect(result.status).toBe('warning');
-    });
-
-    it('should return critical status when budget > 100%', async () => {
-      // Arrange
-      const budget = {
-        _id: 'budget123',
-        monthlyLimit: 100,
-        categoryId: 'cat789'
-      };
-      const transactions = [
-        { amount: 120, type: 'expense' }
-      ];
-      
-      mockBudgetModel.queryOne.mockResolvedValue(budget);
-      mockTransactionModel.find.mockResolvedValue(transactions);
-
-      // Act
-      const result = await budgetCalculator.calculateRemainingBudget('budget123');
-
-      // Assert
-      expect(result.percentageUsed).toBe(120);
-      expect(result.status).toBe('critical');
-      expect(result.remaining).toBe(-20);
-    });
-
-    it('should handle empty transactions', async () => {
-      // Arrange
-      mockBudgetModel.queryOne.mockResolvedValue({
-        id: 1,
-        monthly_limit: 500
-      });
-      mockTransactionModel.find.mockResolvedValue([]);
-
-      // Act
-      const result = await budgetCalculator.calculateRemainingBudget('budget123');
-
-      // Assert
-      expect(result.totalSpent).toBe(0);
-      expect(result.remaining).toBe(500);
-      expect(result.percentageUsed).toBe(0);
-      expect(result.status).toBe('healthy');
-    });
+  it('healthy si < 80 %', async () => {
+    mockBudgetModel.queryOne.mockResolvedValue({ id:1, monthly_limit:500 });
+    mockTxModel.find.mockResolvedValue([{amount:150}]);
+    const r = await svc.calculateRemainingBudget(1);
+    expect(r).toMatchObject({ totalSpent:150, remaining:350, status:'healthy' });
   });
 
-  describe('calculateResteAVivre', () => {
-    it('should calculate "reste à vivre" correctly', async () => {
-      // Arrange
-      const userId = 'user123';
-      const currentMonth = new Date();
-      
-      // Mock requête SQL agrégat
-      mockTransactionModel.query.mockResolvedValue([
-        { type: 'income', total: 2500 },
-        { type: 'expense', total: 1800 }
-      ]);
-      
-      mockBudgetModel.find.mockResolvedValue([
-        { monthlyLimit: 400, spent: 350 }, // Alimentation
-        { monthlyLimit: 200, spent: 180 }, // Transport
-        { monthlyLimit: 300, spent: 250 }  // Loisirs
-      ]);
+  it('warning si 80–100 %', async () => {
+    mockBudgetModel.queryOne.mockResolvedValue({ id:1, monthly_limit:100 });
+    mockTxModel.find.mockResolvedValue([{amount:85}]);
+    expect((await svc.calculateRemainingBudget(1)).status).toBe('warning');
+  });
 
-      // Act
-      const result = await budgetCalculator.calculateResteAVivre(userId);
+  it('critical et remaining négatif si > 100 %', async () => {
+    mockBudgetModel.queryOne.mockResolvedValue({ id:1, monthly_limit:100 });
+    mockTxModel.find.mockResolvedValue([{amount:120}]);
+    const r = await svc.calculateRemainingBudget(1);
+    expect(r).toMatchObject({ status:'critical', remaining:-20 });
+  });
 
-      // Assert
-      expect(result).toEqual({
-        totalIncome: 2500,
-        totalExpenses: 1800,
-        budgetedExpenses: 780, // 350 + 180 + 250
-        nonBudgetedExpenses: 1020, // 1800 - 780
-        resteAVivre: 700, // 2500 - 1800
-        dailyResteAVivre: expect.any(Number), // ~23.33
-        status: 'comfortable' // > 20% des revenus
-      });
-    });
+  it('reste à vivre = revenus - dépenses', async () => {
+    mockTxModel.query.mockResolvedValue([
+      { type:'income', total:2500 }, { type:'expense', total:1800 }
+    ]);
+    const r = await svc.calculateResteAVivre('user1');
+    expect(r.resteAVivre).toBe(700);
   });
 });
 \end{lstlisting}
@@ -220,6 +85,7 @@ Ces tests vérifient que le service de calcul se comporte correctement dans tous
 
 Les tests d'intégration valident que les couches communiquent bien entre elles. L'exemple suivant teste les endpoints de transactions de bout en bout, avec une vraie base de données de test :
 
+\iffalse % BLOC COMPRESSE — tests integration PostgreSQL
 \begin{exemple}
 \textbf{Tests d'intégration des endpoints critiques :}
 \begin{lstlisting}[language=JavaScript]
@@ -396,56 +262,74 @@ describe('Transactions API Integration Tests', () => {
 });
 \end{lstlisting}
 \end{exemple}
+\fi % fin bloc compressé
 
 \begin{exemple}
-\textbf{Tests d'intégration — Rapports analytiques (MongoDB/Mongoose) :}
+\textbf{Tests d'intégration — Transactions API (supertest + PostgreSQL réel) :}
 \begin{lstlisting}[language=JavaScript]
-// tests/integration/api/reports.test.js
-// Les rapports mensuels et logs d'audit sont stockes dans MongoDB
-const mongoose = require('mongoose');
-const MonthlyReport = require('../../../src/models/MonthlyReport');
-const AuditLog = require('../../../src/models/AuditLog');
-
-describe('Monthly Reports - MongoDB Integration', () => {
+describe('Transactions API', () => {
   beforeAll(async () => {
-    await mongoose.connect(process.env.MONGO_URI_TEST);
+    testUser = await db.one(
+      `INSERT INTO users(email,password_hash) VALUES($1,$2) RETURNING *`,
+      ['test@msb.com', await bcrypt.hash('Test123!@#', 12)]
+    );
+    authToken = jwt.sign({ userId: testUser.id }, process.env.JWT_SECRET);
+    testCategory = await db.one(
+      `INSERT INTO categories(name) VALUES('Alimentation') RETURNING *`
+    );
   });
-
   afterAll(async () => {
-    await MonthlyReport.deleteMany({});
-    await AuditLog.deleteMany({});
-    await mongoose.connection.close();
+    await db.none('DELETE FROM transactions; DELETE FROM categories; DELETE FROM users');
+    await db.$pool.end();
   });
 
-  it('should persist monthly report with category breakdown', async () => {
-    const report = await MonthlyReport.create({
-      userId: 42, // FK vers PostgreSQL users.id
-      period: { month: 1, year: 2025 },
-      metrics: {
-        totalExpenses: 1800,
-        savingsRate: 28,
-        categoryBreakdown: [
-          { categoryName: 'Alimentation', amount: 450, percentage: 25 },
-          { categoryName: 'Transport', amount: 180, percentage: 10 }
-        ]
-      }
-    });
-
-    expect(report._id).toBeDefined();
-    expect(report.metrics.categoryBreakdown).toHaveLength(2);
-    expect(report.metrics.savingsRate).toBe(28);
+  it('POST 201 — crée et persiste en base', async () => {
+    const res = await request(app).post('/api/transactions')
+      .set('Authorization', `Bearer ${authToken}`)
+      .send({ amount:45.50, type:'expense', category_id:testCategory.id,
+              description:'Courses', date: new Date().toISOString() })
+      .expect(201);
+    expect(res.body).toMatchObject({ amount:45.50, user_id:testUser.id });
+    expect(await db.oneOrNone('SELECT id FROM transactions WHERE id=$1',[res.body.id])).toBeTruthy();
   });
 
-  it('should log audit events for sensitive operations', async () => {
-    await AuditLog.create({
-      userId: 42,
-      action: 'LOGIN_SUCCESS',
-      metadata: { ip: '127.0.0.1', userAgent: 'Jest/Test' },
-      timestamp: new Date()
-    });
+  it('POST 400 — rejette injection SQL et données invalides', async () => {
+    await request(app).post('/api/transactions')
+      .set('Authorization', `Bearer ${authToken}`)
+      .send({ amount:"1; DROP TABLE transactions;--", type:'expense' }).expect(400);
+  });
 
-    const log = await AuditLog.findOne({ userId: 42, action: 'LOGIN_SUCCESS' });
-    expect(log).toBeTruthy();
+  it('GET 200 — liste paginée, isolation par utilisateur', async () => {
+    const res = await request(app).get('/api/transactions?page=1&limit=10')
+      .set('Authorization', `Bearer ${authToken}`).expect(200);
+    expect(res.body).toHaveProperty('pagination');
+    expect(res.body.data.map(t => t.amount)).not.toContain(999);
+  });
+});
+\end{lstlisting}
+\end{exemple}
+
+\begin{exemple}
+\textbf{Tests d'intégration — MongoDB (rapports analytiques + audit) :}
+\begin{lstlisting}[language=JavaScript]
+describe('MongoDB Integration', () => {
+  beforeAll(() => mongoose.connect(process.env.MONGO_URI_TEST));
+  afterAll(async () => { await MonthlyReport.deleteMany({}); await mongoose.connection.close(); });
+
+  it('persiste un rapport mensuel avec répartition par catégorie', async () => {
+    const r = await MonthlyReport.create({
+      userId: 42, period: { month: 1, year: 2025 },
+      metrics: { totalExpenses: 1800, savingsRate: 28,
+        categoryBreakdown: [{ categoryName:'Alimentation', amount:450 }] }
+    });
+    expect(r._id).toBeDefined();
+    expect(r.metrics.savingsRate).toBe(28);
+  });
+
+  it('log un événement audit LOGIN_SUCCESS', async () => {
+    await AuditLog.create({ userId:42, action:'LOGIN_SUCCESS',
+      metadata:{ ip:'127.0.0.1' }, timestamp: new Date() });
+    const log = await AuditLog.findOne({ userId:42, action:'LOGIN_SUCCESS' });
     expect(log.metadata.ip).toBe('127.0.0.1');
   });
 });
@@ -464,101 +348,34 @@ Les deux suites de tests s'exécutent en parallèle dans le pipeline CI/CD, chac
 \subsection{Tests End-to-End - Parcours utilisateur complets}
 
 \begin{exemple}
-\textbf{Test E2E Cypress - Parcours création de budget :}
+\textbf{Test E2E Cypress — Parcours budget (création, alertes 80\% et dépassement) :}
 \begin{lstlisting}[language=JavaScript]
-// cypress/e2e/budget-creation.cy.js
-describe('Budget Creation Flow', () => {
-  beforeEach(() => {
-    // Reset database et login
-    cy.task('db:seed');
-    cy.login('test@mysmartbudget.com', 'Test123!@#');
-    cy.visit('/budgets');
-  });
+describe('Budget Flow E2E', () => {
+  beforeEach(() => { cy.task('db:seed'); cy.login('test@msb.com', 'Test123!@#'); });
 
-  it('should create a new budget envelope successfully', () => {
-    // Vérifier la page des budgets
-    cy.contains('h1', 'Mes Enveloppes Budgétaires').should('be.visible');
-    
-    // Cliquer sur le bouton de création
+  it('crée une enveloppe et vérifie l\'affichage', () => {
+    cy.visit('/budgets');
     cy.get('[data-cy=create-budget-btn]').click();
-    
-    // Remplir le formulaire
     cy.get('[data-cy=budget-name]').type('Alimentation');
     cy.get('[data-cy=budget-amount]').type('400');
-    cy.get('[data-cy=budget-category]').select('Courses');
-    cy.get('[data-cy=budget-color]').click();
-    cy.get('[data-cy=color-green]').click();
-    
-    // Soumettre
     cy.get('[data-cy=submit-budget]').click();
-    
-    // Vérifier la création
-    cy.contains('.budget-card', 'Alimentation').within(() => {
-      cy.contains('400€').should('be.visible');
-      cy.contains('0% utilisé').should('be.visible');
-      cy.get('.progress-bar').should('have.css', 'width', '0px');
-    });
-    
-    // Vérifier la notification
-    cy.get('.notification-success')
-      .should('contain', 'Enveloppe créée avec succès')
-      .and('be.visible');
+    cy.contains('.budget-card', 'Alimentation').contains('0% utilisé').should('be.visible');
   });
 
-  it('should update budget status when adding transactions', () => {
-    // Créer un budget
-    cy.createBudget('Loisirs', 200);
-    
-    // Ajouter une transaction
-    cy.visit('/transactions');
-    cy.get('[data-cy=add-transaction]').click();
-    cy.get('[data-cy=amount]').type('50');
-    cy.get('[data-cy=category]').select('Loisirs');
-    cy.get('[data-cy=description]').type('Cinéma');
-    cy.get('[data-cy=submit-transaction]').click();
-    
-    // Retourner aux budgets
-    cy.visit('/budgets');
-    
-    // Vérifier la mise à jour
-    cy.contains('.budget-card', 'Loisirs').within(() => {
-      cy.contains('50€ / 200€').should('be.visible');
-      cy.contains('25% utilisé').should('be.visible');
-      cy.get('.progress-bar')
-        .should('have.css', 'background-color', 'rgb(76, 175, 80)'); // Vert
-    });
-  });
-
-  it('should show warning when budget exceeds 80%', () => {
+  it('passe en warning à 85%', () => {
     cy.createBudget('Transport', 100);
     cy.createTransaction(85, 'Transport', 'Essence');
-    
     cy.visit('/budgets');
-    cy.contains('.budget-card', 'Transport').within(() => {
-      cy.contains('85% utilisé').should('be.visible');
-      cy.get('.progress-bar')
-        .should('have.css', 'background-color', 'rgb(255, 152, 0)'); // Orange
-      cy.get('.warning-icon').should('be.visible');
-    });
+    cy.contains('.budget-card', 'Transport')
+      .find('.warning-icon').should('be.visible');
   });
 
-  it('should show critical alert when budget is exceeded', () => {
+  it('affiche alerte critique et dépassement à 120%', () => {
     cy.createBudget('Shopping', 150);
     cy.createTransaction(180, 'Shopping', 'Vêtements');
-    
     cy.visit('/budgets');
-    cy.contains('.budget-card', 'Shopping').within(() => {
-      cy.contains('120% utilisé').should('be.visible');
-      cy.contains('Dépassement: 30€').should('be.visible');
-      cy.get('.progress-bar')
-        .should('have.css', 'background-color', 'rgb(244, 67, 54)'); // Rouge
-      cy.get('.alert-icon').should('be.visible');
-    });
-    
-    // Vérifier la notification
-    cy.get('.notification-warning')
-      .should('contain', 'Budget Shopping dépassé de 30€')
-      .and('be.visible');
+    cy.contains('.budget-card', 'Shopping').contains('Dépassement: 30€').should('be.visible');
+    cy.get('.notification-warning').should('contain', 'Budget Shopping dépassé');
   });
 });
 \end{lstlisting}
@@ -605,170 +422,29 @@ describe('Budget Creation Flow', () => {
 Les tests de performance de My Smart Budget utilisent k6 pour simuler des charges réalistes correspondant aux pics d'utilisation mensuels (début de mois lors des imports bancaires).
 
 \begin{exemple}
-\textbf{Scénario de test de charge k6 - Import mensuel :}
+\textbf{Configuration k6 — seuils et scénario de charge mensuel :}
 \begin{lstlisting}[language=JavaScript]
 // k6/scenarios/monthly-import-spike.js
-import http from 'k6/http';
-import { check, sleep, group } from 'k6';
-import { SharedArray } from 'k6/data';
-import { Rate, Trend } from 'k6/metrics';
-
-// Métriques personnalisées
-const loginErrors = new Rate('login_errors');
-const importDuration = new Trend('import_duration');
-const dashboardLoad = new Trend('dashboard_load_time');
-
-// Données de test partagées
-const testUsers = new SharedArray('users', function() {
-  return JSON.parse(open('./test-users.json'));
-});
-
 export const options = {
   scenarios: {
-    // Simulation pic mensuel d'imports
     monthly_spike: {
       executor: 'ramping-arrival-rate',
-      startRate: 10,
-      timeUnit: '1s',
-      preAllocatedVUs: 50,
-      maxVUs: 200,
+      preAllocatedVUs: 50, maxVUs: 200,
       stages: [
-        { duration: '2m', target: 20 },  // Montée progressive
-        { duration: '3m', target: 100 }, // Pic d'activité
-        { duration: '5m', target: 100 }, // Maintien charge élevée
-        { duration: '2m', target: 20 },  // Redescente
-        { duration: '2m', target: 5 },   // Retour normal
+        { duration: '2m', target: 20 },  // montée
+        { duration: '5m', target: 100 }, // pic
+        { duration: '2m', target: 5 },   // descente
       ],
     }
   },
   thresholds: {
-    http_req_duration: ['p(95)<800', 'p(99)<2000'], // 95% < 800ms
-    http_req_failed: ['rate<0.05'],                  // < 5% erreurs
-    login_errors: ['rate<0.02'],                     // < 2% échecs login
-    import_duration: ['p(95)<5000'],                 // Import < 5s
-    dashboard_load_time: ['p(95)<2000'],             // Dashboard < 2s
+    http_req_duration: ['p(95)<800', 'p(99)<2000'],
+    http_req_failed:   ['rate<0.05'],
+    import_duration:   ['p(95)<5000'],
+    dashboard_load_time: ['p(95)<2000'],
   }
 };
-
-const BASE_URL = 'https://api.mysmartbudget.com';
-
-export default function() {
-  const user = testUsers[__VU % testUsers.length];
-  let authToken = null;
-
-  group('User Journey - Monthly Import', () => {
-    // 1. Login
-    group('Authentication', () => {
-      const loginRes = http.post(`${BASE_URL}/auth/login`, 
-        JSON.stringify({
-          email: user.email,
-          password: user.password
-        }), {
-          headers: { 'Content-Type': 'application/json' },
-          tags: { name: 'Login' }
-        }
-      );
-
-      const loginSuccess = check(loginRes, {
-        'login successful': (r) => r.status === 200,
-        'token received': (r) => r.json('accessToken') !== undefined,
-      });
-
-      if (!loginSuccess) {
-        loginErrors.add(1);
-        return; // Arrêt si échec login
-      }
-
-      authToken = loginRes.json('accessToken');
-    });
-
-    sleep(1);
-
-    // 2. Import CSV mensuel
-    group('CSV Import', () => {
-      const csvData = generateMonthlyTransactions(150); // 150 transactions
-      const importStart = new Date();
-
-      const importRes = http.post(`${BASE_URL}/import/csv`,
-        csvData, {
-          headers: {
-            'Authorization': `Bearer ${authToken}`,
-            'Content-Type': 'text/csv'
-          },
-          tags: { name: 'ImportCSV' },
-          timeout: '10s'
-        }
-      );
-
-      importDuration.add(new Date() - importStart);
-
-      check(importRes, {
-        'import successful': (r) => r.status === 200,
-        'transactions imported': (r) => r.json('imported') > 0,
-        'no errors': (r) => r.json('errors') === 0,
-        'import under 5s': (r) => r.timings.duration < 5000,
-      });
-    });
-
-    sleep(2);
-
-    // 3. Consultation dashboard
-    group('Dashboard Loading', () => {
-      const dashboardStart = new Date();
-
-      const dashboardRes = http.get(`${BASE_URL}/dashboard/summary`, {
-        headers: { 
-          'Authorization': `Bearer ${authToken}` 
-        },
-        tags: { name: 'DashboardLoad' }
-      });
-
-      dashboardLoad.add(new Date() - dashboardStart);
-
-      check(dashboardRes, {
-        'dashboard loaded': (r) => r.status === 200,
-        'has transactions': (r) => r.json('totalTransactions') > 0,
-        'has budgets': (r) => r.json('budgets') !== undefined,
-        'load under 2s': (r) => r.timings.duration < 2000,
-      });
-    });
-
-    sleep(3);
-
-    // 4. Vérification budgets
-    group('Budget Check', () => {
-      const budgetsRes = http.get(`${BASE_URL}/budgets`, {
-        headers: { 'Authorization': `Bearer ${authToken}` },
-        tags: { name: 'GetBudgets' }
-      });
-
-      check(budgetsRes, {
-        'budgets retrieved': (r) => r.status === 200,
-        'budget calculations correct': (r) => {
-          const budgets = r.json();
-          return budgets.every(b => b.remaining === b.limit - b.spent);
-        }
-      });
-    });
-  });
-
-  sleep(Math.random() * 5 + 5); // Pause entre utilisateurs
-}
-
-// Génération de transactions de test
-function generateMonthlyTransactions(count) {
-  const categories = ['Alimentation', 'Transport', 'Loisirs', 'Santé'];
-  let csv = 'date,amount,category,description,type\n';
-  
-  for (let i = 0; i < count; i++) {
-    const date = new Date(2024, 0, Math.floor(Math.random() * 28) + 1);
-    const amount = (Math.random() * 200 + 10).toFixed(2);
-    const category = categories[Math.floor(Math.random() * categories.length)];
-    csv += `${date.toISOString()},${amount},${category},Transaction ${i},expense\n`;
-  }
-  
-  return csv;
-}
+// Le scénario couvre : login → import CSV (150 tx) → dashboard → budgets
 \end{lstlisting}
 \end{exemple}
 
@@ -926,76 +602,25 @@ sonar.issue.ignore.multicriteria.e2.resourceKey=**/*.jsx
 \end{tcolorbox}
 
 \begin{exemple}
-\textbf{Exemple de refactoring suite à SonarQube :}
+\textbf{Refactoring SonarQube — complexité cognitive 21 → 8 :}
 \begin{lstlisting}[language=JavaScript]
-// AVANT : Complexité cognitive élevée (score: 21)
+// AVANT (score: 21) — boucle imbriquée 4 niveaux
+for (let i = 0; i < transactions.length; i++) {
+  if (tx.categoryId === budget.categoryId)
+    if (tx.type === 'expense')
+      if (tx.date >= start && tx.date <= end) { total += tx.amount; ... }
+}
+
+// APRÈS (score: 8) — décomposition en fonctions pures
 const calculateBudgetStatus = (budget, transactions) => {
-  let total = 0;
-  let status = 'healthy';
-  
-  for (let i = 0; i < transactions.length; i++) {
-    if (transactions[i].categoryId === budget.categoryId) {
-      if (transactions[i].type === 'expense') {
-        if (transactions[i].date >= budget.startDate && 
-            transactions[i].date <= budget.endDate) {
-          total += transactions[i].amount;
-          
-          if (total > budget.limit) {
-            status = 'critical';
-          } else if (total > budget.limit * 0.8) {
-            status = 'warning';
-          } else if (total > budget.limit * 0.5) {
-            status = 'normal';
-          }
-        }
-      }
-    }
-  }
-  
-  return { total, status, remaining: budget.limit - total };
-};
-
-// APRÈS : Complexité réduite (score: 8)
-const calculateBudgetStatus = (budget, transactions) => {
-  const relevantTransactions = filterRelevantTransactions(
-    transactions, 
-    budget
+  const relevant = transactions.filter(t =>
+    t.categoryId === budget.categoryId && t.type === 'expense' &&
+    t.date >= budget.startDate && t.date <= budget.endDate
   );
-  
-  const totalSpent = calculateTotalSpent(relevantTransactions);
-  const status = determineBudgetStatus(totalSpent, budget.limit);
-  
-  return {
-    total: totalSpent,
-    status,
-    remaining: budget.limit - totalSpent,
-    percentage: (totalSpent / budget.limit) * 100
-  };
-};
-
-const filterRelevantTransactions = (transactions, budget) => {
-  return transactions.filter(t => 
-    t.categoryId === budget.categoryId &&
-    t.type === 'expense' &&
-    isWithinDateRange(t.date, budget.startDate, budget.endDate)
-  );
-};
-
-const calculateTotalSpent = (transactions) => {
-  return transactions.reduce((sum, t) => sum + t.amount, 0);
-};
-
-const determineBudgetStatus = (spent, limit) => {
-  const percentage = (spent / limit) * 100;
-  
-  if (percentage > 100) return 'critical';
-  if (percentage > 80) return 'warning';
-  if (percentage > 50) return 'normal';
-  return 'healthy';
-};
-
-const isWithinDateRange = (date, start, end) => {
-  return date >= start && date <= end;
+  const totalSpent = relevant.reduce((s, t) => s + t.amount, 0);
+  const pct = (totalSpent / budget.limit) * 100;
+  return { totalSpent, remaining: budget.limit - totalSpent,
+    status: pct > 100 ? 'critical' : pct > 80 ? 'warning' : 'healthy' };
 };
 \end{lstlisting}
 \end{exemple}
@@ -1026,18 +651,32 @@ const isWithinDateRange = (date, start, end) => {
 \end{itemize}
 \end{tcolorbox}
 
+% Pipeline CI/CD détaillé dans le Chapitre 8
+
 \section{Pipeline CI/CD et automatisation}
 
-\begin{exemple}
-\textbf{GitHub Actions - Pipeline de qualité complet :}
-\begin{lstlisting}[language=yaml]
-# .github/workflows/quality-pipeline.yml
-name: Quality & Deployment Pipeline
-on:
-  push:
-    branches: [main, develop]
-  pull_request:
-    branches: [main]
+Le pipeline CI/CD de My Smart Budget est entièrement décrit au \textbf{Chapitre 8 — Déploiement et CI/CD}. En résumé, le pipeline GitHub Actions comprend 7 jobs (tests unitaires, intégration, SonarQube, E2E Cypress, performance k6, audit sécurité, déploiement) et s'exécute en moins de 15 minutes sur chaque push.
+
+\begin{tcolorbox}[colback=yellow!5!white,colframe=yellow!60!black,title=\textbf{Statistiques Pipeline CI/CD (Q4 2024)}]
+\begin{center}
+\begin{tabular}{|l|c|}
+\hline
+\textbf{Métrique} & \textbf{Valeur} \\
+\hline
+Builds totaux & 487 \\
+Taux de succès & 94.3\% \\
+Temps moyen pipeline & 12min 34s \\
+Tests exécutés par build & 684 \\
+Déploiements réussis & 142/147 (96.6\%) \\
+Code coverage moyen & 85.3\% \\
+Vulnérabilités bloquantes & 0 \\
+\hline
+\end{tabular}
+\end{center}
+\end{tcolorbox}
+
+% Pipeline YAML complet dans le chapitre 8
+\iffalse
 
 jobs:
   # Job 1: Tests unitaires et intégration
@@ -1272,6 +911,7 @@ Vulnérabilités bloquantes & 0 & → 0 \\
     \item \textbf{Lighthouse :} 1min 30s
 \end{itemize}
 \end{tcolorbox}
+\fi
 
 \section{Synthèse et plan d'amélioration}
 
@@ -1300,27 +940,3 @@ Vulnérabilités bloquantes & 0 & → 0 \\
 \end{enumerate}
 \end{tcolorbox}
 
-\section{Liens et ressources}
-
-\begin{itemize}
-    \item \textbf{Jest Documentation :} \url{https://jestjs.io/docs/getting-started}
-    \item \textbf{Cypress Best Practices :} \url{https://docs.cypress.io/guides/references/best-practices}
-    \item \textbf{k6 Performance Testing :} \url{https://k6.io/docs/}
-    \item \textbf{SonarQube Rules :} \url{https://rules.sonarsource.com/javascript}
-    \item \textbf{Lighthouse CI :} \url{https://github.com/GoogleChrome/lighthouse-ci}
-    \item \textbf{PostgreSQL Performance :} \url{https://www.postgresql.org/docs/current/performance-tips.html}
-\end{itemize}
-
-
-\begin{jury}
-\textbf{Questions fréquentes du jury :}
-\begin{itemize}
-    \item Quelle est votre couverture de code et comment la mesurez-vous ?
-    \item Comment assurez-vous la qualité en production ?
-    \item Vos tests sont-ils vraiment automatisés ?
-    \item Comment gérez-vous les régressions ?
-    \item Quels sont vos critères de performance ?
-    \item Comment testez-vous les cas d'erreur ?
-    \item Votre pipeline CI/CD est-il efficace ?
-\end{itemize}
-\end{jury}

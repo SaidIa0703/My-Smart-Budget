@@ -17,7 +17,6 @@ La conception d'\textbf{My Smart Budget} s'est déroulée en plusieurs étapes s
     \item \textbf{Validation :} Relecture globale avant implémentation.
 \end{enumerate}
 
-
 % ============================================================
 % USE CASES
 % ============================================================
@@ -50,15 +49,6 @@ Les interactions du système sont définies par trois acteurs principaux :
     \label{fig:usage_global}
 \end{figure}
 
-\begin{jury}
-\textbf{Points de vigilance contrôlés :}
-\begin{itemize}
-    \item Les cas d'usage critiques sont tous traçables vers des User Stories.
-    \item Les flux alternatifs (erreurs) sont documentés dans les critères d'acceptation.
-    \item La distinction des rôles (User vs Admin) est claire.
-\end{itemize}
-\end{jury}
-
 % ============================================================
 % DIAGRAMME DE CLASSES
 % ============================================================
@@ -69,7 +59,7 @@ Ce diagramme structure les données manipulées par l'application et sert de ré
 
 \begin{figure}[H]
     \centering
-    \safefig{chapters/assets/images/class-diagram-app-budget-v3.png}{0.95\textwidth}{class-diagram-app-budget-v3.png}
+    \safefig{chapters/assets/images/class-diagram.png}{0.95\textwidth}{class-diagram.png}
     \caption{Diagramme de classes UML détaillé — My Smart Budget}
     \label{fig:class-diagram}
 \end{figure}
@@ -229,7 +219,7 @@ Le modèle de données a été conçu selon la méthode Merise (MCD/MLD/MPD) pui
 
 \begin{figure}[H]
     \centering
-    \safefig{chapters/assets/images/mcd-app-budget-v3.png}{0.95\textwidth}{mcd-app-budget-v3.png}
+    \safefig{chapters/assets/images/mcd.png}{0.95\textwidth}{mcd.png}
     \caption{Modèle Conceptuel de Données (MCD) — entités et relations}
     \label{fig:mcd}
 \end{figure}
@@ -265,7 +255,7 @@ L'application repose sur une séparation stricte des responsabilités.
 
 \begin{figure}[H]
     \centering
-    \safefig{chapters/assets/images/arch-3tiers-app-budget-v3.png}{0.92\textwidth}{arch-3tiers-app-budget-v3.png}
+    \safefig{chapters/assets/images/arch-3tiers.png}{0.92\textwidth}{arch-3tiers.png}
     \caption{Architecture 3-tiers : Next.js (Front) — Express (Back) — PostgreSQL (Data)}
     \label{fig:arch-3tiers}
 \end{figure}

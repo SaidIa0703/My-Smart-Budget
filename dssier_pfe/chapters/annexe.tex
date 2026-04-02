@@ -131,7 +131,7 @@ Cette annexe regroupe l'ensemble des schémas, diagrammes et captures d'écran r
 
 \begin{figure}[H]
     \centering
-    \safefig{chapters/assets/images/class-diagram-app-budget-v3.png}{0.95\textwidth}{class-diagram-app-budget-v3.png}
+    \safefig{chapters/assets/images/class-diagram.png}{0.95\textwidth}{class-diagram.png}
     \caption{Diagramme de classes UML détaillé — My Smart Budget}
     \label{fig:class-diagram-ann}
 \end{figure}
@@ -175,14 +175,14 @@ Cette annexe regroupe l'ensemble des schémas, diagrammes et captures d'écran r
 
 \begin{figure}[H]
     \centering
-    \safefig{chapters/assets/images/mcd-app-budget-v3.png}{0.95\textwidth}{mcd-app-budget-v3.png}
+    \safefig{chapters/assets/images/mcd.png}{0.95\textwidth}{mcd.png}
     \caption{Modèle Conceptuel de Données (MCD) — entités et relations}
     \label{fig:mcd-ann}
 \end{figure}
 
 \begin{figure}[H]
     \centering
-    \safefig{chapters/assets/images/arch-3tiers-app-budget-v3.png}{0.95\textwidth}{arch-3tiers-app-budget-v3.png}
+    \safefig{chapters/assets/images/arch-3tiers.png}{0.95\textwidth}{arch-3tiers.png}
     \caption{Architecture 3-tiers : Next.js (Front) — Express (Back) — PostgreSQL (Data)}
     \label{fig:arch-3tiers-ann}
 \end{figure}
@@ -210,79 +210,145 @@ Cette annexe regroupe l'ensemble des schémas, diagrammes et captures d'écran r
 \end{figure}
 
 % ============================================================
-\section{Maquettes de l'interface — Questionnaire d'onboarding}
+\section{Diagrammes techniques complémentaires}
 % ============================================================
 
 \begin{figure}[H]
     \centering
-    \safefig{chapters/assets/images/question1.png}{0.7\textwidth}{question1.png}
-    \caption{Onboarding — Étape 1 : Profil Personnel (nom, âge, situation matrimoniale)}
-    \label{fig:maquette-onboarding-1-ann}
+    \safefig{chapters/assets/images/ERD.png}{0.95\textwidth}{ERD.png}
+    \caption{Diagramme Entité-Relation (ERD) — Modèle physique de la base de données PostgreSQL}
+    \label{fig:erd-ann}
 \end{figure}
 
 \begin{figure}[H]
     \centering
-    \safefig{chapters/assets/images/question2.png}{0.7\textwidth}{question2.png}
-    \caption{Onboarding — Étape 2 : Situation Professionnelle (statut, revenu mensuel)}
-    \label{fig:maquette-onboarding-2-ann}
-\end{figure}
-
-\begin{figure}[H]
-    \centering
-    \safefig{chapters/assets/images/question3.png}{0.7\textwidth}{question3.png}
-    \caption{Onboarding — Étape 3 : Composition Familiale (enfants à charge, type de logement)}
-    \label{fig:maquette-onboarding-3-ann}
-\end{figure}
-
-\begin{figure}[H]
-    \centering
-    \safefig{chapters/assets/images/question4.png}{0.7\textwidth}{question4.png}
-    \caption{Onboarding — Étape 4 : Vos Objectifs financiers (dernière étape)}
-    \label{fig:maquette-onboarding-4-ann}
+    \safefig{chapters/assets/images/seq-import-csv.png}{0.95\textwidth}{seq-import-csv.png}
+    \caption{Diagramme de séquence — Flux d'import de transactions via fichier CSV}
+    \label{fig:seq-import-csv-ann}
 \end{figure}
 
 % ============================================================
-\section{Maquettes de l'interface — Profils et budgets}
+\section{Maquettes haute fidélité — Authentification}
 % ============================================================
 
 \begin{figure}[H]
     \centering
-    \safefig{chapters/assets/images/profilgen.png}{0.7\textwidth}{profilgen.png}
-    \caption{Sélection du profil prédéfini (Célibataire, En couple, Famille, Retraité(e), Étudiant(e))}
-    \label{fig:maquette-profils-liste-ann}
+    \begin{minipage}{0.48\textwidth}
+        \centering
+        \safefig{chapters/assets/images/Connexion (Desktop).png}{\textwidth}{Connexion (Desktop).png}
+        \caption{Écran de connexion haute fidélité — Desktop}
+        \label{fig:hifi-login-desktop-ann}
+    \end{minipage}\hfill
+    \begin{minipage}{0.48\textwidth}
+        \centering
+        \safefig{chapters/assets/images/Connexion - Fidèle à la capture.png}{\textwidth}{Connexion - Fidèle à la capture.png}
+        \caption{Écran de connexion — Version finale fidèle à l'implémentation}
+        \label{fig:hifi-login-fid-ann}
+    \end{minipage}
 \end{figure}
 
 \begin{figure}[H]
     \centering
-    \safefig{chapters/assets/images/profil1.png}{0.7\textwidth}{profil1.png}
-    \caption{Budget recommandé — Profil Jeune Célibataire (28 ans, 2\,500\,€/mois)}
-    \label{fig:maquette-budget-celibataire-ann}
+    \safefig{chapters/assets/images/Inscription (Desktop).png}{0.75\textwidth}{Inscription (Desktop).png}
+    \caption{Écran d'inscription haute fidélité — Création de compte (Desktop)}
+    \label{fig:hifi-register-ann}
+\end{figure}
+
+% ============================================================
+\section{Maquettes haute fidélité — Onboarding}
+% ============================================================
+
+\begin{figure}[H]
+    \centering
+    \begin{minipage}{0.48\textwidth}
+        \centering
+        \safefig{chapters/assets/images/Onboarding - Profil (Desktop).png}{\textwidth}{Onboarding - Profil (Desktop).png}
+        \caption{Onboarding haute fidélité — Étape 1 : Profil personnel}
+        \label{fig:hifi-onboarding-profil-ann}
+    \end{minipage}\hfill
+    \begin{minipage}{0.48\textwidth}
+        \centering
+        \safefig{chapters/assets/images/Onboarding - Revenus (Desktop).png}{\textwidth}{Onboarding - Revenus (Desktop).png}
+        \caption{Onboarding haute fidélité — Étape 2 : Situation professionnelle et revenus}
+        \label{fig:hifi-onboarding-revenus-ann}
+    \end{minipage}
 \end{figure}
 
 \begin{figure}[H]
     \centering
-    \safefig{chapters/assets/images/profil2.png}{0.7\textwidth}{profil2.png}
-    \caption{Budget recommandé — Profil Famille Mariée (42 ans, 3\,500\,€/mois, 2 enfants)}
-    \label{fig:maquette-budget-famille-ann}
+    \safefig{chapters/assets/images/Onboarding - Objectifs (Desktop).png}{0.75\textwidth}{Onboarding - Objectifs (Desktop).png}
+    \caption{Onboarding haute fidélité — Étape finale : Objectifs financiers}
+    \label{fig:hifi-onboarding-objectifs-ann}
+\end{figure}
+
+% ============================================================
+\section{Maquettes haute fidélité — Dashboard}
+% ============================================================
+
+\begin{figure}[H]
+    \centering
+    \safefig{chapters/assets/images/Dashboard (Desktop).png}{0.92\textwidth}{Dashboard (Desktop).png}
+    \caption{Dashboard haute fidélité — Vue principale (Desktop)}
+    \label{fig:hifi-dashboard-ann}
 \end{figure}
 
 \begin{figure}[H]
     \centering
-    \safefig{chapters/assets/images/profil3.png}{0.7\textwidth}{profil3.png}
-    \caption{Budget recommandé — Profil Retraité(e) (68 ans, 1\,800\,€/mois)}
-    \label{fig:maquette-budget-retraite-ann}
+    \safefig{chapters/assets/images/Dashboard (MSB Desktop).png}{0.92\textwidth}{Dashboard (MSB Desktop).png}
+    \caption{Dashboard My Smart Budget — Vue complète avec graphiques et activité récente}
+    \label{fig:hifi-dashboard-msb-ann}
+\end{figure}
+
+% ============================================================
+\section{Maquettes haute fidélité — Transactions}
+% ============================================================
+
+\begin{figure}[H]
+    \centering
+    \safefig{chapters/assets/images/Transactions (Desktop).png}{0.92\textwidth}{Transactions (Desktop).png}
+    \caption{Page Transactions haute fidélité — Liste et filtres (Desktop)}
+    \label{fig:hifi-transactions-ann}
 \end{figure}
 
 \begin{figure}[H]
     \centering
-    \safefig{chapters/assets/images/profiletudiant.png}{0.7\textwidth}{profiletudiant.png}
-    \caption{Budget recommandé — Profil Étudiant(e) (22 ans, 800\,€/mois)}
-    \label{fig:maquette-budget-etudiant-ann}
+    \safefig{chapters/assets/images/Transactions (MSB Desktop).png}{0.92\textwidth}{Transactions (MSB Desktop).png}
+    \caption{Page Transactions My Smart Budget — Vue détaillée avec historique}
+    \label{fig:hifi-transactions-msb-ann}
+\end{figure}
+
+% ============================================================
+\section{Maquettes haute fidélité — Budget}
+% ============================================================
+
+\begin{figure}[H]
+    \centering
+    \safefig{chapters/assets/images/Budget (Desktop).png}{0.92\textwidth}{Budget (Desktop).png}
+    \caption{Page Budget haute fidélité — Catégories et barres de progression (Desktop)}
+    \label{fig:hifi-budget-ann}
 \end{figure}
 
 \begin{figure}[H]
     \centering
-    \safefig{chapters/assets/images/tabBudget.png}{0.95\textwidth}{tabBudget.png}
-    \caption{Tableau comparatif des budgets par profil (Célibataire, Famille, Retraité(e), Étudiant(e))}
-    \label{fig:maquette-tableau-comparatif-ann}
+    \safefig{chapters/assets/images/Budget (MSB Desktop).png}{0.92\textwidth}{Budget (MSB Desktop).png}
+    \caption{Page Budget My Smart Budget — Vue complète avec alertes visuelles}
+    \label{fig:hifi-budget-msb-ann}
+\end{figure}
+
+% ============================================================
+\section{Maquettes haute fidélité — Objectifs et Profil}
+% ============================================================
+
+\begin{figure}[H]
+    \centering
+    \safefig{chapters/assets/images/Objectifs (Desktop).png}{0.85\textwidth}{Objectifs (Desktop).png}
+    \caption{Page Objectifs financiers haute fidélité — Projets d'épargne (Desktop)}
+    \label{fig:hifi-objectifs-ann}
+\end{figure}
+
+\begin{figure}[H]
+    \centering
+    \safefig{chapters/assets/images/Profil (Desktop).png}{0.85\textwidth}{Profil (Desktop).png}
+    \caption{Page Profil utilisateur haute fidélité — Informations, statistiques et offre Premium}
+    \label{fig:hifi-profil-ann}
 \end{figure}

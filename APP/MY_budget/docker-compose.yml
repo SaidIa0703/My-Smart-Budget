@@ -53,6 +53,7 @@ services:
       DB_PASSWORD: smart_password
       DB_NAME: smart_budget
       MONGO_URI: mongodb://smart_user:smart_password@mongodb:27017/smart_budget?authSource=admin
+      CORS_ORIGIN: https://smarterbudget.net
     depends_on:
       postgres:
         condition: service_healthy

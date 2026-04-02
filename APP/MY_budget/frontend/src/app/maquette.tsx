@@ -75,16 +75,17 @@ const MySmartBudget = () => {
   // ✅ CORRECTION 2 : redirect vers /login si pas connecté + vérification questionnaire
   useEffect(() => {
     if (typeof globalThis.window === 'undefined') return;
-    const userData = localStorage.getItem('user');
+    const userData = sessionStorage.getItem('user');
     if (!userData) {
       globalThis.location.href = '/login';
       return;
     }
     const parsedUser = JSON.parse(userData);
     setUser(parsedUser);
-    const questionnaireDone = localStorage.getItem('questionnaire_done');
+    const questionnaireDoneKey = `questionnaire_done_${parsedUser.id}`;
+    const questionnaireDone = localStorage.getItem(questionnaireDoneKey);
     if (questionnaireDone) {
-      const savedAnswers = localStorage.getItem('questionnaire_answers');
+      const savedAnswers = localStorage.getItem(`questionnaire_answers_${parsedUser.id}`);
       if (savedAnswers) setQuestionnaireAnswers(JSON.parse(savedAnswers));
       setScreen('dashboard');
     } else {
@@ -94,8 +95,10 @@ const MySmartBudget = () => {
 
   // ✅ Questionnaire terminé → page d'accueil
   const handleQuestionnaireComplete = (answers: any) => {
-    localStorage.setItem('questionnaire_done', 'true');
-    localStorage.setItem('questionnaire_answers', JSON.stringify(answers));
+    if (user?.id) {
+      localStorage.setItem(`questionnaire_done_${user.id}`, 'true');
+      localStorage.setItem(`questionnaire_answers_${user.id}`, JSON.stringify(answers));
+    }
     setQuestionnaireAnswers(answers);
     setScreen('welcome');
   };
@@ -128,7 +131,8 @@ const MySmartBudget = () => {
   }, [currentPage]);
 
   const logout = () => {
-    localStorage.clear();
+    sessionStorage.removeItem('token');
+    sessionStorage.removeItem('user');
     globalThis.location.href = '/login';
   };
 
@@ -179,8 +183,8 @@ const MySmartBudget = () => {
   };
 
   const calculateStats = () => {
-    const revenus = transactions.filter(t => t.amount > 0).reduce((sum, t) => sum + t.amount, 0);
-    const depenses = Math.abs(transactions.filter(t => t.amount < 0).reduce((sum, t) => sum + t.amount, 0));
+    const revenus = transactions.filter(t => Number(t.amount) > 0).reduce((sum, t) => sum + Number(t.amount), 0);
+    const depenses = Math.abs(transactions.filter(t => Number(t.amount) < 0).reduce((sum, t) => sum + Number(t.amount), 0));
     const solde = revenus - depenses;
     return { revenus, depenses, solde };
   };

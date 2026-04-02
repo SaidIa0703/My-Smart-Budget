@@ -41,7 +41,7 @@ router.get('/:userId', async (req, res) =>{
 router.delete('/:id', async (req, res) => {
     try{
         const {id} = req.params;
-        await db.one('DELETE FROM transactions WHERE id = $1', [id]);
+        await db.none('DELETE FROM transactions WHERE id = $1', [id]);
         res.json({message : 'Transaction supprimée'});
     }catch(error){
         console.error('Error', error);

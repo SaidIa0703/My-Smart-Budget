@@ -223,7 +223,7 @@ const MySmartBudget = () => {
       <div className="min-h-screen bg-gradient-to-br from-gray-50 via-indigo-50 to-purple-50 flex items-center justify-center">
         <div className="text-center">
           <div className="inline-block animate-spin text-4xl mb-4">⏳</div>
-          <p className="text-gray-500 font-medium">Chargement...</p>
+          <p className="text-violet-500 font-medium">Chargement...</p>
         </div>
       </div>
     );
@@ -383,15 +383,15 @@ const MySmartBudget = () => {
                   {getCategoryIcon(transaction.amount, transaction.category)}
                 </div>
                 <div>
-                  <p className="font-semibold text-gray-800">{transaction.name}</p>
-                  <p className="text-sm text-gray-500">{transaction.category}</p>
+                  <p className="font-semibold text-slate-900">{transaction.name}</p>
+                  <p className="text-sm text-violet-500">{transaction.category}</p>
                 </div>
               </div>
               <div className="text-right">
                 <p className={`font-bold text-lg ${transaction.amount > 0 ? 'text-green-500' : 'text-red-500'}`}>
                   {transaction.amount > 0 ? '+' : ''}€{Math.abs(transaction.amount).toFixed(2)}
                 </p>
-                <p className="text-sm text-gray-500">{new Date(transaction.date).toLocaleDateString('fr-FR')}</p>
+                <p className="text-sm text-violet-500">{new Date(transaction.date).toLocaleDateString('fr-FR')}</p>
               </div>
             </div>
           ))}
@@ -485,7 +485,7 @@ const MySmartBudget = () => {
                 onClick={() => setSearchText('')}
                 className="absolute right-4 top-1/2 transform -translate-y-1/2 p-2 hover:bg-gray-200 rounded-lg"
               >
-                <X size={20} className="text-gray-600" />
+                <X size={20} className="text-indigo-600" />
               </button>
             )}
           </div>
@@ -526,13 +526,13 @@ const MySmartBudget = () => {
           {loading ? (
             <div className="text-center py-12">
               <div className="inline-block animate-spin">⏳</div>
-              <p className="text-gray-500 mt-2">Chargement des transactions...</p>
+              <p className="text-violet-500 mt-2">Chargement des transactions...</p>
             </div>
           ) : filteredTransactions.length === 0 ? (
             <div className="text-center py-12 bg-gradient-to-br from-gray-50 to-gray-100 rounded-2xl">
-              <Search size={48} className="mx-auto text-gray-400 mb-4" />
-              <h3 className="text-xl font-bold text-gray-700 mb-2">Aucune transaction trouvée</h3>
-              <p className="text-gray-600 mb-4">
+              <Search size={48} className="mx-auto text-indigo-400 mb-4" />
+              <h3 className="text-xl font-bold text-indigo-900 mb-2">Aucune transaction trouvée</h3>
+              <p className="text-indigo-600 mb-4">
                 {searchText ? `Aucune transaction ne correspond à "${searchText}"` : 'Ajoute ta première transaction!'}
               </p>
               {(searchText || filterCategory) && (
@@ -556,8 +556,8 @@ const MySmartBudget = () => {
                     {getCategoryIcon(transaction.amount, transaction.category)}
                   </div>
                   <div className="flex-1">
-                    <p className="font-bold text-gray-800 text-lg">{transaction.name}</p>
-                    <p className="text-sm text-gray-500">{transaction.category} • {new Date(transaction.date).toLocaleDateString('fr-FR')}</p>
+                    <p className="font-bold text-slate-900 text-lg">{transaction.name}</p>
+                    <p className="text-sm text-violet-500">{transaction.category} • {new Date(transaction.date).toLocaleDateString('fr-FR')}</p>
                   </div>
                 </div>
                 <div className="flex items-center gap-4">
@@ -604,8 +604,8 @@ const MySmartBudget = () => {
                     <div className="flex items-center gap-3">
                       <span className="text-3xl">{category.icon}</span>
                       <div>
-                        <p className="font-bold text-gray-800">{category.name}</p>
-                        <p className="text-sm text-gray-500">€{category.spent.toFixed(2)} / €{category.budget}</p>
+                        <p className="font-bold text-slate-900">{category.name}</p>
+                        <p className="text-sm text-violet-500">€{category.spent.toFixed(2)} / €{category.budget}</p>
                       </div>
                     </div>
                     <div className={`text-sm font-bold px-3 py-1 rounded-full ${
@@ -628,7 +628,7 @@ const MySmartBudget = () => {
                   </div>
                   {selectedCategory === i && (
                     <div className="mt-4 pt-4 border-t border-gray-200 animate-slideDown">
-                      <p className="text-sm text-gray-600">Budget restant: <span className="font-bold text-green-600">€{Math.max(0, category.budget - category.spent).toFixed(2)}</span></p>
+                      <p className="text-sm text-indigo-600">Budget restant: <span className="font-bold text-green-600">€{Math.max(0, category.budget - category.spent).toFixed(2)}</span></p>
                     </div>
                   )}
                 </div>
@@ -645,7 +645,7 @@ const MySmartBudget = () => {
       <div className="bg-white rounded-3xl p-6 shadow-xl border border-gray-100 text-center py-12">
         <Target size={48} className="mx-auto mb-4 text-indigo-600" />
         <h3 className="text-2xl font-bold mb-2">Pas d'objectifs encore</h3>
-        <p className="text-gray-600 mb-6">Crée tes premiers objectifs d'épargne</p>
+        <p className="text-indigo-600 mb-6">Crée tes premiers objectifs d'épargne</p>
         <button className="px-6 py-3 bg-gradient-to-r from-indigo-600 to-purple-600 text-white rounded-2xl font-medium">
           + Créer un Objectif
         </button>
@@ -660,8 +660,8 @@ const MySmartBudget = () => {
           <div className="w-32 h-32 bg-gradient-to-br from-indigo-500 to-purple-500 rounded-full flex items-center justify-center text-white text-4xl font-bold mb-4 shadow-2xl animate-bounce">
             {user?.name ? user.name.split(' ').map(n => n[0]).join('') : 'U'}
           </div>
-          <h3 className="text-2xl font-bold text-gray-800">{user?.name}</h3>
-          <p className="text-gray-500">{user?.email}</p>
+          <h3 className="text-2xl font-bold text-slate-900">{user?.name}</h3>
+          <p className="text-violet-500">{user?.email}</p>
         </div>
         <div className="space-y-4">
           {[
@@ -676,11 +676,11 @@ const MySmartBudget = () => {
               style={{ animationDelay: `${i * 75}ms` }}
             >
               <div className="flex items-center gap-3">
-                <item.icon size={20} className="text-gray-600 group-hover:text-indigo-600 transition-colors" />
-                <span className="font-medium text-gray-800">{item.label}</span>
+                <item.icon size={20} className="text-indigo-600 group-hover:text-indigo-600 transition-colors" />
+                <span className="font-medium text-slate-900">{item.label}</span>
               </div>
               <div className="flex items-center gap-2">
-                {item.value && <span className="text-sm text-gray-500">{item.value}</span>}
+                {item.value && <span className="text-sm text-violet-500">{item.value}</span>}
               </div>
             </button>
           ))}
@@ -720,7 +720,7 @@ const MySmartBudget = () => {
               <span className="absolute top-1 right-1 w-2 h-2 bg-red-500 rounded-full animate-pulse"></span>
             </button>
             <div className="hidden md:flex items-center gap-2">
-              <span className="text-sm font-medium text-gray-700">{user?.name || 'User'}</span>
+              <span className="text-sm font-medium text-indigo-900">{user?.name || 'User'}</span>
               <div className="w-10 h-10 bg-gradient-to-br from-indigo-500 to-purple-500 rounded-xl flex items-center justify-center text-white font-bold shadow-lg">
                 {user?.name ? user.name.split(' ').map(n => n[0]).join('') : 'U'}
               </div>
@@ -748,11 +748,11 @@ const MySmartBudget = () => {
         </aside>
 
         <main className="flex-1">
-          {currentPage === 'dashboard' && <DashboardPage />}
-          {currentPage === 'transactions' && <TransactionsPage />}
-          {currentPage === 'budget' && <BudgetPage />}
-          {currentPage === 'goals' && <GoalsPage />}
-          {currentPage === 'profile' && <ProfilePage />}
+          {currentPage === 'dashboard' && DashboardPage()}
+          {currentPage === 'transactions' && TransactionsPage()}
+          {currentPage === 'budget' && BudgetPage()}
+          {currentPage === 'goals' && GoalsPage()}
+          {currentPage === 'profile' && ProfilePage()}
         </main>
       </div>
     </div>

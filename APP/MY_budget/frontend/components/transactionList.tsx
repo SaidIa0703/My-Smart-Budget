@@ -14,7 +14,7 @@ export default function TransactionList() {
   const fetchTransactions = async () => {
     try {
       const user = JSON.parse(localStorage.getItem('user') || '{}');
-      const response = await fetch(`http://localhost:5001/api/transactions/${user.id}`);
+      const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/transactions/${user.id}`);
       
       if (response.ok) {
         const data = await response.json();
@@ -28,7 +28,7 @@ export default function TransactionList() {
 
   const handleDelete = async (id: number) => {
     try {
-      const response = await fetch(`http://localhost:5001/api/transactions/${id}`, {
+      const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/transactions/${id}`, {
         method: 'DELETE'
       });
 

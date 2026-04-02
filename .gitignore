@@ -62,7 +62,7 @@ Thumbs.db
 !fonts/
 !fonts/*.ttf
 **/node_modules/
-APP/MY_budget/frontend/package-lock.json
+# package-lock.json tracked for CI
 **/.next/
 **/.env
 **/.env.*

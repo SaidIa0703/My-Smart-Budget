@@ -706,27 +706,14 @@ Couverture code maintenue & 85.3\% & > 80\% & ✅ \\
 \subsection{Documentation API avec OpenAPI}
 
 \begin{exemple}
-\textbf{Spécification OpenAPI pour My Smart Budget :}
+\textbf{Extrait OpenAPI 3.0 — My Smart Budget API (3 endpoints représentatifs) :}
 \begin{lstlisting}[language=yaml]
 openapi: 3.0.3
 info:
   title: My Smart Budget API
-  description: API de gestion budgétaire personnelle
   version: 1.0.0
-  contact:
-    email: support@mysmartbudget.com
-  license:
-    name: MIT
-    url: https://opensource.org/licenses/MIT
-
 servers:
   - url: https://api.mysmartbudget.com/v1
-    description: Production
-  - url: https://staging-api.mysmartbudget.com/v1
-    description: Staging
-  - url: http://localhost:3001/v1
-    description: Development
-
 security:
   - bearerAuth: []
 
@@ -744,363 +731,87 @@ paths:
               type: object
               required: [email, password, firstName, lastName]
               properties:
-                email:
-                  type: string
-                  format: email
-                  example: user@example.com
-                password:
-                  type: string
-                  format: password
-                  minLength: 12
-                  pattern: '^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]+'
-                firstName:
-                  type: string
-                  minLength: 2
-                  maxLength: 50
-                lastName:
-                  type: string
-                  minLength: 2
-                  maxLength: 50
+                email: { type: string, format: email }
+                password: { type: string, minLength: 12 }
+                firstName: { type: string }
+                lastName: { type: string }
       responses:
-        '201':
-          description: Utilisateur créé avec succès
-          content:
-            application/json:
-              schema:
-                type: object
-                properties:
-                  userId:
-                    type: string
-                    format: uuid
-                  message:
-                    type: string
-        '400':
-          $ref: '#/components/responses/BadRequest'
-        '409':
-          description: Email déjà utilisé
+        '201': { description: Utilisateur créé }
+        '400': { $ref: '#/components/responses/BadRequest' }
+        '409': { description: Email déjà utilisé }
 
   /transactions:
     get:
-      summary: Liste des transactions
+      summary: Liste paginée des transactions
       tags: [Transactions]
       parameters:
-        - name: page
-          in: query
-          schema:
-            type: integer
-            minimum: 1
-            default: 1
-        - name: limit
-          in: query
-          schema:
-            type: integer
-            minimum: 1
-            maximum: 100
-            default: 50
-        - name: startDate
-          in: query
-          schema:
-            type: string
-            format: date
-        - name: endDate
-          in: query
-          schema:
-            type: string
-            format: date
-        - name: category_id
-          in: query
-          schema:
-            type: integer
-        - name: type
-          in: query
-          schema:
-            type: string
-            enum: [income, expense]
+        - { name: page, in: query, schema: { type: integer, default: 1 } }
+        - { name: limit, in: query, schema: { type: integer, default: 50 } }
+        - { name: type, in: query, schema: { type: string, enum: [income, expense] } }
       responses:
-        '200':
-          description: Liste paginée des transactions
-          content:
-            application/json:
-              schema:
-                type: object
-                properties:
-                  data:
-                    type: array
-                    items:
-                      $ref: '#/components/schemas/Transaction'
-                  pagination:
-                    $ref: '#/components/schemas/Pagination'
-    
+        '200': { description: Liste paginée }
     post:
       summary: Créer une transaction
       tags: [Transactions]
-      requestBody:
-        required: true
-        content:
-          application/json:
-            schema:
-              $ref: '#/components/schemas/TransactionInput'
       responses:
-        '201':
-          description: Transaction créée
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/Transaction'
-        '400':
-          $ref: '#/components/responses/BadRequest'
+        '201': { description: Transaction créée }
 
   /budgets/{budgetId}/status:
     get:
       summary: Statut d'un budget
       tags: [Budgets]
       parameters:
-        - name: budgetId
-          in: path
-          required: true
-          schema:
-            type: string
+        - { name: budgetId, in: path, required: true, schema: { type: string } }
       responses:
         '200':
-          description: Statut du budget
+          description: Statut avec projection fin de mois
           content:
             application/json:
               schema:
-                type: object
                 properties:
-                  budgetId:
-                    type: string
-                  monthlyLimit:
-                    type: number
-                  totalSpent:
-                    type: number
-                  remaining:
-                    type: number
-                  percentageUsed:
-                    type: number
-                  status:
-                    type: string
-                    enum: [healthy, warning, critical]
-                  projection:
-                    type: object
-                    properties:
-                      endOfMonthEstimate:
-                        type: number
-                      willExceed:
-                        type: boolean
+                  status: { type: string, enum: [healthy, warning, critical] }
+                  percentageUsed: { type: number }
+                  remaining: { type: number }
 
 components:
   schemas:
     Transaction:
       type: object
       properties:
-        id:
-          type: integer
-        user_id:
-          type: integer
-        amount:
-          type: number
-          format: double
-          minimum: 0
-        type:
-          type: string
-          enum: [income, expense]
-        category_id:
-          type: integer
-        description:
-          type: string
-          maxLength: 200
-        date:
-          type: string
-          format: date-time
-        createdAt:
-          type: string
-          format: date-time
-        updatedAt:
-          type: string
-          format: date-time
-
-    TransactionInput:
-      type: object
-      required: [amount, type, category_id, date]
-      properties:
-        amount:
-          type: number
-          format: double
-          minimum: 0.01
-          maximum: 1000000
-        type:
-          type: string
-          enum: [income, expense]
-        category_id:
-          type: integer
-        description:
-          type: string
-          maxLength: 200
-        date:
-          type: string
-          format: date
-
-    Pagination:
-      type: object
-      properties:
-        page:
-          type: integer
-        limit:
-          type: integer
-        total:
-          type: integer
-        pages:
-          type: integer
-
+        id: { type: integer }
+        amount: { type: number, minimum: 0 }
+        type: { type: string, enum: [income, expense] }
+        category_id: { type: integer }
+        date: { type: string, format: date-time }
   securitySchemes:
     bearerAuth:
       type: http
       scheme: bearer
       bearerFormat: JWT
-
-  responses:
-    BadRequest:
-      description: Requête invalide
-      content:
-        application/json:
-          schema:
-            type: object
-            properties:
-              error:
-                type: string
-              details:
-                type: array
-                items:
-                  type: object
-                  properties:
-                    field:
-                      type: string
-                    message:
-                      type: string
 \end{lstlisting}
 \end{exemple}
 
 \subsection{Monitoring et observabilité}
 
-\begin{exemple}
-\textbf{Stack de monitoring (docker-compose.monitoring.yml) :}
-\begin{lstlisting}[language=yaml]
-version: '3.8'
-
-services:
-  # Prometheus pour métriques
-  prometheus:
-    image: prom/prometheus:v2.47.2
-    container_name: msb-prometheus
-    ports:
-      - "9090:9090"
-    volumes:
-      - ./monitoring/prometheus.yml:/etc/prometheus/prometheus.yml
-      - prometheus_data:/prometheus
-    command:
-      - '--config.file=/etc/prometheus/prometheus.yml'
-      - '--storage.tsdb.retention.time=30d'
-      - '--web.enable-lifecycle'
-    networks:
-      - monitoring
-
-  # Grafana pour visualisation
-  grafana:
-    image: grafana/grafana:10.2.2
-    container_name: msb-grafana
-    ports:
-      - "3002:3000"
-    environment:
-      - GF_SECURITY_ADMIN_USER=admin
-      - GF_SECURITY_ADMIN_PASSWORD=${GRAFANA_PASSWORD}
-      - GF_INSTALL_PLUGINS=grafana-postgresql-datasource
-    volumes:
-      - grafana_data:/var/lib/grafana
-      - ./monitoring/grafana/dashboards:/etc/grafana/provisioning/dashboards
-      - ./monitoring/grafana/datasources:/etc/grafana/provisioning/datasources
-    networks:
-      - monitoring
-    depends_on:
-      - prometheus
-
-  # Loki pour logs
-  loki:
-    image: grafana/loki:2.9.3
-    container_name: msb-loki
-    ports:
-      - "3100:3100"
-    volumes:
-      - ./monitoring/loki-config.yaml:/etc/loki/local-config.yaml
-      - loki_data:/loki
-    command: -config.file=/etc/loki/local-config.yaml
-    networks:
-      - monitoring
-
-  # Promtail pour collecte de logs
-  promtail:
-    image: grafana/promtail:2.9.3
-    container_name: msb-promtail
-    volumes:
-      - /var/log:/var/log:ro
-      - ./logs:/app/logs:ro
-      - ./monitoring/promtail-config.yaml:/etc/promtail/config.yml
-    command: -config.file=/etc/promtail/config.yml
-    networks:
-      - monitoring
-    depends_on:
-      - loki
-
-  # Node Exporter pour métriques système
-  node-exporter:
-    image: prom/node-exporter:v1.7.0
-    container_name: msb-node-exporter
-    ports:
-      - "9100:9100"
-    volumes:
-      - /proc:/host/proc:ro
-      - /sys:/host/sys:ro
-      - /:/rootfs:ro
-    command:
-      - '--path.procfs=/host/proc'
-      - '--path.sysfs=/host/sys'
-      - '--collector.filesystem.mount-points-exclude=^/(sys|proc|dev|host|etc)($$|/)'
-    networks:
-      - monitoring
-
-  # MongoDB Exporter
-  mongodb-exporter:
-    image: percona/mongodb_exporter:0.39
-    container_name: msb-mongodb-exporter
-    ports:
-      - "9216:9216"
-    environment:
-      - MONGODB_URI=mongodb://${MONGO_ROOT_USER}:${MONGO_ROOT_PASSWORD}@mongodb:27017
-    networks:
-      - monitoring
-
-  # Uptime Kuma pour monitoring synthétique
-  uptime-kuma:
-    image: louislam/uptime-kuma:1.23.11
-    container_name: msb-uptime
-    ports:
-      - "3003:3001"
-    volumes:
-      - uptime_data:/app/data
-    networks:
-      - monitoring
-
-networks:
-  monitoring:
-    driver: bridge
-
-volumes:
-  prometheus_data:
-  grafana_data:
-  loki_data:
-  uptime_data:
-\end{lstlisting}
-\end{exemple}
+\begin{tcolorbox}[colback=blue!5!white,colframe=blue!60!black,title=\textbf{Stack de monitoring — services déployés}]
+\small
+\begin{center}
+\begin{tabular}{|l|l|l|}
+\hline
+\textbf{Service} & \textbf{Image} & \textbf{Rôle} \\
+\hline
+Prometheus & prom/prometheus:v2.47.2 & Collecte des métriques (scrape 15s) \\
+Grafana & grafana/grafana:10.2.2 & Dashboards et alertes visuelles \\
+Loki & grafana/loki:2.9.3 & Agrégation des logs applicatifs \\
+Promtail & grafana/promtail:2.9.3 & Agent de collecte des logs \\
+Node Exporter & prom/node-exporter:v1.7.0 & Métriques système (CPU, RAM, disque) \\
+MongoDB Exporter & percona/mongodb\_exporter:0.39 & Métriques MongoDB vers Prometheus \\
+Uptime Kuma & louislam/uptime-kuma:1.23.11 & Monitoring synthétique et SLA \\
+\hline
+\end{tabular}
+\end{center}
+Tous les services partagent un réseau Docker \texttt{monitoring} isolé avec volumes persistants.
+\end{tcolorbox}
 
 \subsection{Dashboards et alertes}
 
@@ -1143,146 +854,7 @@ Disk usage & 42\% & > 80\% & ✅ \\
 
 \subsection{Runbook opérationnel}
 
-\begin{exemple}
-\textbf{Runbook My Smart Budget (extraits) :}
-\begin{lstlisting}[language=markdown]
-# My Smart Budget - Runbook Opérationnel
-
-## 1. Architecture Overview
-- **Frontend:** Next.js sur AWS EC2 (smarterbudget.net)
-- **Backend:** Node.js/Express sur AWS EC2
-- **Database:** PostgreSQL 16 + MongoDB 7 (Docker)
-- **Proxy:** Nginx (reverse proxy + SSL)
-- **Monitoring:** Grafana + Prometheus + UptimeKuma
-
-## 2. Procédures de démarrage
-
-### Démarrage local (développement)
-```bash
-# Cloner le repository
-git clone https://github.com/mysmartbudget/app.git
-cd app
-
-# Installer les dépendances
-npm install --prefix backend
-npm install --prefix frontend
-
-# Copier les variables d'environnement
-cp backend/.env.example backend/.env
-cp frontend/.env.example frontend/.env
-
-# Démarrer avec Docker Compose
-docker-compose up -d
-
-# Vérifier le statut
-docker-compose ps
-curl http://localhost:3001/health
-```
-
-### Vérifications de santé
-```bash
-# Backend health check
-curl https://api.mysmartbudget.com/health
-
-# MongoDB status
-mongosh $MONGODB_URI --eval "db.adminCommand('ping')"
-
-# PostgreSQL check
-pg_isready -h localhost -U smart_user -d smart_budget
-```
-
-## 3. Procédures d'urgence
-
-### Incident: API Down
-1. Vérifier le status sur https://status.mysmartbudget.com
-2. Consulter les logs: `render logs --service api --tail 100`
-3. Redémarrer le service: `render restart --service api`
-4. Si persistant, rollback: `render deploy --service api --commit LAST_KNOWN_GOOD`
-
-### Incident: Database Connection Issues
-1. Vérifier le conteneur MongoDB: `docker ps | grep mongodb`
-2. Check connection string: `echo $MONGODB_URI`
-3. Test connection: `mongosh $MONGODB_URI`
-4. Si connection pool épuisé:
-   ```javascript
-   // Augmenter temporairement le pool
-   // Augmenter le pool pg-promise
-   const pgp = pgPromise({ poolSize: 20 });
-   ```
-
-### Incident: Haute latence
-1. Identifier l'endpoint lent dans Grafana
-2. Vérifier les index MongoDB:
-   ```javascript
-   db.transactions.getIndexes()
-   // Si index manquant:
-   db.transactions.createIndex({ userId: 1, date: -1 })
-   ```
-3. Vérifier les index PostgreSQL: `EXPLAIN ANALYZE SELECT ...`
-4. Scale horizontalement si nécessaire
-
-## 4. Procédures de maintenance
-
-### Backup PostgreSQL + MongoDB (automatique + manuel)
-```bash
-# Backup PostgreSQL
-pg_dump -U smart_user smart_budget > backup_pg_$(date +%Y%m%d_%H%M%S).sql
-
-# Backup MongoDB
-mongodump --uri="$MONGO_URI" --out=backup_mongo_$(date +%Y%m%d_%H%M%S)
-
-# Restauration PostgreSQL
-psql -U smart_user smart_budget < backup_pg_20240115_143022.sql
-```
-
-### Rotation des logs
-```bash
-# Logs applicatifs (Winston)
-find /app/logs -name "*.log" -mtime +30 -delete
-
-# Archivage
-tar -czf logs_archive_$(date +%Y%m).tar.gz /app/logs/*.log
-aws s3 cp logs_archive_*.tar.gz s3://mysmartbudget-archives/logs/
-```
-
-### Mise à jour des dépendances
-```bash
-# Scan des vulnérabilités
-npm audit --prefix backend
-npm audit --prefix frontend
-
-# Mise à jour sécurisée
-npm update --save --prefix backend
-npm update --save --prefix frontend
-
-# Test après mise à jour
-npm test --prefix backend
-npm test --prefix frontend
-```
-
-## 5. Contacts d'urgence
-
-| Rôle | Contact | Téléphone | Priorité |
-|------|---------|-----------|----------|
-| Lead Dev | A. Saidi | +33 6 XX XX XX XX | P1-P2 |
-| DevOps | B. Martin | +33 6 XX XX XX XX | P1-P3 |
-| MongoDB Support | Support | -- | P1 only |
-| Render Support | support@render.com | -- | P1-P2 |
-
-## 6. Post-Mortem Template
-
-### Incident: [TITRE]
-- **Date:** YYYY-MM-DD HH:MM
-- **Durée:** XX minutes
-- **Impact:** XX utilisateurs affectés
-- **Cause racine:** Description
-- **Résolution:** Actions prises
-- **Actions correctives:** 
-  - [ ] Action 1
-  - [ ] Action 2
-- **Lessons learned:** Points d'amélioration
-\end{lstlisting}
-\end{exemple}
+Un runbook complet est maintenu dans le repository (\texttt{docs/runbook.md}). Il couvre les procédures de démarrage, les vérifications de santé, les incidents courants (API down, latence élevée, connexion base de données) et les procédures de backup automatisées via \texttt{pg\_dump} (PostgreSQL) et \texttt{mongodump} (MongoDB). La rotation des logs applicatifs (Winston) est configurée avec archivage S3 après 30 jours.
 
 \section{Métriques de déploiement et performance}
 
@@ -1345,27 +917,3 @@ Utilisation mémoire & 45\% & → stable \\
 Cela permet à n'importe quel développeur ou opérateur de comprendre rapidement comment intervenir si un problème survient, grâce à une documentation opérationnelle complète et à des dashboards toujours à jour.
 \end{tcolorbox}
 
-\section{Liens et ressources}
-
-\begin{itemize}
-    \item \textbf{Repository GitHub :} \url{https://github.com/SaidIa0703/My-Smart-Budget}
-    \item \textbf{Documentation API :} \url{https://api.mysmartbudget.com/docs}
-    \item \textbf{Status Page :} \url{https://status.mysmartbudget.com}
-    \item \textbf{Grafana Dashboards :} \url{https://grafana.mysmartbudget.com}
-    \item \textbf{Docker Hub :} \url{https://hub.docker.com/u/abedel}
-    \item \textbf{Runbook complet :} \url{https://docs.mysmartbudget.com/ops}
-\end{itemize}
-
-
-\begin{jury}
-\textbf{Questions fréquentes du jury :}
-\begin{itemize}
-    \item Comment gérez-vous les déploiements sans interruption ?
-    \item Votre pipeline CI/CD est-il totalement automatisé ?
-    \item Comment surveillez-vous la production ?
-    \item Quelle est votre stratégie de rollback ?
-    \item Comment gérez-vous les secrets ?
-    \item Vos images Docker sont-elles sécurisées ?
-    \item Quel est votre MTTR en cas d'incident ?
-\end{itemize}
-\end{jury}

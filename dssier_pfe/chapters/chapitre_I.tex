@@ -204,53 +204,6 @@ Jest coverage report + SonarQube analysis &
 \end{tabular}
 \end{tcolorbox}
 
-% === NOUVEAU : Détail de l'instrumentation technique ===
-\begin{tcolorbox}[colback=gray!5!white,colframe=gray!60!black,title=\textbf{Instrumentation technique des KPI}]
-\textbf{KPI 1 — Adoption (utilisateurs actifs) :}
-\begin{lstlisting}[language=JavaScript]
-// MongoDB (Mongoose) : Tracking des connexions utilisateur
-await User.findByIdAndUpdate(userId, {
-  $set: { lastLogin: new Date() },
-  $inc: { loginCount: 1 }
-});
-
-// Requête d'analyse hebdomadaire (utilisateurs actifs)
-const activeUsers = await User.countDocuments({
-  lastLogin: { $gte: new Date(Date.now() - 7*24*60*60*1000) }
-});
-\end{lstlisting}
-
-\textbf{KPI 2 — Dépassements budgétaires :}
-\begin{lstlisting}[language=SQL]
--- Requête PostgreSQL pour tracker les dépassements
-SELECT 
-  COUNT(*) as overspend_count,
-  EXTRACT(MONTH FROM created_at) as month
-FROM alerts 
-WHERE type = 'budget_exceeded' 
-  AND user_id = ?
-GROUP BY month;
-\end{lstlisting}
-
-\textbf{KPI 3 — Satisfaction (collecte in-app) :}
-\begin{lstlisting}[language=JavaScript]
-// Endpoint API pour feedback
-app.post('/api/feedback', async (req, res) => {
-  const { userId, score, comment } = req.body;
-  await Feedback.create({ userId, score, comment, timestamp: new Date() });
-  // Calcul automatique du NPS
-  const nps = await calculateNPS();
-  await Analytics.track('feedback_submitted', { userId, score, nps });
-});
-\end{lstlisting}
-
-\textbf{KPI 4 — Performance (monitoring temps réel) :}
-\begin{itemize}
-    \item \textbf{Frontend :} Performance Observer API + envoi métriques à l'API
-    \item \textbf{Backend :} Middleware Express mesurant response time
-    \item \textbf{Infrastructure :} New Relic APM + alertes Slack si P95 $>$ 2s
-\end{itemize}
-\end{tcolorbox}
 
 % ========================
 % === DIAGRAMME CONTEXTE AMÉLIORÉ ===

@@ -106,26 +106,25 @@ Afin de garantir la livraison d'un MVP (Minimum Viable Product) fonctionnel dans
 \subsection{Fonctionnalités incluses}
 
 \begin{description}
-    \item[Authentification :] Inscription, connexion JWT (24h), hashage Bcrypt.
-    \item[Gestion Profil :] Modification informations, changement mot de passe, suppression compte.
-    \item[Transactions :] Saisie manuelle, catégorisation, filtres avancés.
+    \item[Authentification :] Inscription, connexion JWT (7 jours), hashage Bcrypt.
+    \item[Gestion Profil :] Modification informations, suppression compte, conformité RGPD.
+    \item[Transactions :] Saisie manuelle, catégorisation, transactions récurrentes.
     \item[Enveloppes :] Définition de plafonds par catégorie, calcul "reste à vivre".
-    \item[Dashboard :] Graphiques dynamiques (Recharts), KPIs financiers.
-    \item[Import/Export :] Traitement fichiers CSV, export JSON.
+    \item[Dashboard :] Graphiques dynamiques (Recharts), KPIs financiers connectés à l'API.
 \end{description}
 
 \begin{tcolorbox}[colback=yellow!5!white,colframe=yellow!60!black,title=\textbf{Suivi de projet GitHub — Données réelles}]
-\textbf{État du Backlog (Janvier 2025) :}
+\textbf{État du Backlog (Avril 2026) :}
 \begin{itemize}
-    \item \textbf{Total Issues :} 47 créées depuis le lancement.
-    \item \textbf{Done :} 34 issues complétées (72\%).
-    \item \textbf{In Progress :} 3 issues (Auth Refactor, Optim Dashboard).
-    \item \textbf{Milestone MVP v1.0 :} 27/40 issues critiques terminées.
+    \item \textbf{Total Issues :} 23 créées depuis le lancement.
+    \item \textbf{Done :} 9 issues complétées (39\%).
+    \item \textbf{In Progress :} 6 issues (Enveloppes, Dashboard API, Profil RGPD).
+    \item \textbf{Milestone M1 MVP :} 2/8 issues critiques terminées (US-03, EPIC-02).
 \end{itemize}
 
-\textbf{Exemple d'Issue (US-02) :}
+\textbf{Exemple d'Issue (US-03) :}
 \textit{"En tant qu'utilisateur, je veux créer/éditer une transaction pour suivre mes dépenses."} \\
-$\rightarrow$ Status : \textbf{Closed} | PR : \#127 | Effort : 8 pts.
+$\rightarrow$ Status : \textbf{Closed} | Issue : \#15 | Effort : 3 SP.
 \end{tcolorbox}
 
 \section{Cibles et Personae}
@@ -153,9 +152,9 @@ Deux profils types ont guidé la conception de l'expérience utilisateur (UX).
 \begin{enumerate}
     \item [$\boxtimes$] Le formulaire demande Email + Mot de passe.
     \item [$\boxtimes$] Le mot de passe est vérifié via \texttt{bcrypt.compare()}.
-    \item [$\boxtimes$] Un Token JWT est généré (expiration 24h) au succès.
+    \item [$\boxtimes$] Un Token JWT est généré (expiration 7 jours) au succès.
     \item [$\boxtimes$] Redirection vers \texttt{/dashboard}.
-    \item [$\boxtimes$] Blocage après 3 tentatives échouées (Rate Limiting).
+    \item [$\boxtimes$] Toutes les routes protégées vérifient le token (middleware JWT).
 \end{enumerate}
 \end{tcolorbox}
 

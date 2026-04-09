@@ -100,17 +100,17 @@ Bien que travaillant seul, je me suis astreint à des rituels stricts pour maint
     \item \textbf{Sprint Retrospective (30 min / 14j)} : Analyse du processus ("How to work better?").
 \end{itemize}
 
-\begin{tcolorbox}[colback=yellow!5!white,colframe=yellow!60!black,title=\textbf{Exemple concret : Sprint du 14/02/2025}]
+\begin{tcolorbox}[colback=yellow!5!white,colframe=yellow!60!black,title=\textbf{Exemple concret : Sprint du 14/02/2026}]
 \textbf{Lors de la Sprint Review :}
-J'ai présenté la fonctionnalité \textit{"Import CSV"}. Un bug critique a été détecté sur le mapping des catégories.
+J'ai présenté la fonctionnalité \textit{"CRUD Transactions"}. Un bug a été détecté sur la route DELETE (utilisation de \texttt{db.one} au lieu de \texttt{db.none} sur une requête sans retour).
 \begin{itemize}
-    \item[$\rightarrow$] \textbf{Action :} Création immédiate de l'issue \#37 \textit{"Fix CSV Category Mapping"} priorisée dans le Sprint suivant.
+    \item[$\rightarrow$] \textbf{Action :} Correction immédiate et fermeture de l'issue \#15 \textit{"US-03 – CRUD Transactions catégorisées"} avec commentaire de résolution.
 \end{itemize}
 
 \textbf{Lors de la Rétrospective :}
-J'ai noté une hétérogénéité dans la description de mes Pull Requests.
+J'ai noté des URLs hardcodées (\texttt{localhost:5001}) dans le frontend, incompatibles avec la production.
 \begin{itemize}
-    \item[$\rightarrow$] \textbf{Action :} Mise en place d'un template PR obligatoire (\texttt{.github/pull\_request\_template.md}) incluant une checklist de qualité.
+    \item[$\rightarrow$] \textbf{Action :} Remplacement systématique par \texttt{process.env.NEXT\_PUBLIC\_API\_URL} et déploiement automatique via CI/CD.
 \end{itemize}
 \end{tcolorbox}
 
@@ -139,14 +139,14 @@ Code Coverage & $> 70\%$ (Backend Jest) & Sprint Review \\
 
 Ces métriques montrent que le projet avance à un rythme stable et que la qualité est suivie dans le temps.
 
-\begin{tcolorbox}[colback=green!5!white,colframe=green!60!black,title=\textbf{Extrait réel du rapport de Sprint 3}]
+\begin{tcolorbox}[colback=green!5!white,colframe=green!60!black,title=\textbf{Extrait réel du rapport de Sprint POC (02/04/2026)}]
 \begin{verbatim}
-## Sprint 3 (01/02/2025 - 14/02/2025)
-- Velocity: 9 issues fermées (Cible: 8) [OK]
-- Lead Time: 2.4 jours/issue [OK]
-- CI Success (main): 12/12 builds [OK]
-- Bugs Prod: 1 mineur (#41) corrigé en S4
-- Coverage Jest: 78% Lines / 71% Branches
+## Sprint POC (19/03/2026 - 02/04/2026)
+- Issues fermées: 8 (#7, #13, #15, #21, #23, #28, #29, #30)
+- Lead Time: 2.1 jours/issue [OK]
+- CI Success (main): pipeline vert (build + deploy + SonarCloud)
+- Bugs Prod: 2 corrigés (CORS www/non-www, JWT_SECRET manquant)
+- Déploiement: smarterbudget.net opérationnel en HTTPS
 \end{verbatim}
 \end{tcolorbox}
 
@@ -159,21 +159,21 @@ Ces métriques montrent que le projet avance à un rythme stable et que la quali
 
 \subsection{Roadmap et Milestones}
 
-Le projet est jalonné par 4 étapes majeures (Milestones GitHub), avec des critères d'entrée (DoR) et de sortie (DoD) stricts.
+Le projet est jalonné par 4 Milestones GitHub, chacune avec des critères d'entrée (DoR) et de sortie (DoD) stricts. Le jalon POC est livré ; les trois suivants constituent la roadmap active.
 
 \begin{center}
 \small
-\begin{tabular}{|l|c|p{6cm}|}
+\begin{tabular}{|l|c|l|p{4.5cm}|}
 \hline
-\textbf{Jalon} & \textbf{Date Cible} & \textbf{Livrable Principal} \\
+\textbf{Jalon} & \textbf{Date} & \textbf{Statut} & \textbf{Livrable Principal} \\
 \hline
-\textbf{POC} & 02/04/2026 & Backend Node.js + Connexion DB. Première route API. \\
+\textbf{POC} & 02/04/2026 & \textcolor{green!60!black}{Livré} & Backend Node.js, connexion PostgreSQL + MongoDB, première route API. \\
 \hline
-\textbf{MVP (v1.0)} & 16/04/2026 & Auth JWT, CRUD complet, Dashboard v1. \\
+\textbf{M1 — MVP (v1.0)} & 16/04/2026 & \textcolor{orange}{En cours} & Auth JWT, CRUD Transactions, Enveloppes budgétaires, Dashboard connecté API. \\
 \hline
-\textbf{Bêta (v1.1)} & 30/04/2026 & Import CSV, Alertes, CI/CD complet. \\
+\textbf{M2 — Bêta (v1.1)} & 30/04/2026 & \textcolor{gray}{Backlog} & Import CSV, Export JSON, Dashboard analytique avancé, SonarCloud $>$ 80\%. \\
 \hline
-\textbf{Finale (v2.0)} & 15/05/2026 & Export PDF, Optimisations Perf, Documentation finale. \\
+\textbf{v2.0 — Finale} & 15/05/2026 & \textcolor{gray}{Backlog} & Notifications budgétaires (80\%/100\%), Backoffice admin, Documentation finale. \\
 \hline
 \end{tabular}
 \end{center}

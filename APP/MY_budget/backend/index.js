@@ -1,157 +1,85 @@
 const express = require('express');
 const cors = require('cors');
-const { db, connectMongo, testPostgres } = require('./db');
+const authMiddleware = require('./middleware/auth');
+const { connectMongo, testPostgres } = require('./db');
 const authRoutes = require('./routes/auth');
 const profileRoutes = require('./routes/profile');
 const transactionsRoutes = require('./routes/transactions');
+
 const app = express();
 
-// Middleware
+// Sécurité de base
 app.disable('x-powered-by');
+
+// CORS
 const allowedOrigins = process.env.CORS_ORIGIN
   ? [process.env.CORS_ORIGIN, `https://www.${process.env.CORS_ORIGIN.replace('https://', '')}`]
   : ['http://localhost:3000'];
+
 app.use(cors({
   origin: allowedOrigins,
   methods: ['GET', 'POST', 'PUT', 'DELETE'],
   allowedHeaders: ['Content-Type', 'Authorization'],
 }));
-app.use('/api/profile', profileRoutes);
+
+// Parsing JSON — doit être avant toutes les routes
 app.use(express.json());
-app.use('/api/transactions', transactionsRoutes);
+
+// Routes
 app.use('/api/auth', authRoutes);
+app.use('/api/profile', profileRoutes);
+app.use('/api/transactions', transactionsRoutes);
 
-// Connecter MongoDB et PostgreSQL au démarrage
-connectMongo();
-testPostgres();
-
-// ===== ROUTES POSTGRESQL =====
-
-// GET toutes les transactions
-app.get('/api/transactions', async (req, res) => {
-  try {
-    const transactions = await db.query('SELECT * FROM transactions ORDER BY created_at DESC');
-    res.json(transactions);
-  } catch (err) {
-    console.error('Erreur:', err);
-    res.status(500).json({ error: err.message });
-  }
-});
-
-// POST une nouvelle transaction
-app.post('/api/transactions', async (req, res) => {
-  const { user_id, label, amount, type } = req.body;
-  try {
-    const transaction = await db.one(
-      'INSERT INTO transactions (user_id, label, amount, type, created_at) VALUES ($1, $2, $3, $4, NOW()) RETURNING *',
-      [user_id || 1, label, amount, type]
-    );
-    res.status(201).json(transaction);
-  } catch (err) {
-    console.error('Erreur:', err);
-    res.status(500).json({ error: err.message });
-  }
-});
-
-// DELETE une transaction
-app.delete('/api/transactions/:id', async (req, res) => {
-  try {
-    await db.query('DELETE FROM transactions WHERE id = $1', [req.params.id]);
-    res.json({ message: 'Transaction supprimée' });
-  } catch (err) {
-    console.error('Erreur:', err);
-    res.status(500).json({ error: err.message });
-  }
-});
-
-// GET budgets
-app.get('/api/budgets', async (req, res) => {
-  try {
-    const budgets = await db.query('SELECT * FROM budgets ORDER BY created_at DESC');
-    res.json(budgets);
-  } catch (err) {
-    console.error('Erreur:', err);
-    res.status(500).json({ error: err.message });
-  }
-});
-
-// POST un nouveau budget
-app.post('/api/budgets', async (req, res) => {
-  const { user_id, category, limit } = req.body;
-  try {
-    const budget = await db.one(
-      'INSERT INTO budgets (user_id, category, limit, created_at) VALUES ($1, $2, $3, NOW()) RETURNING *',
-      [user_id || 1, category, limit]
-    );
-    res.status(201).json(budget);
-  } catch (err) {
-    console.error('Erreur:', err);
-    res.status(500).json({ error: err.message });
-  }
-});
-
-// ===== ROUTES MONGODB =====
-
-// GET tous les reports
-app.get('/api/reports', async (req, res) => {
+// Reports MongoDB (protégé)
+app.get('/api/reports', authMiddleware, async (req, res) => {
   try {
     const Report = require('./models/report');
-    const reports = await Report.find().sort({ createdAt: -1 });
+    const reports = await Report.find({ userId: req.user.userId }).sort({ createdAt: -1 });
     res.json(reports);
   } catch (err) {
-    console.error('Erreur:', err);
+    console.error('Erreur reports:', err);
     res.status(500).json({ error: err.message });
   }
 });
 
-// POST un nouveau report
-app.post('/api/reports', async (req, res) => {
+app.post('/api/reports', authMiddleware, async (req, res) => {
   try {
     const Report = require('./models/report');
-    const { userId, title, description, data, type } = req.body;
-    const report = new Report({ userId, title, description, data, type });
+    const { title, description, data, type } = req.body;
+    const report = new Report({ userId: req.user.userId, title, description, data, type });
     await report.save();
     res.status(201).json(report);
   } catch (err) {
-    console.error('Erreur:', err);
+    console.error('Erreur reports:', err);
     res.status(500).json({ error: err.message });
   }
 });
 
-// GET statistiques
-app.get('/api/stats', async (req, res) => {
-  try {
-    const transactions = await db.query('SELECT type, COUNT(*) as count, SUM(amount) as total FROM transactions GROUP BY type');
-    res.json(transactions);
-  } catch (err) {
-    console.error('Erreur:', err);
-    res.status(500).json({ error: err.message });
-  }
-});
-
-// Health check
-app.get('/health', (req, res) => {
+// Health check (public)
+app.get('/health', (_req, res) => {
   res.status(200).json({ status: 'OK', timestamp: new Date() });
 });
 
-// Route racine
-app.get('/', (req, res) => {
+// Route racine (public)
+app.get('/', (_req, res) => {
   res.json({
     message: 'Smart Budget API',
     endpoints: {
+      auth: '/api/auth',
       transactions: '/api/transactions',
-      budgets: '/api/budgets',
+      profile: '/api/profile',
       reports: '/api/reports',
-      stats: '/api/stats',
       health: '/health',
     },
   });
 });
 
-// Démarrer le serveur
+// Connexion aux bases de données
+connectMongo();
+testPostgres();
+
 const PORT = process.env.PORT || 5001;
 app.listen(PORT, () => {
-  console.log(`🚀 Serveur lancé sur le port ${PORT}`);
+  console.log(`Serveur lancé sur le port ${PORT}`);
   console.log(`http://localhost:${PORT}`);
 });
-

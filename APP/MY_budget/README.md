@@ -1,36 +1,124 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# Smart Budget — Application de gestion budgétaire
 
-## Getting Started
+Application web fullstack de gestion de budget personnel permettant de suivre ses revenus, dépenses et d'analyser ses habitudes financières.
 
-First, run the development server:
+## Stack technique
 
-```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
+| Couche | Technologie |
+|--------|------------|
+| Frontend | Next.js 15, React, TypeScript, Tailwind CSS |
+| Backend | Node.js, Express |
+| Base de données relationnelle | PostgreSQL (transactions, utilisateurs, budgets) |
+| Base de données documents | MongoDB (rapports, analytics) |
+| Authentification | JWT (jsonwebtoken + bcryptjs) |
+| Infrastructure | Docker, Docker Compose, Nginx |
+
+## Architecture
+
+```
+┌─────────────────────────────────┐
+│  Frontend Next.js (port 3000)   │
+├─────────────────────────────────┤
+│  Nginx (reverse proxy)          │
+├─────────────────────────────────┤
+│  Backend Express (port 5001)    │
+├─────────────────┬───────────────┤
+│  PostgreSQL     │  MongoDB      │
+└─────────────────┴───────────────┘
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+## Lancer le projet
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+### Avec Docker (recommandé)
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+```bash
+docker-compose up --build
+```
 
-## Learn More
+L'application est accessible sur `http://localhost:3000`.
 
-To learn more about Next.js, take a look at the following resources:
+### En développement local
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+**Backend**
+```bash
+cd backend
+npm install
+cp .env.example .env   # remplir les variables
+npm run dev
+```
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+**Frontend**
+```bash
+cd frontend
+npm install
+npm run dev
+```
 
-## Deploy on Vercel
+## Variables d'environnement
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+Créer un fichier `.env` dans `backend/` :
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+```env
+PORT=5001
+JWT_SECRET=votre_secret_jwt_fort
+DATABASE_URL=postgresql://user:password@localhost:5432/smartbudget
+MONGO_URI=mongodb://localhost:27017/smartbudget
+CORS_ORIGIN=http://localhost:3000
+```
+
+## API — Endpoints principaux
+
+Toutes les routes (sauf `/api/auth/*` et `/health`) nécessitent un header `Authorization: Bearer <token>`.
+
+| Méthode | Route | Description |
+|---------|-------|-------------|
+| POST | `/api/auth/register` | Inscription |
+| POST | `/api/auth/login` | Connexion |
+| GET | `/api/transactions` | Transactions de l'utilisateur connecté |
+| POST | `/api/transactions/add` | Ajouter une transaction |
+| PUT | `/api/transactions/:id` | Modifier une transaction |
+| DELETE | `/api/transactions/:id` | Supprimer une transaction |
+| GET | `/api/transactions/stats` | Statistiques du mois en cours |
+| GET | `/api/profile` | Profil de l'utilisateur connecté |
+| POST | `/api/profile/save` | Sauvegarder le profil |
+| GET | `/api/reports` | Rapports de l'utilisateur connecté |
+| GET | `/health` | Health check |
+
+## Sécurité
+
+- Mots de passe hachés avec **bcrypt** (salt rounds : 10)
+- Authentification par **JWT** (expiration 7 jours)
+- Middleware d'authentification sur toutes les routes protégées
+- Protection **IDOR** : vérification de la propriété des ressources avant toute modification ou suppression
+- **CORS** restreint aux origines autorisées
+- Header `X-Powered-By` désactivé
+
+## Tests
+
+```bash
+cd backend
+npm test
+```
+
+## Structure du projet
+
+```
+MY_budget/
+├── backend/
+│   ├── middleware/
+│   │   └── auth.js          # Middleware JWT
+│   ├── models/
+│   │   └── report.js        # Modèle MongoDB
+│   ├── routes/
+│   │   ├── auth.js          # Register / Login
+│   │   ├── profile.js       # Profil utilisateur
+│   │   └── transactions.js  # CRUD transactions
+│   ├── __tests__/
+│   ├── db.js                # Connexions PostgreSQL + MongoDB
+│   ├── index.js             # Point d'entrée Express
+│   └── init.sql             # Schéma PostgreSQL
+├── frontend/
+│   └── src/app/             # Pages et composants Next.js
+├── nginx/                   # Configuration reverse proxy
+└── docker-compose.yml
+```

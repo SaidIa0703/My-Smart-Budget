@@ -33,7 +33,7 @@ describe('POST /api/auth/register', () => {
 
   it('retourne 400 si email déjà utilisé', async () => {
     db.oneOrNone.mockResolvedValue({ id: 1, email: 'a@a.com' });
-    const res = await request(app).post('/api/auth/register').send({ email: 'a@a.com', password: 'password123', name: 'Test' });
+    const res = await request(app).post('/api/auth/register').send({ email: 'a@a.com', password: 'Password123', name: 'Test' });
     expect(res.status).toBe(400);
     expect(res.body.message).toBe('Email déjà utilisé');
   });
@@ -41,7 +41,7 @@ describe('POST /api/auth/register', () => {
   it('retourne 201 et un token si inscription réussie', async () => {
     db.oneOrNone.mockResolvedValue(null);
     db.one.mockResolvedValue({ id: 1, email: 'a@a.com', name: 'Test' });
-    const res = await request(app).post('/api/auth/register').send({ email: 'a@a.com', password: 'password123', name: 'Test' });
+    const res = await request(app).post('/api/auth/register').send({ email: 'a@a.com', password: 'Password123', name: 'Test' });
     expect(res.status).toBe(201);
     expect(res.body.token).toBeDefined();
   });
@@ -59,7 +59,7 @@ describe('POST /api/auth/login', () => {
 
   it('retourne 401 si utilisateur introuvable', async () => {
     db.oneOrNone.mockResolvedValue(null);
-    const res = await request(app).post('/api/auth/login').send({ email: 'a@a.com', password: 'password123' });
+    const res = await request(app).post('/api/auth/login').send({ email: 'a@a.com', password: 'Password123' });
     expect(res.status).toBe(401);
   });
 
@@ -70,8 +70,8 @@ describe('POST /api/auth/login', () => {
   });
 
   it('retourne 200 et un token si connexion réussie', async () => {
-    db.oneOrNone.mockResolvedValue({ id: 1, email: 'a@a.com', name: 'Test', password: await bcrypt.hash('password123', 10) });
-    const res = await request(app).post('/api/auth/login').send({ email: 'a@a.com', password: 'password123' });
+    db.oneOrNone.mockResolvedValue({ id: 1, email: 'a@a.com', name: 'Test', password: await bcrypt.hash('Password123', 10) });
+    const res = await request(app).post('/api/auth/login').send({ email: 'a@a.com', password: 'Password123' });
     expect(res.status).toBe(200);
     expect(res.body.token).toBeDefined();
   });

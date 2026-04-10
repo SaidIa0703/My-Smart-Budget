@@ -74,7 +74,7 @@ const MySmartBudget = () => {
   const [filterCategory, setFilterCategory] = useState('');
   const [message, setMessage] = useState('');
 
-  // ✅ CORRECTION 2 : redirect vers /login si pas connecté + vérification questionnaire
+  // redirect vers /login si pas connecté + vérification questionnaire
   useEffect(() => {
     if (typeof globalThis.window === 'undefined') return;
     const userData = sessionStorage.getItem('user');
@@ -95,7 +95,7 @@ const MySmartBudget = () => {
     }
   }, []);
 
-  // ✅ Questionnaire terminé → page d'accueil
+  //  Questionnaire terminé → page d'accueil
   const handleQuestionnaireComplete = (answers: any) => {
     if (user?.id) {
       localStorage.setItem(`questionnaire_done_${user.id}`, 'true');
@@ -105,10 +105,10 @@ const MySmartBudget = () => {
     setScreen('welcome');
   };
 
-  // ✅ Page d'accueil → dashboard
+  // Page d'accueil → dashboard
   const handleEnterDashboard = () => setScreen('dashboard');
 
-  // ✅ CHARGER LES TRANSACTIONS
+  //  CHARGER LES TRANSACTIONS
   useEffect(() => {
     if (user && screen === 'dashboard') {
       fetchTransactions();
@@ -117,7 +117,10 @@ const MySmartBudget = () => {
 
   const fetchTransactions = async () => {
     try {
-      const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/transactions/${user?.id}`);
+      const token = sessionStorage.getItem('token');
+      const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/transactions`, {
+        headers: { 'Authorization': `Bearer ${token}` }
+      });
       if (response.ok) {
         const data = await response.json();
         setTransactions(data);
@@ -138,16 +141,19 @@ const MySmartBudget = () => {
     globalThis.location.href = '/login';
   };
 
-  // ✅ CORRECTION 3 : template literal corrigé (backtick au lieu de quote)
+  // template literal corrigé (backtick au lieu de quote)
   const handleAddTransaction = async (e: React.FormEvent) => {
     e.preventDefault();
     setMessage('');
     try {
+      const token = sessionStorage.getItem('token');
       const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/transactions/add`, {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`
+        },
         body: JSON.stringify({
-          userId: user?.id,
           ...formData,
           amount: Number.parseFloat(formData.amount)
         })
@@ -174,8 +180,10 @@ const MySmartBudget = () => {
 
   const handleDeleteTransaction = async (id: number) => {
     try {
+      const token = sessionStorage.getItem('token');
       const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/transactions/${id}`, {
-        method: 'DELETE'
+        method: 'DELETE',
+        headers: { 'Authorization': `Bearer ${token}` }
       });
       if (response.ok) {
         fetchTransactions();
@@ -189,9 +197,13 @@ const MySmartBudget = () => {
     e.preventDefault();
     if (!editingTransaction) return;
     try {
+      const token = sessionStorage.getItem('token');
       const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/transactions/${editingTransaction.id}`, {
         method: 'PUT',
-        headers: { 'Content-Type': 'application/json' },
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`
+        },
         body: JSON.stringify({
           name: editingTransaction.name,
           category: editingTransaction.category,
@@ -244,7 +256,7 @@ const MySmartBudget = () => {
 
   // ─── ÉCRANS ───────────────────────────────────────────────────────────────
 
-  // ✅ CORRECTION 4 : spinner pendant le chargement (évite le flash du dashboard)
+  //  spinner pendant le chargement (évite le flash du dashboard)
   if (screen === 'loading') {
     return (
       <div className="min-h-screen bg-gradient-to-br from-gray-50 via-indigo-50 to-purple-50 flex items-center justify-center">
@@ -327,7 +339,7 @@ const MySmartBudget = () => {
           <p className="text-sm mt-4 text-emerald-100">Ce mois</p>
         </div>
 
-        {/* ✅ CORRECTION 5 : "Antoine" remplacé par "Dépenses" */}
+        {/* "Dépenses" */}
         <div className={`bg-gradient-to-br from-rose-400 to-orange-400 rounded-3xl p-6 text-white shadow-2xl transform transition-all duration-500 hover:scale-105 delay-200 ${animateCards ? 'animate-slideInRight' : ''}`}>
           <div className="flex justify-between items-start">
             <div>
@@ -346,7 +358,6 @@ const MySmartBudget = () => {
       {categories.length > 0 && (
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
           <div className="bg-white rounded-3xl p-6 shadow-xl border border-gray-100">
-            {/* ✅ CORRECTION 6 : titre "miam les chips" remplacé */}
             <h3 className="text-xl font-bold mb-4">Répartition des dépenses</h3>
             <ResponsiveContainer width="100%" height={300}>
               <PieChart>

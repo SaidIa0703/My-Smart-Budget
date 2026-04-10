@@ -15,8 +15,11 @@ router.post('/register', async (req, res) => {
       return res.status(400).json({ message: 'Tous les champs sont requis' });
     }
 
-    if (password.length < 6) {
-      return res.status(400).json({ message: 'Minimum 6 caractères' });
+    const passwordRegex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d).{8,}$/;
+    if (!passwordRegex.test(password)) {
+      return res.status(400).json({
+        message: 'Le mot de passe doit contenir au moins 8 caractères, une majuscule, une minuscule et un chiffre'
+      });
     }
 
     const existingUser = await db.oneOrNone(

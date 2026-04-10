@@ -1,5 +1,7 @@
 const express = require('express');
 const cors = require('cors');
+const helmet = require('helmet');
+const rateLimit = require('express-rate-limit');
 const authMiddleware = require('./middleware/auth');
 const { connectMongo, testPostgres } = require('./db');
 const authRoutes = require('./routes/auth');
@@ -8,7 +10,8 @@ const transactionsRoutes = require('./routes/transactions');
 
 const app = express();
 
-// Sécurité de base
+// Headers de sécurité
+app.use(helmet());
 app.disable('x-powered-by');
 
 // CORS
@@ -22,11 +25,20 @@ app.use(cors({
   allowedHeaders: ['Content-Type', 'Authorization'],
 }));
 
-// Parsing JSON — doit être avant toutes les routes
-app.use(express.json());
+// Parsing JSON — limité à 10kb pour éviter les payloads abusifs
+app.use(express.json({ limit: '10kb' }));
+
+// Rate limiting sur les routes d'authentification (brute force)
+const authLimiter = rateLimit({
+  windowMs: 15 * 60 * 1000, // 15 minutes
+  max: 20,
+  message: { message: 'Trop de tentatives, réessayez dans 15 minutes' },
+  standardHeaders: true,
+  legacyHeaders: false,
+});
 
 // Routes
-app.use('/api/auth', authRoutes);
+app.use('/api/auth', authLimiter, authRoutes);
 app.use('/api/profile', profileRoutes);
 app.use('/api/transactions', transactionsRoutes);
 

@@ -3,7 +3,8 @@ CREATE TABLE IF NOT EXISTS users (
   name VARCHAR(255) NOT NULL,
   email VARCHAR(255) UNIQUE NOT NULL,
   password VARCHAR(255) NOT NULL,
-  created_at TIMESTAMP DEFAULT NOW()
+  created_at TIMESTAMP DEFAULT NOW(),
+  updated_at TIMESTAMP DEFAULT NOW()
 );
 
 -- Migration : ajout colonne password si elle n'existe pas encore
@@ -17,11 +18,14 @@ CREATE TABLE IF NOT EXISTS transactions (
   amount DECIMAL(10, 2) NOT NULL,
   date DATE NOT NULL DEFAULT CURRENT_DATE,
   is_recurring BOOLEAN DEFAULT FALSE,
-  created_at TIMESTAMP DEFAULT NOW()
+  created_at TIMESTAMP DEFAULT NOW(),
+  updated_at TIMESTAMP DEFAULT NOW()
 );
 
--- Migration : ajout colonne is_recurring si elle n'existe pas encore
+-- Migrations
 ALTER TABLE transactions ADD COLUMN IF NOT EXISTS is_recurring BOOLEAN DEFAULT FALSE;
+ALTER TABLE transactions ADD COLUMN IF NOT EXISTS updated_at TIMESTAMP DEFAULT NOW();
+ALTER TABLE users ADD COLUMN IF NOT EXISTS updated_at TIMESTAMP DEFAULT NOW();
 
 CREATE TABLE IF NOT EXISTS budgets (
   id SERIAL PRIMARY KEY,

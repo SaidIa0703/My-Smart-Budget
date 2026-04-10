@@ -86,7 +86,7 @@ router.put('/:id', async (req, res) => {
         }
 
         const transaction = await db.one(
-            'UPDATE transactions SET name=$1, category=$2, amount=$3, date=$4, is_recurring=$5 WHERE id=$6 RETURNING *',
+            'UPDATE transactions SET name=$1, category=$2, amount=$3, date=$4, is_recurring=$5, updated_at=NOW() WHERE id=$6 RETURNING *',
             [name, category, amount, date, is_recurring ?? false, id]
         );
         res.json(transaction);

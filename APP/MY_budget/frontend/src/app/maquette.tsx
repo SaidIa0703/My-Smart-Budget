@@ -617,7 +617,7 @@ const MySmartBudget = () => {
             <select
               value={filterCategory}
               onChange={(e) => setFilterCategory(e.target.value)}
-              className="flex-1 px-4 py-3 bg-gradient-to-r from-indigo-50 to-purple-50 border-2 border-indigo-200 rounded-2xl focus:outline-none focus:ring-2 focus:ring-indigo-500 font-medium"
+              className="flex-1 px-4 py-3 bg-gradient-to-r from-indigo-50 to-purple-50 border-2 border-indigo-200 rounded-2xl focus:outline-none focus:ring-2 focus:ring-indigo-500 font-medium text-gray-900"
             >
               <option value="">📂 Toutes catégories</option>
               <option value="Alimentation">🛒 Alimentation</option>

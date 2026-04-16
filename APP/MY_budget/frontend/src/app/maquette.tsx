@@ -295,9 +295,9 @@ const MySmartBudget = () => {
         setMenuOpen(false);
       }}
       className={`flex items-center gap-3 px-4 py-3 rounded-2xl transition-all duration-300 hover:scale-105 w-full ${
-        currentPage === page 
-          ? 'bg-gradient-to-r from-indigo-600 to-purple-600 text-white shadow-lg shadow-indigo-500/30' 
-          : 'hover:bg-gray-100'
+        currentPage === page
+          ? 'bg-gradient-to-r from-indigo-600 to-purple-600 text-white shadow-lg shadow-indigo-500/30'
+          : 'text-gray-700 hover:bg-gray-100 hover:text-gray-900'
       }`}
     >
       <Icon size={22} className={currentPage === page ? 'animate-pulse' : ''} />

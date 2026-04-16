@@ -138,7 +138,7 @@ if (response.ok) {
         <div className="bg-white rounded-lg shadow-lg p-8">
           
           {/* Tabs */}
-          <div className="flex mb-8 bg-gray-100 rounded-lg p-1">
+          <div className="flex mb-8 bg-black-100 rounded-lg p-1">
             <button
               onClick={() => setIsLogin(true)}
               className={`flex-1 py-2 px-4 rounded font-medium transition ${
@@ -197,7 +197,7 @@ if (response.ok) {
                     value={formData.name}
                     onChange={handleChange}
                     placeholder="Jean Dupont"
-                    className={`w-full pl-10 pr-4 py-2 border rounded-lg focus:outline-none focus:ring-2 ${
+                    className={`w-full pl-10 pr-4 py-2 border rounded-lg focus:outline-none focus:ring-2 bg-white text-gray-900 ${
                       errors.name
                         ? 'border-red-400 focus:ring-red-200'
                         : 'border-gray-300 focus:ring-indigo-200'
@@ -224,7 +224,7 @@ if (response.ok) {
                   value={formData.email}
                   onChange={handleChange}
                   placeholder="vous@exemple.com"
-                  className={`w-full pl-10 pr-4 py-2 border rounded-lg focus:outline-none focus:ring-2 ${
+                  className={`w-full pl-10 pr-4 py-2 border rounded-lg focus:outline-none focus:ring-2 bg-white text-gray-900 ${
                     errors.email
                       ? 'border-red-400 focus:ring-red-200'
                       : 'border-gray-300 focus:ring-indigo-200'
@@ -250,7 +250,7 @@ if (response.ok) {
                   value={formData.secret}
                   onChange={handleChange}
                   placeholder="••••••"
-                  className={`w-full pl-10 pr-10 py-2 border rounded-lg focus:outline-none focus:ring-2 ${
+                  className={`w-full pl-10 pr-10 py-2 border rounded-lg focus:outline-none focus:ring-2 bg-white text-gray-900 ${
                     errors.strength
                       ? 'border-red-400 focus:ring-red-200'
                       : 'border-gray-300 focus:ring-indigo-200'

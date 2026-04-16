@@ -6,7 +6,7 @@ import ProfileSection from '../ProfileSection';
 import {
   TrendingUp, Plus, Home, Receipt, Wallet, Target, User,
   ChevronRight, X, ArrowUpRight, ArrowDownRight,
-  Search, Eye, EyeOff, Menu, Trash2,
+  Search, Eye, EyeOff, Menu, Trash2, Bell,
 } from 'lucide-react';
 import { ResponsiveContainer, PieChart, Pie, Cell, Tooltip, BarChart, CartesianGrid, XAxis, YAxis, Bar } from 'recharts';
 

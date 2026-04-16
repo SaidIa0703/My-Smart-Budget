@@ -30,7 +30,7 @@ router.post('/save', async (req, res) => {
     }
 });
 
-// GET /api/profile — profil de l'utilisateur connecté uniquement
+// GET /api/profile  de l'utilisateur connecté uniquement
 router.get('/', async (req, res) => {
     try {
         const userId = req.user.userId;

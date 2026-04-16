@@ -875,13 +875,6 @@ const MySmartBudget = () => {
             <NavItem icon={Target} label="Objectifs" page="goals" />
             <NavItem icon={User} label="Profil" page="profile" />
           </nav>
-          <div className="mt-8 p-4 bg-gradient-to-br from-indigo-100 to-purple-100 rounded-2xl">
-            <h4 className="font-bold text-indigo-900 mb-2">💎 Premium</h4>
-            <p className="text-sm text-indigo-700 mb-3">Fonctionnalités avancées!</p>
-            <button className="w-full py-2 bg-gradient-to-r from-indigo-600 to-purple-600 text-white rounded-xl font-medium shadow-lg hover:shadow-xl transform hover:scale-105 transition-all duration-300">
-              Passer Pro
-            </button>
-          </div>
         </aside>
 
         <main className="flex-1">

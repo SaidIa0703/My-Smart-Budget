@@ -1,6 +1,7 @@
 'use client';
 import { ResponsiveContainer, PieChart, Pie, Cell, Tooltip, BarChart, CartesianGrid, XAxis, YAxis, Bar } from 'recharts';
 import React, { useState, useEffect } from 'react';
+import { useRouter } from 'next/navigation';
 import {
   TrendingUp, CreditCard, Target, PiggyBank,
   Bell, Settings, Plus, Home, Receipt, Wallet, User,
@@ -50,7 +51,8 @@ const WelcomePage = ({ user, answers, onEnter }) => {
 
 // ─── COMPOSANT PRINCIPAL ──────────────────────────────────────────────────────
 const MySmartBudget = () => {
-  // ✅ CORRECTION 1 : screen state pour gérer le flux login → questionnaire → welcome → dashboard
+  const router = useRouter();
+  // screen state : loading → questionnaire → welcome → (redirect vers /profile/[type])
   const [screen, setScreen] = useState('loading');
   const [currentPage, setCurrentPage] = useState('dashboard');
   const [showBalance, setShowBalance] = useState(true);
@@ -88,8 +90,8 @@ const MySmartBudget = () => {
     const questionnaireDone = localStorage.getItem(questionnaireDoneKey);
     if (questionnaireDone) {
       const savedAnswers = localStorage.getItem(`questionnaire_answers_${parsedUser.id}`);
-      if (savedAnswers) setQuestionnaireAnswers(JSON.parse(savedAnswers));
-      setScreen('dashboard');
+      const profileType = savedAnswers ? JSON.parse(savedAnswers).profileType : 'salarie';
+      router.push(`/profile/${profileType}`);
     } else {
       setScreen('questionnaire');
     }
@@ -105,8 +107,11 @@ const MySmartBudget = () => {
     setScreen('welcome');
   };
 
-  // Page d'accueil → dashboard
-  const handleEnterDashboard = () => setScreen('dashboard');
+  // Page d'accueil → redirection vers le dashboard du profil
+  const handleEnterDashboard = () => {
+    const profileType = questionnaireAnswers?.profileType || 'salarie';
+    router.push(`/profile/${profileType}`);
+  };
 
   //  CHARGER LES TRANSACTIONS
   useEffect(() => {

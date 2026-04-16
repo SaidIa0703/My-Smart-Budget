@@ -284,7 +284,7 @@ if (response.ok) {
                     value={formData.confirmSecret}
                     onChange={handleChange}
                     placeholder="••••••"
-                    className={`w-full pl-10 pr-4 py-2 border rounded-lg focus:outline-none focus:ring-2 ${
+                    className={`w-full pl-10 pr-4 py-2 border rounded-lg focus:outline-none focus:ring-2 bg-white text-gray-900 ${
                       errors.mismatch
                         ? 'border-red-400 focus:ring-red-200'
                         : 'border-gray-300 focus:ring-indigo-200'

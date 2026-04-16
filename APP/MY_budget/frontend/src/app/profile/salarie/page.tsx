@@ -1,9 +1,10 @@
 'use client';
 import React, { useState } from 'react';
 import { useProfileDashboard } from '../useProfileDashboard';
+import GoalsSection from '../GoalsSection';
+import ProfileSection from '../ProfileSection';
 import {
-  TrendingUp, CreditCard, Target, PiggyBank,
-  Bell, Settings, Plus, Home, Receipt, Wallet, User,
+  TrendingUp, Plus, Home, Receipt, Wallet, Target, User,
   ChevronRight, X, ArrowUpRight, ArrowDownRight,
   Search, Eye, EyeOff, Menu, Trash2,
 } from 'lucide-react';
@@ -416,74 +417,7 @@ export default function SalariePage() {
   };
 
   // ── Objectifs ──
-  const GoalsPage = () => (
-    <div className="space-y-6 animate-fadeIn">
-      <div className="bg-white rounded-3xl p-6 shadow-xl border border-gray-100 text-center py-12">
-        <PiggyBank size={48} className="mx-auto mb-4 text-indigo-600" />
-        <h3 className="text-2xl font-bold mb-2">
-          {db.answers?.objectifsEpargne?.length > 0 ? 'Vos objectifs' : 'Pas d\'objectifs encore'}
-        </h3>
-        {db.answers?.objectifsEpargne?.length > 0 ? (
-          <div className="flex flex-wrap justify-center gap-2 mb-6">
-            {db.answers.objectifsEpargne.map((o: string) => (
-              <span key={o} className="px-3 py-1.5 bg-indigo-50 border border-indigo-200 rounded-xl text-sm text-indigo-700 font-medium">{o}</span>
-            ))}
-          </div>
-        ) : (
-          <p className="text-indigo-600 mb-6">Créez vos premiers objectifs d'épargne</p>
-        )}
-        <button className="px-6 py-3 bg-gradient-to-r from-indigo-600 to-purple-600 text-white rounded-2xl font-medium">
-          + Créer un Objectif
-        </button>
-      </div>
-    </div>
-  );
-
-  // ── Profil ──
-  const ProfilePage = () => (
-    <div className="space-y-6 animate-fadeIn">
-      <div className="bg-white rounded-3xl p-8 shadow-xl border border-gray-100">
-        <div className="flex flex-col items-center mb-8">
-          <div className="w-32 h-32 bg-gradient-to-br from-indigo-500 to-purple-500 rounded-full flex items-center justify-center text-white text-4xl font-bold mb-4 shadow-2xl animate-bounce">
-            {db.user?.name ? db.user.name.split(' ').map((n: string) => n[0]).join('') : 'U'}
-          </div>
-          <h3 className="text-2xl font-bold text-slate-900">{db.user?.name}</h3>
-          <p className="text-violet-500">{db.user?.email}</p>
-          <span className="mt-3 px-4 py-1.5 bg-indigo-50 text-indigo-700 text-sm font-bold rounded-full border border-indigo-100">💼 Profil Salarié</span>
-        </div>
-        <div className="space-y-4">
-          {[
-            { icon: Bell, label: 'Notifications', value: 'Activées' },
-            { icon: CreditCard, label: 'Cartes liées', value: '0' },
-            { icon: PiggyBank, label: 'Épargne auto', value: 'Désactivée' },
-            { icon: Settings, label: 'Paramètres', value: '' },
-          ].map((item, i) => (
-            <button key={i}
-              className="w-full flex items-center justify-between p-4 rounded-2xl bg-gray-50 hover:bg-gradient-to-r hover:from-indigo-50 hover:to-purple-50 transition-all duration-300 group transform hover:scale-[1.02]"
-              style={{ animationDelay: `${i * 75}ms` }}>
-              <div className="flex items-center gap-3">
-                <item.icon size={20} className="text-indigo-600" />
-                <span className="font-medium text-slate-900">{item.label}</span>
-              </div>
-              {item.value && <span className="text-sm text-violet-500">{item.value}</span>}
-            </button>
-          ))}
-          <button onClick={db.changeProfile}
-            className="w-full flex items-center justify-between p-4 rounded-2xl bg-gray-50 hover:bg-gradient-to-r hover:from-indigo-50 hover:to-purple-50 transition-all duration-300 group transform hover:scale-[1.02]">
-            <div className="flex items-center gap-3">
-              <User size={20} className="text-indigo-600" />
-              <span className="font-medium text-slate-900">Changer de profil</span>
-            </div>
-            <span className="text-sm text-violet-500">Salarié</span>
-          </button>
-        </div>
-      </div>
-      <button onClick={db.logout}
-        className="w-full py-4 bg-gradient-to-r from-red-500 to-pink-500 text-white rounded-3xl font-bold shadow-xl hover:shadow-2xl transform hover:scale-[1.02] transition-all duration-300">
-        Déconnexion
-      </button>
-    </div>
-  );
+  // ── Objectifs & Profil → composants partagés ──
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-gray-50 via-indigo-50 to-purple-50">
@@ -526,8 +460,25 @@ export default function SalariePage() {
           {page === 'dashboard' && <DashboardPage />}
           {page === 'transactions' && <TransactionsPage />}
           {page === 'budget' && <BudgetPage />}
-          {page === 'goals' && <GoalsPage />}
-          {page === 'profile' && <ProfilePage />}
+          {page === 'goals' && (
+            <GoalsSection
+              goals={db.goals}
+              addGoal={db.addGoal}
+              updateGoal={db.updateGoal}
+              deleteGoal={db.deleteGoal}
+            />
+          )}
+          {page === 'profile' && (
+            <ProfileSection
+              user={db.user}
+              settings={db.settings}
+              updateSettings={db.updateSettings}
+              logout={db.logout}
+              changeProfile={db.changeProfile}
+              profileBadge="💼 Profil Salarié"
+              profileLabel="Salarié"
+            />
+          )}
         </main>
       </div>
     </div>

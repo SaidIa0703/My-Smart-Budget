@@ -13,6 +13,44 @@ export interface Transaction {
   is_recurring?: boolean;
 }
 
+export interface Goal {
+  id: string;
+  name: string;
+  icon: string;
+  targetAmount: number;
+  currentAmount: number;
+  deadline: string;
+  color: string;
+}
+
+export interface ProfileSettings {
+  notifications: boolean;
+  epargneAuto: boolean;
+  epargneAutoPct: number;
+  currency: string;
+  cartes: { label: string; last4: string }[];
+}
+
+// Mapping questionnaire → goal preset
+const GOAL_PRESETS: Record<string, { icon: string; color: string; label: string }> = {
+  vacances:   { icon: '✈️', color: '#45B7D1', label: 'Vacances' },
+  immobilier: { icon: '🏡', color: '#4ECDC4', label: 'Immobilier' },
+  retraite:   { icon: '🌅', color: '#96CEB4', label: 'Retraite' },
+  urgence:    { icon: '🛡️', color: '#FF6B6B', label: "Fonds d'urgence" },
+  voiture:    { icon: '🚗', color: '#FFEAA7', label: 'Voiture' },
+  etudes:     { icon: '📚', color: '#DDA0DD', label: 'Études' },
+  investir:   { icon: '📈', color: '#6366f1', label: 'Investissement' },
+  mariage:    { icon: '💍', color: '#f472b6', label: 'Mariage' },
+};
+
+const DEFAULT_SETTINGS: ProfileSettings = {
+  notifications: true,
+  epargneAuto: false,
+  epargneAutoPct: 10,
+  currency: 'EUR',
+  cartes: [],
+};
+
 export function useProfileDashboard() {
   const router = useRouter();
   const [user, setUser] = useState<any>(null);
@@ -32,19 +70,80 @@ export function useProfileDashboard() {
   const [filterCategory, setFilterCategory] = useState('');
   const [message, setMessage] = useState('');
 
+  // ── Goals ──
+  const [goals, setGoals] = useState<Goal[]>([]);
+
+  // ── Settings ──
+  const [settings, setSettings] = useState<ProfileSettings>(DEFAULT_SETTINGS);
+
+  // ── Init ──
   useEffect(() => {
     const userData = sessionStorage.getItem('user');
     if (!userData) { router.push('/login'); return; }
     const parsedUser = JSON.parse(userData);
     setUser(parsedUser);
+
     const savedAnswers = localStorage.getItem(`questionnaire_answers_${parsedUser.id}`);
-    if (savedAnswers) setAnswers(JSON.parse(savedAnswers));
+    const parsedAnswers = savedAnswers ? JSON.parse(savedAnswers) : null;
+    if (parsedAnswers) setAnswers(parsedAnswers);
+
+    // Goals — init depuis questionnaire si vierges
+    const savedGoals = localStorage.getItem(`msb_goals_${parsedUser.id}`);
+    if (savedGoals) {
+      setGoals(JSON.parse(savedGoals));
+    } else if (parsedAnswers?.objectifsEpargne?.length > 0) {
+      const initial: Goal[] = parsedAnswers.objectifsEpargne.map((key: string, i: number) => {
+        const preset = GOAL_PRESETS[key] ?? { icon: '🎯', color: '#8884d8', label: key };
+        return {
+          id: `goal_${i}_${Date.now()}`,
+          name: preset.label,
+          icon: preset.icon,
+          targetAmount: 1000,
+          currentAmount: 0,
+          deadline: new Date(Date.now() + 365 * 24 * 3600 * 1000).toISOString().split('T')[0],
+          color: preset.color,
+        };
+      });
+      setGoals(initial);
+      localStorage.setItem(`msb_goals_${parsedUser.id}`, JSON.stringify(initial));
+    }
+
+    // Settings
+    const savedSettings = localStorage.getItem(`msb_settings_${parsedUser.id}`);
+    if (savedSettings) setSettings(JSON.parse(savedSettings));
   }, []);
 
   useEffect(() => {
     if (user) fetchTransactions();
   }, [user]);
 
+  // Persist goals
+  const persistGoals = (updated: Goal[]) => {
+    setGoals(updated);
+    if (user?.id) localStorage.setItem(`msb_goals_${user.id}`, JSON.stringify(updated));
+  };
+
+  const addGoal = (goal: Omit<Goal, 'id'>) => {
+    const newGoal = { ...goal, id: `goal_${Date.now()}` };
+    persistGoals([...goals, newGoal]);
+  };
+
+  const updateGoal = (updated: Goal) => {
+    persistGoals(goals.map(g => g.id === updated.id ? updated : g));
+  };
+
+  const deleteGoal = (id: string) => {
+    persistGoals(goals.filter(g => g.id !== id));
+  };
+
+  // Persist settings
+  const updateSettings = (partial: Partial<ProfileSettings>) => {
+    const updated = { ...settings, ...partial };
+    setSettings(updated);
+    if (user?.id) localStorage.setItem(`msb_settings_${user.id}`, JSON.stringify(updated));
+  };
+
+  // ── Transactions ──
   const fetchTransactions = async () => {
     try {
       const token = sessionStorage.getItem('token');
@@ -72,7 +171,7 @@ export function useProfileDashboard() {
         setShowAddForm(false);
         fetchTransactions();
       } else {
-        setMessage('Erreur lors de l\'ajout.');
+        setMessage("Erreur lors de l'ajout.");
       }
     } catch {
       setMessage('Erreur serveur.');
@@ -155,5 +254,7 @@ export function useProfileDashboard() {
     handleAddTransaction, handleDeleteTransaction, handleEditTransaction,
     logout, changeProfile,
     stats, categoryData, filteredTransactions,
+    goals, addGoal, updateGoal, deleteGoal,
+    settings, updateSettings,
   };
 }

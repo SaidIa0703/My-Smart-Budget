@@ -79,7 +79,7 @@ export default function AddTransaction({ onTransactionAdded }: Readonly<Props>) 
             placeholder="Ex: Carrefour, Salaire..."
             value={formData.name}
             onChange={(e) => setFormData({ ...formData, name: e.target.value })}
-            className="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500"
+            className="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 bg-white text-gray-900"
             required
           />
         </div>
@@ -90,7 +90,7 @@ export default function AddTransaction({ onTransactionAdded }: Readonly<Props>) 
             id="category"
             value={formData.category}
             onChange={(e) => setFormData({ ...formData, category: e.target.value })}
-            className="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500"
+            className="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 bg-white text-gray-900"
             required
           >
             <option value="">Choisir une catégorie</option>
@@ -112,7 +112,7 @@ export default function AddTransaction({ onTransactionAdded }: Readonly<Props>) 
               placeholder="0.00"
               value={formData.amount}
               onChange={(e) => setFormData({ ...formData, amount: e.target.value })}
-              className="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500"
+              className="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 bg-white text-gray-900"
               step="0.01"
               required
             />
@@ -125,7 +125,7 @@ export default function AddTransaction({ onTransactionAdded }: Readonly<Props>) 
               type="date"
               value={formData.date}
               onChange={(e) => setFormData({ ...formData, date: e.target.value })}
-              className="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500"
+              className="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 bg-white text-gray-900"
               required
             />
           </div>

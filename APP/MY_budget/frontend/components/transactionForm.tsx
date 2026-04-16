@@ -23,7 +23,7 @@ export default function TransactionForm({ onAdd }: Readonly<{ onAdd: (t: Transac
         <label htmlFor="label" className="text-sm text-gray-600">Intitulé</label>
         <input
           id="label"
-          className="w-full rounded-md border px-3 py-2 outline-none focus:ring"
+          className="w-full rounded-md border px-3 py-2 outline-none focus:ring bg-white text-gray-900"
           placeholder="Courses, Salaire, Loyer…"
           value={label}
           onChange={(e) => setLabel(e.target.value)}
@@ -35,7 +35,7 @@ export default function TransactionForm({ onAdd }: Readonly<{ onAdd: (t: Transac
           <label htmlFor="amount" className="text-sm text-gray-600">Montant (€)</label>
           <input
             id="amount"
-            className="w-full rounded-md border px-3 py-2 outline-none focus:ring"
+            className="w-full rounded-md border px-3 py-2 outline-none focus:ring bg-white text-gray-900"
             inputMode="decimal"
             placeholder="0,00"
             value={amount}
@@ -44,7 +44,7 @@ export default function TransactionForm({ onAdd }: Readonly<{ onAdd: (t: Transac
         </div>
         <div className="space-y-1">
           <label htmlFor="type" className="text-sm text-gray-600">Type</label>
-          <select id="type" className="w-full rounded-md border px-3 py-2" value={type} onChange={(e) => setType(e.target.value as "income" | "expense")}>
+          <select id="type" className="w-full rounded-md border px-3 py-2 bg-white text-gray-900" value={type} onChange={(e) => setType(e.target.value as "income" | "expense")}>
             <option value="expense">Dépense</option>
             <option value="income">Revenu</option>
           </select>

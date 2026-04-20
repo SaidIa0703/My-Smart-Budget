@@ -691,7 +691,12 @@ const MySmartBudget = () => {
                         <span className="text-xs bg-indigo-100 text-indigo-700 px-2 py-0.5 rounded-full font-medium">🔄 Récurrent</span>
                       )}
                     </div>
-                    <p className="text-sm text-violet-500">{transaction.category} • {new Date(transaction.date).toLocaleDateString('fr-FR')}</p>
+                    <p className="text-sm text-violet-500">
+                      {transaction.category} • {new Date(transaction.date).toLocaleDateString('fr-FR')}
+                      {transaction.updated_at && (
+                        <span className="text-gray-400"> • modifié le {new Date(transaction.updated_at).toLocaleDateString('fr-FR')}</span>
+                      )}
+                    </p>
                   </div>
                 </div>
                 <div className="flex items-center gap-2">

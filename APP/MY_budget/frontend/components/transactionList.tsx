@@ -58,6 +58,7 @@ export default function TransactionList() {
               <th className="px-6 py-3 text-left text-sm font-semibold">Catégorie</th>
               <th className="px-6 py-3 text-left text-sm font-semibold">Montant</th>
               <th className="px-6 py-3 text-left text-sm font-semibold">Date</th>
+              <th className="px-6 py-3 text-left text-sm font-semibold">Modifié le</th>
               <th className="px-6 py-3 text-left text-sm font-semibold">Actions</th>
             </tr>
           </thead>
@@ -70,6 +71,11 @@ export default function TransactionList() {
                   {transaction.amount > 0 ? '+' : ''}€{transaction.amount.toFixed(2)}
                 </td>
                 <td className="px-6 py-3">{new Date(transaction.date).toLocaleDateString('fr-FR')}</td>
+                <td className="px-6 py-3 text-gray-400 text-sm">
+                  {transaction.updated_at
+                    ? new Date(transaction.updated_at).toLocaleDateString('fr-FR', { day: '2-digit', month: '2-digit', year: 'numeric', hour: '2-digit', minute: '2-digit' })
+                    : '—'}
+                </td>
                 <td className="px-6 py-3">
                   <button
                     onClick={() => handleDelete(transaction.id)}

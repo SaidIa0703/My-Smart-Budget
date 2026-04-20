@@ -11,6 +11,7 @@ export interface Transaction {
   amount: number;
   date: string;
   is_recurring?: boolean;
+  updated_at?: string;
 }
 
 export interface Goal {

@@ -361,7 +361,12 @@ export default function EtudiantPage() {
                     <p className="font-bold text-slate-900 text-lg">{t.name}</p>
                     {t.is_recurring && <span className="text-xs bg-indigo-100 text-indigo-700 px-2 py-0.5 rounded-full font-medium">🔄 Récurrent</span>}
                   </div>
-                  <p className="text-sm text-violet-500">{t.category} • {new Date(t.date).toLocaleDateString('fr-FR')}</p>
+                  <p className="text-sm text-violet-500">
+                    {t.category} • {new Date(t.date).toLocaleDateString('fr-FR')}
+                    {t.updated_at && (
+                      <span className="text-gray-400"> • modifié le {new Date(t.updated_at).toLocaleDateString('fr-FR')}</span>
+                    )}
+                  </p>
                 </div>
               </div>
               <div className="flex items-center gap-2">

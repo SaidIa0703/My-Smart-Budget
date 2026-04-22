@@ -32,17 +32,19 @@ interface FormState {
 const getIcon = (category: string) =>
   CATEGORY_ICONS[category.toLowerCase().normalize('NFD').replaceAll(/[\u0300-\u036f]/g, '')] || '💰';
 
-const getStatus = (spending: number, limit: number): 'normal' | 'warning' | 'danger' => {
+const getStatus = (spending: number, limit: number): 'normal' | 'warning' | 'alert' | 'danger' => {
   const pct = spending / limit;
-  if (pct >= 1) return 'danger';
-  if (pct >= 0.8) return 'warning';
+  if (pct >= 1)   return 'danger';
+  if (pct >= 0.9) return 'alert';
+  if (pct >= 0.7) return 'warning';
   return 'normal';
 };
 
 const statusColors = {
-  normal:  { bar: 'from-blue-500 to-purple-600', bg: 'bg-slate-50 hover:bg-blue-50',  border: 'border-slate-200' },
-  warning: { bar: 'from-amber-400 to-orange-500', bg: 'bg-amber-50 hover:bg-amber-100', border: 'border-amber-200' },
-  danger:  { bar: 'from-red-500 to-red-600',     bg: 'bg-red-50 hover:bg-red-100',    border: 'border-red-200' },
+  normal:  { bar: 'from-blue-500 to-purple-600',   bg: 'bg-slate-50 hover:bg-blue-50',    border: 'border-slate-200' },
+  warning: { bar: 'from-amber-400 to-yellow-400',  bg: 'bg-amber-50 hover:bg-amber-100',  border: 'border-amber-200' },
+  alert:   { bar: 'from-orange-500 to-red-400',    bg: 'bg-orange-50 hover:bg-orange-100', border: 'border-orange-300' },
+  danger:  { bar: 'from-red-500 to-red-600',       bg: 'bg-red-50 hover:bg-red-100',      border: 'border-red-200' },
 };
 
 export default function BudgetCategories() {
@@ -135,6 +137,10 @@ export default function BudgetCategories() {
 
   const exceeded = budgets.filter(b => Number(b.current_spending) >= Number(b.limit));
 
+  const totalLimit    = budgets.reduce((s, b) => s + Number(b.limit), 0);
+  const totalSpending = budgets.reduce((s, b) => s + Number(b.current_spending), 0);
+  const resteAVivre   = Math.max(totalLimit - totalSpending, 0);
+
   return (
     <div className="bg-white rounded-2xl shadow p-6 space-y-5">
       {/* Header */}
@@ -147,6 +153,20 @@ export default function BudgetCategories() {
           <Plus size={16} /> Nouveau budget
         </button>
       </div>
+
+      {/* Reste à vivre */}
+      {!loading && !error && budgets.length > 0 && (
+        <div className="flex items-center justify-between bg-indigo-50 border border-indigo-200 rounded-xl px-5 py-3">
+          <div>
+            <p className="text-xs text-indigo-500 font-medium uppercase tracking-wide">Reste à vivre mensuel</p>
+            <p className="text-2xl font-bold text-indigo-700 mt-0.5">{resteAVivre.toFixed(2)} €</p>
+          </div>
+          <div className="text-right text-xs text-indigo-400">
+            <p>{totalSpending.toFixed(0)} € dépensés</p>
+            <p>sur {totalLimit.toFixed(0)} € budgétés</p>
+          </div>
+        </div>
+      )}
 
       {/* Alerte dépassements */}
       {exceeded.length > 0 && (
@@ -234,14 +254,15 @@ export default function BudgetCategories() {
 
                 <div className="flex justify-between text-xs font-medium text-slate-600">
                   <span>
-                    {status === 'danger' && '❌ Dépassé !'}
-                    {status === 'warning' && `⚠️ ${Math.round(pct)}% utilisé`}
-                    {status === 'normal' && `✅ ${Math.round(pct)}% utilisé`}
+                    {status === 'danger'  && '❌ Dépassé !'}
+                    {status === 'alert'   && `🔶 ${Math.round(pct)}% — Alerte 90%`}
+                    {status === 'warning' && `⚠️ ${Math.round(pct)}% — Alerte 70%`}
+                    {status === 'normal'  && `✅ ${Math.round(pct)}% utilisé`}
                   </span>
                   <span>
                     {status === 'danger'
-                      ? `-${(spending - limit).toFixed(0)}€ au-dessus`
-                      : `${remaining.toFixed(0)}€ restant`}
+                      ? `-${(spending - limit).toFixed(0)} € au-dessus`
+                      : `${remaining.toFixed(0)} € restant`}
                   </span>
                 </div>
               </div>

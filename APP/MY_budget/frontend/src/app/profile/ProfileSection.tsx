@@ -2,9 +2,12 @@
 import React, { useState } from 'react';
 import {
   Bell, CreditCard, PiggyBank, Settings, User,
-  X, Plus, Trash2, Check, ChevronRight,
+  X, Plus, Trash2, Check, ChevronRight, Lock, Download, ShieldAlert,
 } from 'lucide-react';
 import type { ProfileSettings } from './useProfileDashboard';
+
+const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5001';
+const getToken = () => sessionStorage.getItem('token') || localStorage.getItem('token') || '';
 
 interface Props {
   user: any;
@@ -26,9 +29,80 @@ const Toggle = ({ value, onChange }: { value: boolean; onChange: (v: boolean) =>
 );
 
 export default function ProfileSection({ user, settings, updateSettings, logout, changeProfile, profileBadge, profileLabel, nbEnfants }: Props) {
-  const [modal, setModal] = useState<'notifications' | 'cartes' | 'epargne' | 'parametres' | null>(null);
+  const [modal, setModal] = useState<'notifications' | 'cartes' | 'epargne' | 'parametres' | 'password' | 'delete' | null>(null);
   const [newCard, setNewCard] = useState({ label: '', last4: '' });
   const [epargneInput, setEpargneInput] = useState(String(settings.epargneAutoPct));
+
+  // RGPD — changement de mot de passe
+  const [pwForm, setPwForm] = useState({ current: '', next: '', confirm: '' });
+  const [pwError, setPwError] = useState('');
+  const [pwSuccess, setPwSuccess] = useState('');
+
+  // RGPD — suppression de compte
+  const [deletePassword, setDeletePassword] = useState('');
+  const [deleteError, setDeleteError] = useState('');
+  const [exportLoading, setExportLoading] = useState(false);
+
+  const handleChangePassword = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setPwError('');
+    setPwSuccess('');
+    if (pwForm.next !== pwForm.confirm) {
+      setPwError('Les nouveaux mots de passe ne correspondent pas.');
+      return;
+    }
+    try {
+      const res = await fetch(`${API_URL}/api/profile/password`, {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${getToken()}` },
+        body: JSON.stringify({ currentPassword: pwForm.current, newPassword: pwForm.next }),
+      });
+      const data = await res.json();
+      if (!res.ok) { setPwError(data.message); return; }
+      setPwSuccess('Mot de passe mis à jour !');
+      setPwForm({ current: '', next: '', confirm: '' });
+    } catch {
+      setPwError('Erreur serveur.');
+    }
+  };
+
+  const handleExportData = async () => {
+    setExportLoading(true);
+    try {
+      const res = await fetch(`${API_URL}/api/profile/export`, {
+        headers: { Authorization: `Bearer ${getToken()}` },
+      });
+      if (!res.ok) return;
+      const blob = await res.blob();
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = `my-smart-budget-export.json`;
+      a.click();
+      URL.revokeObjectURL(url);
+    } catch {}
+    setExportLoading(false);
+  };
+
+  const handleDeleteAccount = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setDeleteError('');
+    try {
+      const res = await fetch(`${API_URL}/api/profile/account`, {
+        method: 'DELETE',
+        headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${getToken()}` },
+        body: JSON.stringify({ password: deletePassword }),
+      });
+      const data = await res.json();
+      if (!res.ok) { setDeleteError(data.message); return; }
+      // Purge complète session + localStorage
+      sessionStorage.clear();
+      localStorage.clear();
+      window.location.href = '/login';
+    } catch {
+      setDeleteError('Erreur serveur.');
+    }
+  };
 
   const addCard = () => {
     if (!newCard.label || newCard.last4.length !== 4) return;
@@ -129,6 +203,41 @@ export default function ProfileSection({ user, settings, updateSettings, logout,
             </div>
             <span className="text-sm text-violet-500">{profileLabel}</span>
           </button>
+
+          {/* Séparateur RGPD */}
+          <div className="pt-2 border-t border-gray-100">
+            <p className="text-xs font-semibold text-slate-400 uppercase tracking-wide px-1 mb-2">Sécurité & RGPD</p>
+
+            {/* Changer le mot de passe */}
+            <button onClick={() => { setPwForm({ current: '', next: '', confirm: '' }); setPwError(''); setPwSuccess(''); setModal('password'); }}
+              className="w-full flex items-center justify-between p-4 rounded-2xl bg-gray-50 hover:bg-gradient-to-r hover:from-indigo-50 hover:to-purple-50 transition-all duration-300 group transform hover:scale-[1.02]">
+              <div className="flex items-center gap-3">
+                <Lock size={20} className="text-indigo-600" />
+                <span className="font-medium text-slate-900">Changer le mot de passe</span>
+              </div>
+              <ChevronRight size={16} className="text-gray-400" />
+            </button>
+
+            {/* Exporter mes données */}
+            <button onClick={handleExportData} disabled={exportLoading}
+              className="w-full flex items-center justify-between p-4 rounded-2xl bg-gray-50 hover:bg-gradient-to-r hover:from-indigo-50 hover:to-purple-50 transition-all duration-300 group transform hover:scale-[1.02] disabled:opacity-50">
+              <div className="flex items-center gap-3">
+                <Download size={20} className="text-indigo-600" />
+                <span className="font-medium text-slate-900">Exporter mes données (JSON)</span>
+              </div>
+              <span className="text-xs text-violet-400">{exportLoading ? 'Export...' : 'RGPD'}</span>
+            </button>
+
+            {/* Supprimer le compte */}
+            <button onClick={() => { setDeletePassword(''); setDeleteError(''); setModal('delete'); }}
+              className="w-full flex items-center justify-between p-4 rounded-2xl bg-red-50 hover:bg-red-100 transition-all duration-300 group transform hover:scale-[1.02]">
+              <div className="flex items-center gap-3">
+                <ShieldAlert size={20} className="text-red-500" />
+                <span className="font-medium text-red-600">Supprimer mon compte</span>
+              </div>
+              <ChevronRight size={16} className="text-red-300" />
+            </button>
+          </div>
         </div>
       </div>
 
@@ -273,6 +382,73 @@ export default function ProfileSection({ user, settings, updateSettings, logout,
                 <Check size={16} /> Enregistrer
               </button>
             </div>
+          </div>
+        </div>
+      )}
+
+      {/* ── Changer le mot de passe ── */}
+      {modal === 'password' && (
+        <div className="fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4">
+          <div className="bg-white rounded-3xl p-6 shadow-2xl w-full max-w-sm">
+            <div className="flex justify-between items-center mb-6">
+              <h2 className="text-xl font-bold text-slate-900 flex items-center gap-2">
+                <Lock size={20} className="text-indigo-600" /> Mot de passe
+              </h2>
+              <button onClick={() => setModal(null)} className="p-2 hover:bg-gray-100 rounded-xl"><X size={18} /></button>
+            </div>
+            <form onSubmit={handleChangePassword} className="space-y-3">
+              {pwError && <p className="text-sm text-red-600 bg-red-50 rounded-xl px-3 py-2">{pwError}</p>}
+              {pwSuccess && <p className="text-sm text-green-700 bg-green-50 rounded-xl px-3 py-2">{pwSuccess}</p>}
+              <input type="password" placeholder="Mot de passe actuel" value={pwForm.current}
+                onChange={e => setPwForm({ ...pwForm, current: e.target.value })}
+                className="w-full px-4 py-2.5 border rounded-xl focus:outline-none focus:ring-2 focus:ring-indigo-500 text-black" required />
+              <input type="password" placeholder="Nouveau mot de passe" value={pwForm.next}
+                onChange={e => setPwForm({ ...pwForm, next: e.target.value })}
+                className="w-full px-4 py-2.5 border rounded-xl focus:outline-none focus:ring-2 focus:ring-indigo-500 text-black" required />
+              <input type="password" placeholder="Confirmer le nouveau mot de passe" value={pwForm.confirm}
+                onChange={e => setPwForm({ ...pwForm, confirm: e.target.value })}
+                className="w-full px-4 py-2.5 border rounded-xl focus:outline-none focus:ring-2 focus:ring-indigo-500 text-black" required />
+              <p className="text-xs text-slate-400">8 caractères min., une majuscule, une minuscule, un chiffre.</p>
+              <div className="flex gap-3 pt-1">
+                <button type="button" onClick={() => setModal(null)}
+                  className="flex-1 py-2.5 border border-gray-300 rounded-xl text-gray-700 hover:bg-gray-50 font-medium">Annuler</button>
+                <button type="submit"
+                  className="flex-1 py-2.5 bg-gradient-to-r from-indigo-600 to-purple-600 text-white rounded-xl font-semibold flex items-center justify-center gap-2">
+                  <Check size={16} /> Enregistrer
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
+
+      {/* ── Supprimer le compte ── */}
+      {modal === 'delete' && (
+        <div className="fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4">
+          <div className="bg-white rounded-3xl p-6 shadow-2xl w-full max-w-sm">
+            <div className="flex justify-between items-center mb-4">
+              <h2 className="text-xl font-bold text-red-600 flex items-center gap-2">
+                <ShieldAlert size={20} /> Supprimer le compte
+              </h2>
+              <button onClick={() => setModal(null)} className="p-2 hover:bg-gray-100 rounded-xl"><X size={18} /></button>
+            </div>
+            <p className="text-sm text-slate-600 mb-4 bg-red-50 rounded-xl p-3">
+              ⚠️ Cette action est <strong>irréversible</strong>. Toutes vos transactions, budgets et données seront supprimés définitivement.
+            </p>
+            <form onSubmit={handleDeleteAccount} className="space-y-3">
+              {deleteError && <p className="text-sm text-red-600 bg-red-50 rounded-xl px-3 py-2">{deleteError}</p>}
+              <input type="password" placeholder="Confirmez votre mot de passe" value={deletePassword}
+                onChange={e => setDeletePassword(e.target.value)}
+                className="w-full px-4 py-2.5 border border-red-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-red-400 text-black" required />
+              <div className="flex gap-3 pt-1">
+                <button type="button" onClick={() => setModal(null)}
+                  className="flex-1 py-2.5 border border-gray-300 rounded-xl text-gray-700 hover:bg-gray-50 font-medium">Annuler</button>
+                <button type="submit"
+                  className="flex-1 py-2.5 bg-gradient-to-r from-red-500 to-pink-500 text-white rounded-xl font-semibold">
+                  Supprimer
+                </button>
+              </div>
+            </form>
           </div>
         </div>
       )}

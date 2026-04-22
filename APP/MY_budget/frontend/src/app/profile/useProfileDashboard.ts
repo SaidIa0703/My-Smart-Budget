@@ -209,6 +209,7 @@ export function useProfileDashboard() {
   const logout = () => {
     sessionStorage.removeItem('token');
     sessionStorage.removeItem('user');
+    localStorage.removeItem('token');
     router.push('/login');
   };
 

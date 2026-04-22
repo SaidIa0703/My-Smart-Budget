@@ -23,16 +23,19 @@ export default function AddTransaction({ onTransactionAdded }: Readonly<Props>) 
     setMessage('');
 
     try {
-      const user = JSON.parse(localStorage.getItem('user') || '{}');
-      
-      const response = await fetch('http://localhost:5001/api/transactions/add', {
+      const token = sessionStorage.getItem('token') || localStorage.getItem('token') || '';
+      const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5001';
+
+      const response = await fetch(`${API_URL}/api/transactions/add`, {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`,
+        },
         body: JSON.stringify({
-          userId: user.id,
           ...formData,
-          amount: Number.parseFloat(formData.amount)
-        })
+          amount: Number.parseFloat(formData.amount),
+        }),
       });
 
       if (response.ok) {

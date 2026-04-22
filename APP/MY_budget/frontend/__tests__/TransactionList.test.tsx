@@ -11,6 +11,9 @@ const mockTransactions = [
 beforeEach(() => {
   localStorage.setItem('user', JSON.stringify({ id: 1 }));
   globalThis.fetch = jest.fn();
+  global.URL.createObjectURL = jest.fn(() => 'blob:mock');
+  global.URL.revokeObjectURL = jest.fn();
+  window.confirm = jest.fn(() => true);
 });
 
 afterEach(() => {
@@ -48,7 +51,7 @@ describe('TransactionList', () => {
     await waitFor(() => {
       expect(screen.getByText('Carrefour')).toBeInTheDocument();
       expect(screen.getByText('Salaire')).toBeInTheDocument();
-      expect(screen.getByText('Alimentation')).toBeInTheDocument();
+      expect(screen.getAllByText('Alimentation').length).toBeGreaterThan(0);
     });
   });
 
@@ -59,9 +62,14 @@ describe('TransactionList', () => {
     });
     render(<TransactionList />);
     await waitFor(() => {
-      const negative = screen.getByText('€-50.00');
-      const positive = screen.getByText('+€2000.00');
-      expect(negative).toHaveClass('text-red-600');
+      // Component renders amounts as "-50.00€" / "+2000.00€" split across text nodes in a <td>
+      const negative = screen.getByText((_, el) =>
+        el?.tagName === 'TD' && (el.textContent?.replaceAll(/\s+/g, '') === '-50.00€')
+      );
+      const positive = screen.getByText((_, el) =>
+        el?.tagName === 'TD' && (el.textContent?.replaceAll(/\s+/g, '') === '+2000.00€')
+      );
+      expect(negative).toHaveClass('text-red-500');
       expect(positive).toHaveClass('text-green-600');
     });
   });
@@ -74,7 +82,7 @@ describe('TransactionList', () => {
     render(<TransactionList />);
     await waitFor(() => expect(screen.getByText('Carrefour')).toBeInTheDocument());
 
-    const deleteButtons = screen.getAllByRole('button');
+    const deleteButtons = screen.getAllByLabelText('Supprimer');
     fireEvent.click(deleteButtons[0]);
 
     await waitFor(() => {

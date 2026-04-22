@@ -36,7 +36,21 @@ CREATE TABLE IF NOT EXISTS budgets (
   updated_at TIMESTAMP DEFAULT NOW()
 );
 
+CREATE TABLE IF NOT EXISTS savings_goals (
+  id SERIAL PRIMARY KEY,
+  user_id INT REFERENCES users(id) ON DELETE CASCADE,
+  name VARCHAR(255) NOT NULL,
+  icon VARCHAR(10) DEFAULT '🎯',
+  target_amount DECIMAL(10, 2) NOT NULL,
+  current_amount DECIMAL(10, 2) DEFAULT 0,
+  deadline DATE,
+  color VARCHAR(20) DEFAULT '#6366f1',
+  created_at TIMESTAMP DEFAULT NOW(),
+  updated_at TIMESTAMP DEFAULT NOW()
+);
+
 CREATE INDEX IF NOT EXISTS idx_transactions_user_id ON transactions(user_id);
 CREATE INDEX IF NOT EXISTS idx_transactions_created_at ON transactions(created_at);
 CREATE INDEX IF NOT EXISTS idx_budgets_user_id ON budgets(user_id);
+CREATE INDEX IF NOT EXISTS idx_savings_goals_user_id ON savings_goals(user_id);
 

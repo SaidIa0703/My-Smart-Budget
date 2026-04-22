@@ -2,11 +2,13 @@ const express = require('express');
 const cors = require('cors');
 const helmet = require('helmet');
 const rateLimit = require('express-rate-limit');
-const authMiddleware = require('./middleware/auth');
 const { connectMongo, testPostgres } = require('./db');
 const authRoutes = require('./routes/auth');
 const profileRoutes = require('./routes/profile');
 const transactionsRoutes = require('./routes/transactions');
+const budgetsRoutes = require('./routes/budgets');
+const goalsRoutes = require('./routes/goals');
+const reportsRoutes = require('./routes/reports');
 
 const app = express();
 
@@ -41,31 +43,9 @@ const authLimiter = rateLimit({
 app.use('/api/auth', authLimiter, authRoutes);
 app.use('/api/profile', profileRoutes);
 app.use('/api/transactions', transactionsRoutes);
-
-// Reports MongoDB (protégé)
-app.get('/api/reports', authMiddleware, async (req, res) => {
-  try {
-    const Report = require('./models/report');
-    const reports = await Report.find({ userId: req.user.userId }).sort({ createdAt: -1 });
-    res.json(reports);
-  } catch (err) {
-    console.error('Erreur reports:', err);
-    res.status(500).json({ error: err.message });
-  }
-});
-
-app.post('/api/reports', authMiddleware, async (req, res) => {
-  try {
-    const Report = require('./models/report');
-    const { title, description, data, type } = req.body;
-    const report = new Report({ userId: req.user.userId, title, description, data, type });
-    await report.save();
-    res.status(201).json(report);
-  } catch (err) {
-    console.error('Erreur reports:', err);
-    res.status(500).json({ error: err.message });
-  }
-});
+app.use('/api/budgets', budgetsRoutes);
+app.use('/api/goals', goalsRoutes);
+app.use('/api/reports', reportsRoutes);
 
 // Health check (public)
 app.get('/health', (_req, res) => {

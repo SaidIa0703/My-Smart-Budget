@@ -9,7 +9,7 @@ export default function ReportsPage() {
   const router = useRouter();
 
   useEffect(() => {
-    const token = localStorage.getItem('token');
+    const token = sessionStorage.getItem('token') || localStorage.getItem('token');
     if (!token) {
       router.push('/login');
     }

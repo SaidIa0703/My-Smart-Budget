@@ -72,7 +72,7 @@ const generateAdvice = (answers) => {
   const advice = [];
 
   if (answers.profileType === 'etudiant') {
-    advice.push({ icon: '🎓', title: 'Budget étudiant', text: "Pensez à la règle 50/30/20 : 50% besoins, 30% envies, 20% épargne — même avec de petits revenus !" });
+    advice.push({ icon: '🎓', title: 'Budget étudiant', text: "Pensez à la règle 50/30/20 : 50% besoins, 30% envies, 20% épargne  même avec de petits revenus !" });
   }
   if (answers.profileType === 'famille') {
     advice.push({ icon: '👨‍👩‍👧', title: 'Budget familial', text: "Créez un fonds d'urgence représentant 3 à 6 mois de dépenses pour protéger votre famille." });
@@ -84,7 +84,7 @@ const generateAdvice = (answers) => {
     advice.push({ icon: '👶', title: 'Parents avisés', text: `Avec ${answers.nbEnfants} enfant(s), pensez à ouvrir un livret épargne dédié pour leurs futures études.` });
   }
   if (answers.dettes && answers.dettes.length > 0 && !answers.dettes.includes('aucune')) {
-    advice.push({ icon: '🏦', title: 'Gestion des dettes', text: "Priorisez le remboursement des dettes à taux élevé avant d'investir — c'est souvent le meilleur rendement !" });
+    advice.push({ icon: '🏦', title: 'Gestion des dettes', text: "Priorisez le remboursement des dettes à taux élevé avant d'investir c'est souvent le meilleur rendement !" });
   }
   if (answers.objectifsEpargne?.includes('urgence')) {
     advice.push({ icon: '🛡️', title: 'Fonds durgence', text: "Objectif fonds d'urgence : visez d'abord 1 000 €, puis augmentez progressivement jusqu'à 3 mois de charges." });
@@ -158,7 +158,7 @@ const Questionnaire = ({ currentUser, onComplete }) => {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
-          'Authorization': `Bearer ${localStorage.getItem('token')}`
+          'Authorization': `Bearer ${sessionStorage.getItem('token') || localStorage.getItem('token')}`
         },
         body: JSON.stringify({ userId: currentUser.id, ...answers })
       });

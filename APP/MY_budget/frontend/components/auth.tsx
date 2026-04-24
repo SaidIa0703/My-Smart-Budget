@@ -125,20 +125,20 @@ if (response.ok) {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 flex items-center justify-center p-4">
+    <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 flex items-center justify-center p-3 sm:p-4">
       <div className="w-full max-w-md">
-        
+
         {/* Header */}
-        <div className="text-center mb-8">
-          <h1 className="text-4xl font-bold text-indigo-600 mb-2">Smart Budget</h1>
-          <p className="text-gray-600">Gestion intelligente de vos finances</p>
+        <div className="text-center mb-6 sm:mb-8">
+          <h1 className="text-3xl sm:text-4xl font-bold text-indigo-600 mb-2">Smart Budget</h1>
+          <p className="text-gray-600 text-sm sm:text-base">Gestion intelligente de vos finances</p>
         </div>
 
         {/* Card */}
-        <div className="bg-white rounded-lg shadow-lg p-8">
+        <div className="bg-white rounded-lg shadow-lg p-5 sm:p-8">
           
           {/* Tabs */}
-          <div className="flex mb-8 bg-black-100 rounded-lg p-1">
+          <div className="flex mb-6 sm:mb-8 bg-gray-100 rounded-lg p-1">
             <button
               onClick={() => setIsLogin(true)}
               className={`flex-1 py-2 px-4 rounded font-medium transition ${
@@ -180,7 +180,7 @@ if (response.ok) {
           )}
 
           {/* Form */}
-          <form onSubmit={handleSubmit} className="space-y-5">
+          <form onSubmit={handleSubmit} className="space-y-4">
             
             {/* Name Field (Register only) */}
             {!isLogin && (
@@ -333,7 +333,7 @@ if (response.ok) {
         </div>
 
         {/* Footer */}
-        <p className="text-center text-gray-600 text-sm mt-6">
+        <p className="text-center text-gray-600 text-xs sm:text-sm mt-4 sm:mt-6">
           © 2026 Smart Budget. Tous droits réservés.
         </p>
       </div>

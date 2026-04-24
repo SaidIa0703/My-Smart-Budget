@@ -2,7 +2,7 @@ const express = require('express');
 const cors = require('cors');
 const helmet = require('helmet');
 const rateLimit = require('express-rate-limit');
-const { connectMongo, testPostgres } = require('./db');
+const { db, connectMongo, testPostgres } = require('./db');
 const authRoutes = require('./routes/auth');
 const profileRoutes = require('./routes/profile');
 const transactionsRoutes = require('./routes/transactions');
@@ -66,12 +66,29 @@ app.get('/', (_req, res) => {
   });
 });
 
-// Connexion aux bases de données
-connectMongo();
-testPostgres();
+// Migration automatique — idempotente, tourne à chaque démarrage
+const runMigrations = async () => {
+  try {
+    await db.none(`
+      ALTER TABLE transactions ADD COLUMN IF NOT EXISTS is_recurring BOOLEAN DEFAULT FALSE;
+      ALTER TABLE transactions ADD COLUMN IF NOT EXISTS updated_at   TIMESTAMP DEFAULT NOW();
+      ALTER TABLE users        ADD COLUMN IF NOT EXISTS updated_at   TIMESTAMP DEFAULT NOW();
+    `);
+    console.log('✅ Migrations PostgreSQL appliquées');
+  } catch (err) {
+    console.error('❌ Erreur migrations:', err.message);
+  }
+};
 
-const PORT = process.env.PORT || 5001;
-app.listen(PORT, () => {
-  console.log(`Serveur lancé sur le port ${PORT}`);
-  console.log(`http://localhost:${PORT}`);
-});
+// Démarrage
+(async () => {
+  await runMigrations();
+  connectMongo();
+  testPostgres();
+
+  const PORT = process.env.PORT || 5001;
+  app.listen(PORT, () => {
+    console.log(`Serveur lancé sur le port ${PORT}`);
+    console.log(`http://localhost:${PORT}`);
+  });
+})();

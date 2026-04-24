@@ -69,31 +69,29 @@ router.get('/stats', async (req, res) => {
 router.put('/:id', ownerGuard, async (req, res) => {
     try {
         const { id } = req.params;
-        const userId = req.user.userId;
         const { name, category, amount, date, is_recurring } = req.body;
 
-        if (!name || !category || !amount) {
+        if (!name || !category || amount === undefined || amount === null) {
             return res.status(400).json({ message: 'Champs requis manquants' });
         }
 
-        // Protection IDOR : vérifier que la transaction appartient à l'utilisateur connecté
-        const existing = await db.oneOrNone(
-            'SELECT id FROM transactions WHERE id = $1 AND user_id = $2',
-            [id, userId]
+        const transaction = await db.oneOrNone(
+            `UPDATE transactions
+             SET name=$1, category=$2, amount=$3, date=$4,
+                 is_recurring=$5, updated_at=NOW()
+             WHERE id=$6
+             RETURNING *`,
+            [name, category, Number(amount), date, is_recurring ?? false, id]
         );
 
-        if (!existing) {
-            return res.status(403).json({ message: 'Accès refusé' });
+        if (!transaction) {
+            return res.status(404).json({ message: 'Transaction introuvable' });
         }
 
-        const transaction = await db.one(
-            'UPDATE transactions SET name=$1, category=$2, amount=$3, date=$4, is_recurring=$5, updated_at=NOW() WHERE id=$6 RETURNING *',
-            [name, category, amount, date, is_recurring ?? false, id]
-        );
         res.json(transaction);
     } catch (error) {
-        console.error('Error:', error);
-        res.status(500).json({ message: 'Erreur serveur' });
+        console.error('PUT transaction error:', error.message);
+        res.status(500).json({ message: 'Erreur serveur', detail: error.message });
     }
 });
 

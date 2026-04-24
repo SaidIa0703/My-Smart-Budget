@@ -46,7 +46,9 @@ const exportCSV = (transactions: Transaction[]) => {
   URL.revokeObjectURL(url);
 };
 
-// ─── Modale d'édition (rendu UNIQUE, plus de double DOM mobile/desktop) ──────
+// ─── Modale d'édition ────────────────────────────────────────────────────────
+// Inputs NON-CONTRÔLÉS (defaultValue + ref) → React ne touche plus au DOM
+// après le montage → aucune perte de focus possible.
 function EditModal({
   transaction,
   onSave,
@@ -56,21 +58,33 @@ function EditModal({
   onSave: (id: number, data: Omit<Transaction, 'id' | 'updated_at'>) => Promise<string | null>;
   onClose: () => void;
 }) {
-  const [name, setName] = useState(transaction.name);
-  const [category, setCategory] = useState(transaction.category);
-  const [amount, setAmount] = useState(String(transaction.amount));
-  const [date, setDate] = useState(transaction.date.split('T')[0]);
-  const [isRecurring, setIsRecurring] = useState(transaction.is_recurring);
-  const [error, setError] = useState('');
-  const [loading, setLoading] = useState(false);
-  const firstInputRef = useRef<HTMLInputElement>(null);
+  const nameRef     = useRef<HTMLInputElement>(null);
+  const amountRef   = useRef<HTMLInputElement>(null);
+  const dateRef     = useRef<HTMLInputElement>(null);
+  const categoryRef = useRef<HTMLSelectElement>(null);
+  const recurringRef = useRef<HTMLInputElement>(null);
 
+  const [error, setError]     = useState('');
+  const [loading, setLoading] = useState(false);
+
+  // Focus automatique à l'ouverture
+  useEffect(() => { nameRef.current?.focus(); }, []);
+
+  // Fermer sur Escape
   useEffect(() => {
-    firstInputRef.current?.focus();
-  }, []);
+    const handler = (e: KeyboardEvent) => { if (e.key === 'Escape') onClose(); };
+    window.addEventListener('keydown', handler);
+    return () => window.removeEventListener('keydown', handler);
+  }, [onClose]);
 
   const handleSave = async () => {
-    if (!name.trim() || !category || !amount) {
+    const name     = nameRef.current?.value.trim() ?? '';
+    const amount   = amountRef.current?.value ?? '';
+    const date     = dateRef.current?.value ?? '';
+    const category = categoryRef.current?.value ?? '';
+    const isRecurring = recurringRef.current?.checked ?? false;
+
+    if (!name || !category || !amount) {
       setError('Tous les champs sont requis.');
       return;
     }
@@ -82,7 +96,7 @@ function EditModal({
     setLoading(true);
     setError('');
     const err = await onSave(transaction.id, {
-      name: name.trim(),
+      name,
       category,
       amount: parsed,
       date,
@@ -92,15 +106,7 @@ function EditModal({
       setError(err);
       setLoading(false);
     }
-    // si ok, le parent ferme la modale via setEditingId(null)
   };
-
-  // Fermer sur Escape
-  useEffect(() => {
-    const handler = (e: KeyboardEvent) => { if (e.key === 'Escape') onClose(); };
-    window.addEventListener('keydown', handler);
-    return () => window.removeEventListener('keydown', handler);
-  }, [onClose]);
 
   return (
     <div
@@ -120,15 +126,14 @@ function EditModal({
           </button>
         </div>
 
-        {/* Champs */}
+        {/* Champs — defaultValue : React ne gère plus la valeur après le montage */}
         <div className="space-y-3">
           <div>
             <label className="block text-sm font-medium text-slate-700 mb-1">Description</label>
             <input
-              ref={firstInputRef}
+              ref={nameRef}
               type="text"
-              value={name}
-              onChange={e => setName(e.target.value)}
+              defaultValue={transaction.name}
               className="w-full px-3 py-2 border border-slate-300 rounded-xl text-slate-900 focus:outline-none focus:ring-2 focus:ring-indigo-500"
             />
           </div>
@@ -137,19 +142,19 @@ function EditModal({
             <div>
               <label className="block text-sm font-medium text-slate-700 mb-1">Montant (€)</label>
               <input
+                ref={amountRef}
                 type="number"
                 step="0.01"
-                value={amount}
-                onChange={e => setAmount(e.target.value)}
+                defaultValue={transaction.amount}
                 className="w-full px-3 py-2 border border-slate-300 rounded-xl text-slate-900 focus:outline-none focus:ring-2 focus:ring-indigo-500"
               />
             </div>
             <div>
               <label className="block text-sm font-medium text-slate-700 mb-1">Date</label>
               <input
+                ref={dateRef}
                 type="date"
-                value={date}
-                onChange={e => setDate(e.target.value)}
+                defaultValue={transaction.date.split('T')[0]}
                 className="w-full px-3 py-2 border border-slate-300 rounded-xl text-slate-900 focus:outline-none focus:ring-2 focus:ring-indigo-500"
               />
             </div>
@@ -158,8 +163,8 @@ function EditModal({
           <div>
             <label className="block text-sm font-medium text-slate-700 mb-1">Catégorie</label>
             <select
-              value={category}
-              onChange={e => setCategory(e.target.value)}
+              ref={categoryRef}
+              defaultValue={transaction.category}
               className="w-full px-3 py-2 border border-slate-300 rounded-xl text-slate-900 focus:outline-none focus:ring-2 focus:ring-indigo-500"
             >
               {CATEGORIES.map(c => <option key={c} value={c}>{c}</option>)}
@@ -168,9 +173,9 @@ function EditModal({
 
           <label className="flex items-center gap-2 cursor-pointer select-none">
             <input
+              ref={recurringRef}
               type="checkbox"
-              checked={isRecurring}
-              onChange={e => setIsRecurring(e.target.checked)}
+              defaultChecked={transaction.is_recurring}
               className="w-4 h-4 accent-indigo-600"
             />
             <span className="text-sm text-slate-600">🔄 Prélèvement récurrent (mensuel)</span>

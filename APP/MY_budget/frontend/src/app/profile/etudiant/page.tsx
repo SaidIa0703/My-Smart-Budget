@@ -419,7 +419,7 @@ export default function EtudiantPage() {
         </aside>
         <main className="flex-1">
           {page === 'dashboard' && <DashboardPage />}
-          {page === 'transactions' && <TransactionsPage />}
+          {page === 'transactions' && TransactionsPage()}
           {page === 'budget' && <BudgetPage />}
           {page === 'goals' && (
             <GoalsSection

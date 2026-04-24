@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState } from 'react';
+import React, { useRef, useState } from 'react';
 import { Plus } from 'lucide-react';
 
 interface Props {
@@ -8,19 +8,24 @@ interface Props {
 }
 
 export default function AddTransaction({ onTransactionAdded }: Readonly<Props>) {
-  const [formData, setFormData] = useState({
-    name: '',
-    category: '',
-    amount: '',
-    date: new Date().toISOString().split('T')[0],
-  });
+  const formRef = useRef<HTMLFormElement>(null);
   const [loading, setLoading] = useState(false);
   const [message, setMessage] = useState('');
 
-  const handleSubmit = async (e: React.FormEvent) => {
+  const today = new Date().toISOString().split('T')[0];
+
+  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     setLoading(true);
     setMessage('');
+
+    const data = new FormData(e.currentTarget);
+    const payload = {
+      name: data.get('name') as string,
+      category: data.get('category') as string,
+      amount: parseFloat(data.get('amount') as string),
+      date: data.get('date') as string,
+    };
 
     try {
       const token = sessionStorage.getItem('token') || localStorage.getItem('token') || '';
@@ -32,22 +37,13 @@ export default function AddTransaction({ onTransactionAdded }: Readonly<Props>) 
           'Content-Type': 'application/json',
           'Authorization': `Bearer ${token}`,
         },
-        body: JSON.stringify({
-          ...formData,
-          amount: Number.parseFloat(formData.amount),
-        }),
+        body: JSON.stringify(payload),
       });
 
       if (response.ok) {
         setMessage('Transaction ajoutée!');
-        setFormData({
-          name: '',
-          category: '',
-          amount: '',
-          date: new Date().toISOString().split('T')[0],
-        });
-        
-        // Appelle le callback sans recharger
+        formRef.current?.reset();
+
         setTimeout(() => {
           if (onTransactionAdded) {
             onTransactionAdded();
@@ -73,15 +69,14 @@ export default function AddTransaction({ onTransactionAdded }: Readonly<Props>) 
         </div>
       )}
 
-      <form onSubmit={handleSubmit} className="space-y-4">
+      <form ref={formRef} onSubmit={handleSubmit} className="space-y-4">
         <div>
           <label htmlFor="description" className="block text-sm font-medium mb-2">Description</label>
           <input
             id="description"
+            name="name"
             type="text"
             placeholder="Ex: Carrefour, Salaire..."
-            value={formData.name}
-            onChange={(e) => setFormData({ ...formData, name: e.target.value })}
             className="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 bg-white text-gray-900"
             required
           />
@@ -91,8 +86,7 @@ export default function AddTransaction({ onTransactionAdded }: Readonly<Props>) 
           <label htmlFor="category" className="block text-sm font-medium mb-2">Catégorie</label>
           <select
             id="category"
-            value={formData.category}
-            onChange={(e) => setFormData({ ...formData, category: e.target.value })}
+            name="category"
             className="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 bg-white text-gray-900"
             required
           >
@@ -111,10 +105,9 @@ export default function AddTransaction({ onTransactionAdded }: Readonly<Props>) 
             <label htmlFor="amount" className="block text-sm font-medium mb-2">Montant (€)</label>
             <input
               id="amount"
+              name="amount"
               type="number"
               placeholder="0.00"
-              value={formData.amount}
-              onChange={(e) => setFormData({ ...formData, amount: e.target.value })}
               className="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 bg-white text-gray-900"
               step="0.01"
               required
@@ -125,9 +118,9 @@ export default function AddTransaction({ onTransactionAdded }: Readonly<Props>) 
             <label htmlFor="date" className="block text-sm font-medium mb-2">Date</label>
             <input
               id="date"
+              name="date"
               type="date"
-              value={formData.date}
-              onChange={(e) => setFormData({ ...formData, date: e.target.value })}
+              defaultValue={today}
               className="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 bg-white text-gray-900"
               required
             />

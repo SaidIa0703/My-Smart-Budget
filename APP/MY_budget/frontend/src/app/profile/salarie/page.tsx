@@ -1,6 +1,7 @@
 'use client';
 import React, { useState } from 'react';
 import { useProfileDashboard } from '../useProfileDashboard';
+import { ProfileAddForm, ProfileEditModal } from '../ProfileTransactionForms';
 import GoalsSection from '../GoalsSection';
 import ProfileSection from '../ProfileSection';
 import {
@@ -224,80 +225,20 @@ export default function SalariePage() {
   const TransactionsPage = () => (
     <div className="space-y-6 animate-fadeIn">
       {db.showAddForm && (
-        <div className="bg-white rounded-3xl p-6 shadow-xl border border-gray-100">
-          <div className="flex justify-between items-center mb-6">
-            <h2 className="text-2xl font-bold">Ajouter une Transaction</h2>
-            <button onClick={() => db.setShowAddForm(false)} className="p-2 hover:bg-gray-100 rounded-lg"><X size={24} /></button>
-          </div>
-          {db.message && (
-            <div className={`mb-4 p-4 rounded-lg ${db.message.includes('ajoutée') ? 'bg-green-100 text-green-700' : 'bg-red-100 text-red-700'}`}>{db.message}</div>
-          )}
-          <form onSubmit={db.handleAddTransaction} className="space-y-4">
-            <input type="text" placeholder="Description" value={db.formData.name}
-              onChange={e => db.setFormData({ ...db.formData, name: e.target.value })}
-              className="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 text-black" required />
-            <select value={db.formData.category} onChange={e => db.setFormData({ ...db.formData, category: e.target.value })}
-              className="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 text-black" required>
-              <option value="">Catégorie</option>
-              {CATEGORIES.map(c => <option key={c.value} value={c.value}>{c.label}</option>)}
-            </select>
-            <div className="grid grid-cols-2 gap-4">
-              <input type="number" placeholder="Montant (€)" step="0.01" value={db.formData.amount}
-                onChange={e => db.setFormData({ ...db.formData, amount: e.target.value })}
-                className="px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 text-black" required />
-              <input type="date" value={db.formData.date}
-                onChange={e => db.setFormData({ ...db.formData, date: e.target.value })}
-                className="px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 text-black" required />
-            </div>
-            <label className="flex items-center gap-3 p-3 bg-indigo-50 rounded-lg cursor-pointer hover:bg-indigo-100 transition">
-              <input type="checkbox" checked={db.formData.is_recurring}
-                onChange={e => db.setFormData({ ...db.formData, is_recurring: e.target.checked })} className="w-5 h-5 accent-indigo-600" />
-              <span className="text-sm font-medium text-indigo-700">🔄 Prélèvement récurrent (mensuel)</span>
-            </label>
-            <button type="submit" className="w-full px-4 py-3 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 transition font-medium flex items-center justify-center gap-2">
-              <Plus size={20} /> Ajouter
-            </button>
-          </form>
-        </div>
+        <ProfileAddForm
+          categories={CATEGORIES}
+          onAdded={() => { db.setShowAddForm(false); db.fetchTransactions(); }}
+          onClose={() => db.setShowAddForm(false)}
+        />
       )}
 
       {db.editingTransaction && (
-        <div className="fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4">
-          <div className="bg-white rounded-3xl p-6 shadow-2xl w-full max-w-md">
-            <div className="flex justify-between items-center mb-6">
-              <h2 className="text-xl font-bold text-slate-900">Modifier la transaction</h2>
-              <button onClick={() => db.setEditingTransaction(null)} className="p-2 hover:bg-gray-100 rounded-lg"><X size={22} /></button>
-            </div>
-            <form onSubmit={db.handleEditTransaction} className="space-y-4">
-              <input type="text" value={db.editingTransaction.name}
-                onChange={e => db.setEditingTransaction({ ...db.editingTransaction, name: e.target.value })}
-                className="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 text-black" required />
-              <select value={db.editingTransaction.category}
-                onChange={e => db.setEditingTransaction({ ...db.editingTransaction, category: e.target.value })}
-                className="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 text-black" required>
-                {CATEGORIES.map(c => <option key={c.value} value={c.value}>{c.label}</option>)}
-              </select>
-              <div className="grid grid-cols-2 gap-4">
-                <input type="number" step="0.01" value={db.editingTransaction.amount}
-                  onChange={e => db.setEditingTransaction({ ...db.editingTransaction, amount: e.target.value })}
-                  className="px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 text-black" required />
-                <input type="date" value={db.editingTransaction.date?.split('T')[0]}
-                  onChange={e => db.setEditingTransaction({ ...db.editingTransaction, date: e.target.value })}
-                  className="px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 text-black" required />
-              </div>
-              <label className="flex items-center gap-3 p-3 bg-indigo-50 rounded-lg cursor-pointer hover:bg-indigo-100 transition">
-                <input type="checkbox" checked={db.editingTransaction.is_recurring ?? false}
-                  onChange={e => db.setEditingTransaction({ ...db.editingTransaction, is_recurring: e.target.checked })} className="w-5 h-5 accent-indigo-600" />
-                <span className="text-sm font-medium text-indigo-700">🔄 Prélèvement récurrent (mensuel)</span>
-              </label>
-              <div className="flex gap-3">
-                <button type="button" onClick={() => db.setEditingTransaction(null)}
-                  className="flex-1 px-4 py-3 border border-gray-300 rounded-lg hover:bg-gray-50 transition font-medium text-slate-900">Annuler</button>
-                <button type="submit" className="flex-1 px-4 py-3 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 transition font-medium">Enregistrer</button>
-              </div>
-            </form>
-          </div>
-        </div>
+        <ProfileEditModal
+          transaction={db.editingTransaction}
+          categories={CATEGORIES}
+          onSaved={() => { db.setEditingTransaction(null); db.fetchTransactions(); }}
+          onClose={() => db.setEditingTransaction(null)}
+        />
       )}
 
       <div className="bg-white rounded-3xl p-6 shadow-xl border border-gray-100">

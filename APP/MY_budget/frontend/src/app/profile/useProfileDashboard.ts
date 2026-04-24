@@ -252,6 +252,7 @@ export function useProfileDashboard() {
     searchText, setSearchText,
     filterCategory, setFilterCategory,
     message,
+    fetchTransactions,
     handleAddTransaction, handleDeleteTransaction, handleEditTransaction,
     logout, changeProfile,
     stats, categoryData, filteredTransactions,

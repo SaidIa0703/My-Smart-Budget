@@ -21,14 +21,6 @@ interface Transaction {
   updated_at: string;
 }
 
-interface EditForm {
-  name: string;
-  category: string;
-  amount: string;
-  date: string;
-  is_recurring: boolean;
-}
-
 const getToken = () =>
   sessionStorage.getItem('token') || localStorage.getItem('token') || '';
 
@@ -44,8 +36,7 @@ const exportCSV = (transactions: Transaction[]) => {
       t.updated_at ? new Date(t.updated_at).toLocaleDateString('fr-FR') : '',
     ].join(',')
   );
-  const csv = [header, ...rows].join('\n');
-  const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
+  const blob = new Blob([header, '\n', ...rows.join('\n')], { type: 'text/csv;charset=utf-8;' });
   const url = URL.createObjectURL(blob);
   const a = document.createElement('a');
   a.href = url;
@@ -54,6 +45,222 @@ const exportCSV = (transactions: Transaction[]) => {
   URL.revokeObjectURL(url);
 };
 
+// ─── Formulaire d'édition DESKTOP (state local = pas de re-render parent) ──
+function EditRowDesktop({
+  transaction,
+  onSave,
+  onCancel,
+}: {
+  transaction: Transaction;
+  onSave: (id: number, data: Omit<Transaction, 'id' | 'updated_at'>) => Promise<string | null>;
+  onCancel: () => void;
+}) {
+  const [name, setName] = useState(transaction.name);
+  const [category, setCategory] = useState(transaction.category);
+  const [amount, setAmount] = useState(String(transaction.amount));
+  const [date, setDate] = useState(transaction.date.split('T')[0]);
+  const [isRecurring, setIsRecurring] = useState(transaction.is_recurring);
+  const [error, setError] = useState('');
+  const [loading, setLoading] = useState(false);
+
+  const handleSave = async () => {
+    if (!name.trim() || !category || !amount) {
+      setError('Tous les champs sont requis.');
+      return;
+    }
+    setLoading(true);
+    setError('');
+    const err = await onSave(transaction.id, {
+      name: name.trim(),
+      category,
+      amount: parseFloat(amount),
+      date,
+      is_recurring: isRecurring,
+    });
+    if (err) setError(err);
+    setLoading(false);
+  };
+
+  return (
+    <tr className="bg-indigo-50">
+      <td className="px-4 py-2">
+        <input
+          type="text"
+          value={name}
+          onChange={e => setName(e.target.value)}
+          className="w-full px-2 py-1.5 border border-indigo-300 rounded-lg text-slate-900 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500"
+          autoFocus
+        />
+      </td>
+      <td className="px-4 py-2">
+        <select
+          value={category}
+          onChange={e => setCategory(e.target.value)}
+          className="w-full px-2 py-1.5 border border-indigo-300 rounded-lg text-slate-900 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500"
+        >
+          {CATEGORIES.map(c => <option key={c} value={c}>{c}</option>)}
+        </select>
+      </td>
+      <td className="px-4 py-2">
+        <input
+          type="number"
+          step="0.01"
+          value={amount}
+          onChange={e => setAmount(e.target.value)}
+          className="w-28 px-2 py-1.5 border border-indigo-300 rounded-lg text-slate-900 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500"
+        />
+      </td>
+      <td className="px-4 py-2">
+        <input
+          type="date"
+          value={date}
+          onChange={e => setDate(e.target.value)}
+          className="px-2 py-1.5 border border-indigo-300 rounded-lg text-slate-900 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500"
+        />
+      </td>
+      <td className="px-4 py-2">
+        <input
+          type="checkbox"
+          checked={isRecurring}
+          onChange={e => setIsRecurring(e.target.checked)}
+          className="w-4 h-4 accent-indigo-600"
+        />
+      </td>
+      <td className="px-4 py-2 text-xs">
+        {error && <span className="text-red-500">{error}</span>}
+      </td>
+      <td className="px-4 py-2">
+        <div className="flex gap-1">
+          <button
+            onClick={handleSave}
+            disabled={loading}
+            className="p-2 text-green-600 hover:bg-green-50 rounded-lg transition disabled:opacity-50"
+            aria-label="Enregistrer"
+          >
+            <Check size={16} />
+          </button>
+          <button
+            onClick={onCancel}
+            className="p-2 text-slate-500 hover:bg-slate-100 rounded-lg transition"
+            aria-label="Annuler édition"
+          >
+            <X size={16} />
+          </button>
+        </div>
+      </td>
+    </tr>
+  );
+}
+
+// ─── Formulaire d'édition MOBILE (state local = pas de re-render parent) ──
+function EditCardMobile({
+  transaction,
+  onSave,
+  onCancel,
+}: {
+  transaction: Transaction;
+  onSave: (id: number, data: Omit<Transaction, 'id' | 'updated_at'>) => Promise<string | null>;
+  onCancel: () => void;
+}) {
+  const [name, setName] = useState(transaction.name);
+  const [category, setCategory] = useState(transaction.category);
+  const [amount, setAmount] = useState(String(transaction.amount));
+  const [date, setDate] = useState(transaction.date.split('T')[0]);
+  const [isRecurring, setIsRecurring] = useState(transaction.is_recurring);
+  const [error, setError] = useState('');
+  const [loading, setLoading] = useState(false);
+
+  const handleSave = async () => {
+    if (!name.trim() || !category || !amount) {
+      setError('Tous les champs sont requis.');
+      return;
+    }
+    setLoading(true);
+    setError('');
+    const err = await onSave(transaction.id, {
+      name: name.trim(),
+      category,
+      amount: parseFloat(amount),
+      date,
+      is_recurring: isRecurring,
+    });
+    if (err) setError(err);
+    setLoading(false);
+  };
+
+  return (
+    <div className="space-y-3">
+      <div className="grid grid-cols-2 gap-2">
+        <div className="col-span-2">
+          <label className="block text-xs font-medium text-slate-500 mb-1">Description</label>
+          <input
+            type="text"
+            value={name}
+            onChange={e => setName(e.target.value)}
+            className="w-full px-3 py-2 border border-slate-300 rounded-lg text-slate-900 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500"
+            autoFocus
+          />
+        </div>
+        <div>
+          <label className="block text-xs font-medium text-slate-500 mb-1">Montant (€)</label>
+          <input
+            type="number"
+            step="0.01"
+            value={amount}
+            onChange={e => setAmount(e.target.value)}
+            className="w-full px-3 py-2 border border-slate-300 rounded-lg text-slate-900 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500"
+          />
+        </div>
+        <div>
+          <label className="block text-xs font-medium text-slate-500 mb-1">Date</label>
+          <input
+            type="date"
+            value={date}
+            onChange={e => setDate(e.target.value)}
+            className="w-full px-3 py-2 border border-slate-300 rounded-lg text-slate-900 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500"
+          />
+        </div>
+        <div className="col-span-2">
+          <label className="block text-xs font-medium text-slate-500 mb-1">Catégorie</label>
+          <select
+            value={category}
+            onChange={e => setCategory(e.target.value)}
+            className="w-full px-3 py-2 border border-slate-300 rounded-lg text-slate-900 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500"
+          >
+            {CATEGORIES.map(c => <option key={c} value={c}>{c}</option>)}
+          </select>
+        </div>
+      </div>
+      <label className="flex items-center gap-2 cursor-pointer">
+        <input
+          type="checkbox"
+          checked={isRecurring}
+          onChange={e => setIsRecurring(e.target.checked)}
+          className="w-4 h-4 accent-indigo-600"
+        />
+        <span className="text-xs text-slate-600">Récurrent</span>
+      </label>
+      {error && <p className="text-xs text-red-500">{error}</p>}
+      <div className="flex gap-2">
+        <button
+          onClick={handleSave}
+          disabled={loading}
+          className="flex-1 flex items-center justify-center gap-1 py-2 bg-indigo-600 text-white rounded-lg text-sm font-medium hover:bg-indigo-700 transition disabled:opacity-50"
+        >
+          <Check size={14} /> Enregistrer
+        </button>
+        <button
+          onClick={onCancel}
+          className="flex-1 flex items-center justify-center gap-1 py-2 border border-slate-300 text-slate-600 rounded-lg text-sm hover:bg-slate-50 transition"
+        >
+          <X size={14} /> Annuler
+        </button>
+      </div>
+    </div>
+  );
+}
+
+// ─── Composant principal ─────────────────────────────────────────────────────
 export default function TransactionList() {
   const [transactions, setTransactions] = useState<Transaction[]>([]);
   const [loading, setLoading] = useState(true);
@@ -64,14 +271,7 @@ export default function TransactionList() {
   const [form, setForm] = useState({
     name: '', category: '', amount: '', date: new Date().toISOString().split('T')[0], is_recurring: false,
   });
-
-  // État édition
   const [editingId, setEditingId] = useState<number | null>(null);
-  const [editForm, setEditForm] = useState<EditForm>({
-    name: '', category: '', amount: '', date: '', is_recurring: false,
-  });
-  const [editMessage, setEditMessage] = useState('');
-  const [editLoading, setEditLoading] = useState(false);
 
   const fetchTransactions = useCallback(async () => {
     setLoading(true);
@@ -108,55 +308,29 @@ export default function TransactionList() {
     }
   };
 
-  const startEdit = (t: Transaction) => {
-    setEditingId(t.id);
-    setEditMessage('');
-    setEditForm({
-      name: t.name,
-      category: t.category,
-      amount: String(t.amount),
-      date: t.date.split('T')[0],
-      is_recurring: t.is_recurring,
-    });
-  };
-
-  const cancelEdit = () => {
-    setEditingId(null);
-    setEditMessage('');
-  };
-
-  const handleEdit = async (id: number) => {
-    if (!editForm.name || !editForm.category || !editForm.amount) {
-      setEditMessage('Tous les champs sont requis.');
-      return;
-    }
-    setEditLoading(true);
-    setEditMessage('');
+  // Appelé par EditRow/EditCard — retourne un message d'erreur ou null si OK
+  const handleSave = useCallback(async (
+    id: number,
+    data: Omit<Transaction, 'id' | 'updated_at'>
+  ): Promise<string | null> => {
     try {
       const res = await fetch(`${API_URL}/api/transactions/${id}`, {
         method: 'PUT',
         headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${getToken()}` },
-        body: JSON.stringify({
-          name: editForm.name,
-          category: editForm.category,
-          amount: parseFloat(editForm.amount),
-          date: editForm.date,
-          is_recurring: editForm.is_recurring,
-        }),
+        body: JSON.stringify(data),
       });
       if (res.ok) {
         const updated = await res.json();
         setTransactions(prev => prev.map(t => t.id === id ? updated : t));
         setEditingId(null);
-      } else {
-        const data = await res.json().catch(() => ({}));
-        setEditMessage(data.message || 'Erreur lors de la sauvegarde.');
+        return null;
       }
+      const body = await res.json().catch(() => ({}));
+      return body.message || 'Erreur lors de la sauvegarde.';
     } catch {
-      setEditMessage('Erreur serveur.');
+      return 'Erreur serveur.';
     }
-    setEditLoading(false);
-  };
+  }, []);
 
   const handleDelete = async (id: number) => {
     if (!confirm('Supprimer cette transaction ?')) return;
@@ -338,76 +512,12 @@ export default function TransactionList() {
               {filtered.map(t => (
                 <div key={t.id} className="bg-white rounded-2xl shadow p-4">
                   {editingId === t.id ? (
-                    /* Formulaire d'édition mobile */
-                    <div className="space-y-3">
-                      <div className="grid grid-cols-2 gap-2">
-                        <div className="col-span-2">
-                          <label className="block text-xs font-medium text-slate-500 mb-1">Description</label>
-                          <input
-                            type="text"
-                            value={editForm.name}
-                            onChange={e => setEditForm({ ...editForm, name: e.target.value })}
-                            className="w-full px-3 py-2 border border-slate-300 rounded-lg text-slate-900 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500"
-                          />
-                        </div>
-                        <div>
-                          <label className="block text-xs font-medium text-slate-500 mb-1">Montant (€)</label>
-                          <input
-                            type="number"
-                            step="0.01"
-                            value={editForm.amount}
-                            onChange={e => setEditForm({ ...editForm, amount: e.target.value })}
-                            className="w-full px-3 py-2 border border-slate-300 rounded-lg text-slate-900 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500"
-                          />
-                        </div>
-                        <div>
-                          <label className="block text-xs font-medium text-slate-500 mb-1">Date</label>
-                          <input
-                            type="date"
-                            value={editForm.date}
-                            onChange={e => setEditForm({ ...editForm, date: e.target.value })}
-                            className="w-full px-3 py-2 border border-slate-300 rounded-lg text-slate-900 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500"
-                          />
-                        </div>
-                        <div className="col-span-2">
-                          <label className="block text-xs font-medium text-slate-500 mb-1">Catégorie</label>
-                          <select
-                            value={editForm.category}
-                            onChange={e => setEditForm({ ...editForm, category: e.target.value })}
-                            className="w-full px-3 py-2 border border-slate-300 rounded-lg text-slate-900 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500"
-                          >
-                            {CATEGORIES.map(c => <option key={c} value={c}>{c}</option>)}
-                          </select>
-                        </div>
-                      </div>
-                      <label className="flex items-center gap-2 cursor-pointer">
-                        <input
-                          type="checkbox"
-                          checked={editForm.is_recurring}
-                          onChange={e => setEditForm({ ...editForm, is_recurring: e.target.checked })}
-                          className="w-4 h-4 accent-indigo-600"
-                        />
-                        <span className="text-xs text-slate-600">Récurrent</span>
-                      </label>
-                      {editMessage && <p className="text-xs text-red-500">{editMessage}</p>}
-                      <div className="flex gap-2">
-                        <button
-                          onClick={() => handleEdit(t.id)}
-                          disabled={editLoading}
-                          className="flex-1 flex items-center justify-center gap-1 py-2 bg-indigo-600 text-white rounded-lg text-sm font-medium hover:bg-indigo-700 transition disabled:opacity-50"
-                        >
-                          <Check size={14} /> Enregistrer
-                        </button>
-                        <button
-                          onClick={cancelEdit}
-                          className="flex-1 flex items-center justify-center gap-1 py-2 border border-slate-300 text-slate-600 rounded-lg text-sm hover:bg-slate-50 transition"
-                        >
-                          <X size={14} /> Annuler
-                        </button>
-                      </div>
-                    </div>
+                    <EditCardMobile
+                      transaction={t}
+                      onSave={handleSave}
+                      onCancel={() => setEditingId(null)}
+                    />
                   ) : (
-                    /* Affichage normal mobile */
                     <div className="flex items-start justify-between gap-2">
                       <div className="flex-1 min-w-0">
                         <p className="font-semibold text-slate-900 truncate">{t.name}</p>
@@ -423,7 +533,7 @@ export default function TransactionList() {
                         </span>
                         <div className="flex gap-1">
                           <button
-                            onClick={() => startEdit(t)}
+                            onClick={() => { setEditingId(t.id); setShowForm(false); }}
                             className="p-1.5 text-indigo-400 hover:bg-indigo-50 rounded-lg transition"
                             aria-label="Modifier"
                           >
@@ -462,75 +572,13 @@ export default function TransactionList() {
                   <tbody className="divide-y divide-slate-100">
                     {filtered.map(t => (
                       editingId === t.id ? (
-                        /* Ligne d'édition inline */
-                        <tr key={t.id} className="bg-indigo-50">
-                          <td className="px-4 py-2">
-                            <input
-                              type="text"
-                              value={editForm.name}
-                              onChange={e => setEditForm({ ...editForm, name: e.target.value })}
-                              className="w-full px-2 py-1.5 border border-indigo-300 rounded-lg text-slate-900 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500"
-                            />
-                          </td>
-                          <td className="px-4 py-2">
-                            <select
-                              value={editForm.category}
-                              onChange={e => setEditForm({ ...editForm, category: e.target.value })}
-                              className="w-full px-2 py-1.5 border border-indigo-300 rounded-lg text-slate-900 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500"
-                            >
-                              {CATEGORIES.map(c => <option key={c} value={c}>{c}</option>)}
-                            </select>
-                          </td>
-                          <td className="px-4 py-2">
-                            <input
-                              type="number"
-                              step="0.01"
-                              value={editForm.amount}
-                              onChange={e => setEditForm({ ...editForm, amount: e.target.value })}
-                              className="w-28 px-2 py-1.5 border border-indigo-300 rounded-lg text-slate-900 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500"
-                            />
-                          </td>
-                          <td className="px-4 py-2">
-                            <input
-                              type="date"
-                              value={editForm.date}
-                              onChange={e => setEditForm({ ...editForm, date: e.target.value })}
-                              className="px-2 py-1.5 border border-indigo-300 rounded-lg text-slate-900 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500"
-                            />
-                          </td>
-                          <td className="px-4 py-2">
-                            <input
-                              type="checkbox"
-                              checked={editForm.is_recurring}
-                              onChange={e => setEditForm({ ...editForm, is_recurring: e.target.checked })}
-                              className="w-4 h-4 accent-indigo-600"
-                            />
-                          </td>
-                          <td className="px-4 py-2 text-xs text-slate-400">
-                            {editMessage && <span className="text-red-500">{editMessage}</span>}
-                          </td>
-                          <td className="px-4 py-2">
-                            <div className="flex gap-1">
-                              <button
-                                onClick={() => handleEdit(t.id)}
-                                disabled={editLoading}
-                                className="p-2 text-green-600 hover:bg-green-50 rounded-lg transition disabled:opacity-50"
-                                aria-label="Enregistrer"
-                              >
-                                <Check size={16} />
-                              </button>
-                              <button
-                                onClick={cancelEdit}
-                                className="p-2 text-slate-500 hover:bg-slate-100 rounded-lg transition"
-                                aria-label="Annuler"
-                              >
-                                <X size={16} />
-                              </button>
-                            </div>
-                          </td>
-                        </tr>
+                        <EditRowDesktop
+                          key={t.id}
+                          transaction={t}
+                          onSave={handleSave}
+                          onCancel={() => setEditingId(null)}
+                        />
                       ) : (
-                        /* Ligne normale */
                         <tr key={t.id} className="hover:bg-slate-50 transition">
                           <td className="px-6 py-4 font-medium text-slate-900">{t.name}</td>
                           <td className="px-6 py-4 text-slate-600 text-sm">{t.category}</td>
@@ -541,7 +589,9 @@ export default function TransactionList() {
                             {new Date(t.date).toLocaleDateString('fr-FR')}
                           </td>
                           <td className="px-6 py-4 text-sm">
-                            {t.is_recurring ? <span className="text-indigo-600 font-medium">🔄 Oui</span> : <span className="text-slate-400">Non</span>}
+                            {t.is_recurring
+                              ? <span className="text-indigo-600 font-medium">🔄 Oui</span>
+                              : <span className="text-slate-400">Non</span>}
                           </td>
                           <td className="px-6 py-4 text-slate-400 text-xs">
                             {t.updated_at
@@ -551,7 +601,7 @@ export default function TransactionList() {
                           <td className="px-6 py-4">
                             <div className="flex gap-1">
                               <button
-                                onClick={() => startEdit(t)}
+                                onClick={() => { setEditingId(t.id); setShowForm(false); }}
                                 className="p-2 text-indigo-400 hover:bg-indigo-50 rounded-lg transition"
                                 aria-label="Modifier"
                               >

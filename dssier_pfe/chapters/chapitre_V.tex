@@ -182,13 +182,13 @@ Les données critiques (Transactions, Budgets) nécessitent une intégrité réf
 
 \begin{lstlisting}[language=SQL, caption={Schéma SQL des transactions}]
 CREATE TABLE transactions (
-  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
-  user_id UUID NOT NULL REFERENCES users(id),
-  amount DECIMAL(10,2) NOT NULL, -- DECIMAL pour la précision monétaire
-  type VARCHAR(10) CHECK (type IN ('income', 'expense')),
-  category_id UUID REFERENCES categories(id),
-  date TIMESTAMP NOT NULL,
-  created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+  id          SERIAL PRIMARY KEY,
+  user_id     INTEGER NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+  amount      DECIMAL(10,2) NOT NULL, -- DECIMAL pour la précision monétaire
+  type        VARCHAR(10) CHECK (type IN ('income', 'expense')),
+  category_id INTEGER REFERENCES categories(id),
+  date        TIMESTAMP NOT NULL,
+  created_at  TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 
 -- Index pour optimiser le Dashboard (filtrage par date)

@@ -69,10 +69,21 @@ router.get('/stats', async (req, res) => {
 router.put('/:id', ownerGuard, async (req, res) => {
     try {
         const { id } = req.params;
+        const userId = req.user.userId;
         const { name, category, amount, date, is_recurring } = req.body;
 
         if (!name || !category || !amount) {
             return res.status(400).json({ message: 'Champs requis manquants' });
+        }
+
+        // Protection IDOR : vérifier que la transaction appartient à l'utilisateur connecté
+        const existing = await db.oneOrNone(
+            'SELECT id FROM transactions WHERE id = $1 AND user_id = $2',
+            [id, userId]
+        );
+
+        if (!existing) {
+            return res.status(403).json({ message: 'Accès refusé' });
         }
 
         const transaction = await db.one(
@@ -85,6 +96,8 @@ router.put('/:id', ownerGuard, async (req, res) => {
         res.status(500).json({ message: 'Erreur serveur' });
     }
 });
+
+//
 
 // DELETE /api/transactions/:id
 router.delete('/:id', ownerGuard, async (req, res) => {

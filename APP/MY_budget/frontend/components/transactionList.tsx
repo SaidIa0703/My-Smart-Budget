@@ -208,17 +208,138 @@ function EditModal({
   );
 }
 
+// ─── Formulaire d'ajout (state local = pas de re-render parent pendant la frappe)
+function AddForm({
+  onAdded,
+  onCancel,
+}: {
+  onAdded: () => void;
+  onCancel: () => void;
+}) {
+  const formRef = useRef<HTMLFormElement>(null);
+  const [message, setMessage] = useState('');
+  const [loading, setLoading] = useState(false);
+
+  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
+    setMessage('');
+    setLoading(true);
+    const data = new FormData(e.currentTarget);
+    const payload = {
+      name:         data.get('name') as string,
+      category:     data.get('category') as string,
+      amount:       parseFloat(data.get('amount') as string),
+      date:         data.get('date') as string,
+      is_recurring: data.get('is_recurring') === 'on',
+    };
+    try {
+      const res = await fetch(`${API_URL}/api/transactions/add`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${getToken()}` },
+        body: JSON.stringify(payload),
+      });
+      if (res.ok) {
+        setMessage('Transaction ajoutée !');
+        formRef.current?.reset();
+        onAdded();
+      } else {
+        setMessage("Erreur lors de l'ajout.");
+      }
+    } catch {
+      setMessage('Erreur serveur.');
+    }
+    setLoading(false);
+  };
+
+  return (
+    <div className="bg-white rounded-2xl shadow p-4 sm:p-6">
+      <h2 className="text-lg font-bold text-slate-900 mb-4">Nouvelle transaction</h2>
+      {message && (
+        <div className={`mb-4 p-3 rounded-lg text-sm ${message.includes('ajoutée') ? 'bg-green-50 text-green-700' : 'bg-red-50 text-red-600'}`}>
+          {message}
+        </div>
+      )}
+      <form ref={formRef} onSubmit={handleSubmit} className="space-y-4">
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+          <div>
+            <label htmlFor="add-name" className="block text-sm font-medium text-slate-700 mb-1">Description</label>
+            <input
+              id="add-name"
+              name="name"
+              type="text"
+              placeholder="Ex: Courses Lidl"
+              className="w-full px-3 py-2 border border-slate-300 rounded-xl text-slate-900 focus:outline-none focus:ring-2 focus:ring-indigo-500"
+              required
+            />
+          </div>
+          <div>
+            <label htmlFor="add-category" className="block text-sm font-medium text-slate-700 mb-1">Catégorie</label>
+            <select
+              id="add-category"
+              name="category"
+              className="w-full px-3 py-2 border border-slate-300 rounded-xl text-slate-900 focus:outline-none focus:ring-2 focus:ring-indigo-500"
+              required
+            >
+              <option value="">Choisir</option>
+              {CATEGORIES.map(c => <option key={c} value={c}>{c}</option>)}
+            </select>
+          </div>
+          <div>
+            <label htmlFor="add-amount" className="block text-sm font-medium text-slate-700 mb-1">Montant (€, négatif = dépense)</label>
+            <input
+              id="add-amount"
+              name="amount"
+              type="number"
+              step="0.01"
+              placeholder="Ex: -45.00"
+              className="w-full px-3 py-2 border border-slate-300 rounded-xl text-slate-900 focus:outline-none focus:ring-2 focus:ring-indigo-500"
+              required
+            />
+          </div>
+          <div>
+            <label htmlFor="add-date" className="block text-sm font-medium text-slate-700 mb-1">Date</label>
+            <input
+              id="add-date"
+              name="date"
+              type="date"
+              defaultValue={new Date().toISOString().split('T')[0]}
+              className="w-full px-3 py-2 border border-slate-300 rounded-xl text-slate-900 focus:outline-none focus:ring-2 focus:ring-indigo-500"
+              required
+            />
+          </div>
+        </div>
+        <label className="flex items-center gap-2 cursor-pointer">
+          <input name="is_recurring" type="checkbox" className="w-4 h-4 accent-indigo-600" />
+          <span className="text-sm text-slate-600">🔄 Prélèvement récurrent (mensuel)</span>
+        </label>
+        <div className="flex gap-3">
+          <button
+            type="submit"
+            disabled={loading}
+            className="px-6 py-2.5 bg-indigo-600 text-white rounded-xl font-medium hover:bg-indigo-700 transition disabled:opacity-50"
+          >
+            {loading ? 'Ajout…' : 'Ajouter'}
+          </button>
+          <button
+            type="button"
+            onClick={onCancel}
+            className="px-6 py-2.5 border border-slate-300 text-slate-600 rounded-xl font-medium hover:bg-slate-50 transition"
+          >
+            Annuler
+          </button>
+        </div>
+      </form>
+    </div>
+  );
+}
+
 // ─── Composant principal ─────────────────────────────────────────────────────
 export default function TransactionList() {
   const [transactions, setTransactions] = useState<Transaction[]>([]);
   const [loading, setLoading] = useState(true);
   const [showForm, setShowForm] = useState(false);
-  const [message, setMessage] = useState('');
   const [search, setSearch] = useState('');
   const [filterCat, setFilterCat] = useState('');
-  const [form, setForm] = useState({
-    name: '', category: '', amount: '', date: new Date().toISOString().split('T')[0], is_recurring: false,
-  });
   const [editingTransaction, setEditingTransaction] = useState<Transaction | null>(null);
 
   const fetchTransactions = useCallback(async () => {
@@ -233,28 +354,6 @@ export default function TransactionList() {
   }, []);
 
   useEffect(() => { fetchTransactions(); }, [fetchTransactions]);
-
-  const handleAdd = async (e: React.FormEvent) => {
-    e.preventDefault();
-    setMessage('');
-    try {
-      const res = await fetch(`${API_URL}/api/transactions/add`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${getToken()}` },
-        body: JSON.stringify({ ...form, amount: parseFloat(form.amount) }),
-      });
-      if (res.ok) {
-        setMessage('Transaction ajoutée !');
-        setForm({ name: '', category: '', amount: '', date: new Date().toISOString().split('T')[0], is_recurring: false });
-        setShowForm(false);
-        fetchTransactions();
-      } else {
-        setMessage("Erreur lors de l'ajout.");
-      }
-    } catch {
-      setMessage('Erreur serveur.');
-    }
-  };
 
   const handleSave = useCallback(async (
     id: number,
@@ -352,84 +451,12 @@ export default function TransactionList() {
             </div>
           </div>
 
-          {/* Formulaire ajout */}
+          {/* Formulaire ajout — composant isolé, zéro re-render parent pendant la frappe */}
           {showForm && (
-            <div className="bg-white rounded-2xl shadow p-4 sm:p-6">
-              <h2 className="text-lg font-bold text-slate-900 mb-4">Nouvelle transaction</h2>
-              {message && (
-                <div className={`mb-4 p-3 rounded-lg text-sm ${message.includes('ajoutée') ? 'bg-green-50 text-green-700' : 'bg-red-50 text-red-600'}`}>
-                  {message}
-                </div>
-              )}
-              <form onSubmit={handleAdd} className="space-y-4">
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                  <div>
-                    <label htmlFor="tl-name" className="block text-sm font-medium text-slate-700 mb-1">Description</label>
-                    <input
-                      id="tl-name"
-                      type="text"
-                      placeholder="Ex: Courses Lidl"
-                      value={form.name}
-                      onChange={e => setForm({ ...form, name: e.target.value })}
-                      className="w-full px-3 py-2 border border-slate-300 rounded-xl text-slate-900 focus:outline-none focus:ring-2 focus:ring-indigo-500"
-                      required
-                    />
-                  </div>
-                  <div>
-                    <label htmlFor="tl-category" className="block text-sm font-medium text-slate-700 mb-1">Catégorie</label>
-                    <select
-                      id="tl-category"
-                      value={form.category}
-                      onChange={e => setForm({ ...form, category: e.target.value })}
-                      className="w-full px-3 py-2 border border-slate-300 rounded-xl text-slate-900 focus:outline-none focus:ring-2 focus:ring-indigo-500"
-                      required
-                    >
-                      <option value="">Choisir</option>
-                      {CATEGORIES.map(c => <option key={c} value={c}>{c}</option>)}
-                    </select>
-                  </div>
-                  <div>
-                    <label htmlFor="tl-amount" className="block text-sm font-medium text-slate-700 mb-1">Montant (€, négatif = dépense)</label>
-                    <input
-                      id="tl-amount"
-                      type="number"
-                      step="0.01"
-                      placeholder="Ex: -45.00"
-                      value={form.amount}
-                      onChange={e => setForm({ ...form, amount: e.target.value })}
-                      className="w-full px-3 py-2 border border-slate-300 rounded-xl text-slate-900 focus:outline-none focus:ring-2 focus:ring-indigo-500"
-                      required
-                    />
-                  </div>
-                  <div>
-                    <label htmlFor="tl-date" className="block text-sm font-medium text-slate-700 mb-1">Date</label>
-                    <input
-                      id="tl-date"
-                      type="date"
-                      value={form.date}
-                      onChange={e => setForm({ ...form, date: e.target.value })}
-                      className="w-full px-3 py-2 border border-slate-300 rounded-xl text-slate-900 focus:outline-none focus:ring-2 focus:ring-indigo-500"
-                      required
-                    />
-                  </div>
-                </div>
-                <label className="flex items-center gap-2 cursor-pointer">
-                  <input
-                    type="checkbox"
-                    checked={form.is_recurring}
-                    onChange={e => setForm({ ...form, is_recurring: e.target.checked })}
-                    className="w-4 h-4 accent-indigo-600"
-                  />
-                  <span className="text-sm text-slate-600">🔄 Prélèvement récurrent (mensuel)</span>
-                </label>
-                <button
-                  type="submit"
-                  className="w-full sm:w-auto px-6 py-2.5 bg-indigo-600 text-white rounded-xl font-medium hover:bg-indigo-700 transition"
-                >
-                  Ajouter
-                </button>
-              </form>
-            </div>
+            <AddForm
+              onAdded={() => { setShowForm(false); fetchTransactions(); }}
+              onCancel={() => setShowForm(false)}
+            />
           )}
 
           {/* Filtres */}

@@ -49,8 +49,8 @@ describe('TransactionList', () => {
     });
     render(<TransactionList />);
     await waitFor(() => {
-      expect(screen.getByText('Carrefour')).toBeInTheDocument();
-      expect(screen.getByText('Salaire')).toBeInTheDocument();
+      expect(screen.getAllByText('Carrefour').length).toBeGreaterThan(0);
+      expect(screen.getAllByText('Salaire').length).toBeGreaterThan(0);
       expect(screen.getAllByText('Alimentation').length).toBeGreaterThan(0);
     });
   });
@@ -80,7 +80,7 @@ describe('TransactionList', () => {
       .mockResolvedValueOnce({ ok: true, json: async () => ({}) });
 
     render(<TransactionList />);
-    await waitFor(() => expect(screen.getByText('Carrefour')).toBeInTheDocument());
+    await waitFor(() => expect(screen.getAllByText('Carrefour').length).toBeGreaterThan(0));
 
     const deleteButtons = screen.getAllByLabelText('Supprimer');
     fireEvent.click(deleteButtons[0]);

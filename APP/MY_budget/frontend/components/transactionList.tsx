@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useState, useCallback } from 'react';
+import { useEffect, useState, useCallback, useRef } from 'react';
 import { Trash2, Plus, X, Download, Pencil, Check } from 'lucide-react';
 
 const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5001';
@@ -36,7 +36,8 @@ const exportCSV = (transactions: Transaction[]) => {
       t.updated_at ? new Date(t.updated_at).toLocaleDateString('fr-FR') : '',
     ].join(',')
   );
-  const blob = new Blob([header, '\n', ...rows.join('\n')], { type: 'text/csv;charset=utf-8;' });
+  const csv = [header, ...rows].join('\n');
+  const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
   const url = URL.createObjectURL(blob);
   const a = document.createElement('a');
   a.href = url;
@@ -45,15 +46,15 @@ const exportCSV = (transactions: Transaction[]) => {
   URL.revokeObjectURL(url);
 };
 
-// ─── Formulaire d'édition DESKTOP (state local = pas de re-render parent) ──
-function EditRowDesktop({
+// ─── Modale d'édition (rendu UNIQUE, plus de double DOM mobile/desktop) ──────
+function EditModal({
   transaction,
   onSave,
-  onCancel,
+  onClose,
 }: {
   transaction: Transaction;
   onSave: (id: number, data: Omit<Transaction, 'id' | 'updated_at'>) => Promise<string | null>;
-  onCancel: () => void;
+  onClose: () => void;
 }) {
   const [name, setName] = useState(transaction.name);
   const [category, setCategory] = useState(transaction.category);
@@ -62,10 +63,20 @@ function EditRowDesktop({
   const [isRecurring, setIsRecurring] = useState(transaction.is_recurring);
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
+  const firstInputRef = useRef<HTMLInputElement>(null);
+
+  useEffect(() => {
+    firstInputRef.current?.focus();
+  }, []);
 
   const handleSave = async () => {
     if (!name.trim() || !category || !amount) {
       setError('Tous les champs sont requis.');
+      return;
+    }
+    const parsed = parseFloat(amount);
+    if (isNaN(parsed)) {
+      setError('Montant invalide.');
       return;
     }
     setLoading(true);
@@ -73,188 +84,120 @@ function EditRowDesktop({
     const err = await onSave(transaction.id, {
       name: name.trim(),
       category,
-      amount: parseFloat(amount),
+      amount: parsed,
       date,
       is_recurring: isRecurring,
     });
-    if (err) setError(err);
-    setLoading(false);
+    if (err) {
+      setError(err);
+      setLoading(false);
+    }
+    // si ok, le parent ferme la modale via setEditingId(null)
   };
 
+  // Fermer sur Escape
+  useEffect(() => {
+    const handler = (e: KeyboardEvent) => { if (e.key === 'Escape') onClose(); };
+    window.addEventListener('keydown', handler);
+    return () => window.removeEventListener('keydown', handler);
+  }, [onClose]);
+
   return (
-    <tr className="bg-indigo-50">
-      <td className="px-4 py-2">
-        <input
-          type="text"
-          value={name}
-          onChange={e => setName(e.target.value)}
-          className="w-full px-2 py-1.5 border border-indigo-300 rounded-lg text-slate-900 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500"
-          autoFocus
-        />
-      </td>
-      <td className="px-4 py-2">
-        <select
-          value={category}
-          onChange={e => setCategory(e.target.value)}
-          className="w-full px-2 py-1.5 border border-indigo-300 rounded-lg text-slate-900 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500"
-        >
-          {CATEGORIES.map(c => <option key={c} value={c}>{c}</option>)}
-        </select>
-      </td>
-      <td className="px-4 py-2">
-        <input
-          type="number"
-          step="0.01"
-          value={amount}
-          onChange={e => setAmount(e.target.value)}
-          className="w-28 px-2 py-1.5 border border-indigo-300 rounded-lg text-slate-900 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500"
-        />
-      </td>
-      <td className="px-4 py-2">
-        <input
-          type="date"
-          value={date}
-          onChange={e => setDate(e.target.value)}
-          className="px-2 py-1.5 border border-indigo-300 rounded-lg text-slate-900 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500"
-        />
-      </td>
-      <td className="px-4 py-2">
-        <input
-          type="checkbox"
-          checked={isRecurring}
-          onChange={e => setIsRecurring(e.target.checked)}
-          className="w-4 h-4 accent-indigo-600"
-        />
-      </td>
-      <td className="px-4 py-2 text-xs">
-        {error && <span className="text-red-500">{error}</span>}
-      </td>
-      <td className="px-4 py-2">
-        <div className="flex gap-1">
+    <div
+      className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/40 backdrop-blur-sm"
+      onClick={e => { if (e.target === e.currentTarget) onClose(); }}
+    >
+      <div className="bg-white rounded-2xl shadow-xl w-full max-w-md p-6 space-y-4">
+        {/* En-tête */}
+        <div className="flex items-center justify-between">
+          <h2 className="text-lg font-bold text-slate-900">Modifier la transaction</h2>
+          <button
+            onClick={onClose}
+            className="p-1.5 text-slate-400 hover:text-slate-600 hover:bg-slate-100 rounded-lg transition"
+            aria-label="Fermer"
+          >
+            <X size={18} />
+          </button>
+        </div>
+
+        {/* Champs */}
+        <div className="space-y-3">
+          <div>
+            <label className="block text-sm font-medium text-slate-700 mb-1">Description</label>
+            <input
+              ref={firstInputRef}
+              type="text"
+              value={name}
+              onChange={e => setName(e.target.value)}
+              className="w-full px-3 py-2 border border-slate-300 rounded-xl text-slate-900 focus:outline-none focus:ring-2 focus:ring-indigo-500"
+            />
+          </div>
+
+          <div className="grid grid-cols-2 gap-3">
+            <div>
+              <label className="block text-sm font-medium text-slate-700 mb-1">Montant (€)</label>
+              <input
+                type="number"
+                step="0.01"
+                value={amount}
+                onChange={e => setAmount(e.target.value)}
+                className="w-full px-3 py-2 border border-slate-300 rounded-xl text-slate-900 focus:outline-none focus:ring-2 focus:ring-indigo-500"
+              />
+            </div>
+            <div>
+              <label className="block text-sm font-medium text-slate-700 mb-1">Date</label>
+              <input
+                type="date"
+                value={date}
+                onChange={e => setDate(e.target.value)}
+                className="w-full px-3 py-2 border border-slate-300 rounded-xl text-slate-900 focus:outline-none focus:ring-2 focus:ring-indigo-500"
+              />
+            </div>
+          </div>
+
+          <div>
+            <label className="block text-sm font-medium text-slate-700 mb-1">Catégorie</label>
+            <select
+              value={category}
+              onChange={e => setCategory(e.target.value)}
+              className="w-full px-3 py-2 border border-slate-300 rounded-xl text-slate-900 focus:outline-none focus:ring-2 focus:ring-indigo-500"
+            >
+              {CATEGORIES.map(c => <option key={c} value={c}>{c}</option>)}
+            </select>
+          </div>
+
+          <label className="flex items-center gap-2 cursor-pointer select-none">
+            <input
+              type="checkbox"
+              checked={isRecurring}
+              onChange={e => setIsRecurring(e.target.checked)}
+              className="w-4 h-4 accent-indigo-600"
+            />
+            <span className="text-sm text-slate-600">🔄 Prélèvement récurrent (mensuel)</span>
+          </label>
+        </div>
+
+        {error && (
+          <p className="text-sm text-red-500 bg-red-50 rounded-lg px-3 py-2">{error}</p>
+        )}
+
+        {/* Actions */}
+        <div className="flex gap-3 pt-1">
           <button
             onClick={handleSave}
             disabled={loading}
-            className="p-2 text-green-600 hover:bg-green-50 rounded-lg transition disabled:opacity-50"
-            aria-label="Enregistrer"
+            className="flex-1 flex items-center justify-center gap-2 py-2.5 bg-indigo-600 text-white rounded-xl font-medium hover:bg-indigo-700 transition disabled:opacity-50"
           >
             <Check size={16} />
+            {loading ? 'Enregistrement…' : 'Enregistrer'}
           </button>
           <button
-            onClick={onCancel}
-            className="p-2 text-slate-500 hover:bg-slate-100 rounded-lg transition"
-            aria-label="Annuler édition"
+            onClick={onClose}
+            className="flex-1 py-2.5 border border-slate-300 text-slate-600 rounded-xl font-medium hover:bg-slate-50 transition"
           >
-            <X size={16} />
+            Annuler
           </button>
         </div>
-      </td>
-    </tr>
-  );
-}
-
-// ─── Formulaire d'édition MOBILE (state local = pas de re-render parent) ──
-function EditCardMobile({
-  transaction,
-  onSave,
-  onCancel,
-}: {
-  transaction: Transaction;
-  onSave: (id: number, data: Omit<Transaction, 'id' | 'updated_at'>) => Promise<string | null>;
-  onCancel: () => void;
-}) {
-  const [name, setName] = useState(transaction.name);
-  const [category, setCategory] = useState(transaction.category);
-  const [amount, setAmount] = useState(String(transaction.amount));
-  const [date, setDate] = useState(transaction.date.split('T')[0]);
-  const [isRecurring, setIsRecurring] = useState(transaction.is_recurring);
-  const [error, setError] = useState('');
-  const [loading, setLoading] = useState(false);
-
-  const handleSave = async () => {
-    if (!name.trim() || !category || !amount) {
-      setError('Tous les champs sont requis.');
-      return;
-    }
-    setLoading(true);
-    setError('');
-    const err = await onSave(transaction.id, {
-      name: name.trim(),
-      category,
-      amount: parseFloat(amount),
-      date,
-      is_recurring: isRecurring,
-    });
-    if (err) setError(err);
-    setLoading(false);
-  };
-
-  return (
-    <div className="space-y-3">
-      <div className="grid grid-cols-2 gap-2">
-        <div className="col-span-2">
-          <label className="block text-xs font-medium text-slate-500 mb-1">Description</label>
-          <input
-            type="text"
-            value={name}
-            onChange={e => setName(e.target.value)}
-            className="w-full px-3 py-2 border border-slate-300 rounded-lg text-slate-900 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500"
-            autoFocus
-          />
-        </div>
-        <div>
-          <label className="block text-xs font-medium text-slate-500 mb-1">Montant (€)</label>
-          <input
-            type="number"
-            step="0.01"
-            value={amount}
-            onChange={e => setAmount(e.target.value)}
-            className="w-full px-3 py-2 border border-slate-300 rounded-lg text-slate-900 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500"
-          />
-        </div>
-        <div>
-          <label className="block text-xs font-medium text-slate-500 mb-1">Date</label>
-          <input
-            type="date"
-            value={date}
-            onChange={e => setDate(e.target.value)}
-            className="w-full px-3 py-2 border border-slate-300 rounded-lg text-slate-900 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500"
-          />
-        </div>
-        <div className="col-span-2">
-          <label className="block text-xs font-medium text-slate-500 mb-1">Catégorie</label>
-          <select
-            value={category}
-            onChange={e => setCategory(e.target.value)}
-            className="w-full px-3 py-2 border border-slate-300 rounded-lg text-slate-900 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500"
-          >
-            {CATEGORIES.map(c => <option key={c} value={c}>{c}</option>)}
-          </select>
-        </div>
-      </div>
-      <label className="flex items-center gap-2 cursor-pointer">
-        <input
-          type="checkbox"
-          checked={isRecurring}
-          onChange={e => setIsRecurring(e.target.checked)}
-          className="w-4 h-4 accent-indigo-600"
-        />
-        <span className="text-xs text-slate-600">Récurrent</span>
-      </label>
-      {error && <p className="text-xs text-red-500">{error}</p>}
-      <div className="flex gap-2">
-        <button
-          onClick={handleSave}
-          disabled={loading}
-          className="flex-1 flex items-center justify-center gap-1 py-2 bg-indigo-600 text-white rounded-lg text-sm font-medium hover:bg-indigo-700 transition disabled:opacity-50"
-        >
-          <Check size={14} /> Enregistrer
-        </button>
-        <button
-          onClick={onCancel}
-          className="flex-1 flex items-center justify-center gap-1 py-2 border border-slate-300 text-slate-600 rounded-lg text-sm hover:bg-slate-50 transition"
-        >
-          <X size={14} /> Annuler
-        </button>
       </div>
     </div>
   );
@@ -271,7 +214,7 @@ export default function TransactionList() {
   const [form, setForm] = useState({
     name: '', category: '', amount: '', date: new Date().toISOString().split('T')[0], is_recurring: false,
   });
-  const [editingId, setEditingId] = useState<number | null>(null);
+  const [editingTransaction, setEditingTransaction] = useState<Transaction | null>(null);
 
   const fetchTransactions = useCallback(async () => {
     setLoading(true);
@@ -308,7 +251,6 @@ export default function TransactionList() {
     }
   };
 
-  // Appelé par EditRow/EditCard — retourne un message d'erreur ou null si OK
   const handleSave = useCallback(async (
     id: number,
     data: Omit<Transaction, 'id' | 'updated_at'>
@@ -322,7 +264,7 @@ export default function TransactionList() {
       if (res.ok) {
         const updated = await res.json();
         setTransactions(prev => prev.map(t => t.id === id ? updated : t));
-        setEditingId(null);
+        setEditingTransaction(null);
         return null;
       }
       const body = await res.json().catch(() => ({}));
@@ -353,232 +295,224 @@ export default function TransactionList() {
   const solde = totalRevenus - totalDepenses;
 
   return (
-    <div className="min-h-screen bg-gray-50">
-      <div className="max-w-6xl mx-auto px-3 sm:px-4 py-4 sm:py-8 space-y-4 sm:space-y-6">
+    <>
+      {/* Modale d'édition (unique, toujours hors du tableau) */}
+      {editingTransaction && (
+        <EditModal
+          transaction={editingTransaction}
+          onSave={handleSave}
+          onClose={() => setEditingTransaction(null)}
+        />
+      )}
 
-        {/* Header */}
-        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
-          <h1 className="text-2xl sm:text-3xl font-bold text-slate-900">Mes Transactions</h1>
-          <div className="flex gap-2">
-            <button
-              onClick={() => exportCSV(transactions)}
-              disabled={transactions.length === 0}
-              className="flex items-center gap-2 px-3 sm:px-4 py-2 border border-slate-300 text-slate-700 rounded-xl text-sm font-medium hover:bg-slate-100 transition disabled:opacity-40"
-            >
-              <Download size={16} />
-              <span className="hidden sm:inline">Export CSV</span>
-            </button>
-            <button
-              onClick={() => { setShowForm(v => !v); setEditingId(null); }}
-              className="flex items-center gap-2 px-3 sm:px-4 py-2 bg-gradient-to-r from-indigo-500 to-purple-600 text-white rounded-xl text-sm font-medium hover:opacity-90 transition"
-            >
-              {showForm ? <><X size={16} /> Annuler</> : <><Plus size={16} /> Ajouter</>}
-            </button>
-          </div>
-        </div>
+      <div className="min-h-screen bg-gray-50">
+        <div className="max-w-6xl mx-auto px-3 sm:px-4 py-4 sm:py-8 space-y-4 sm:space-y-6">
 
-        {/* KPIs */}
-        <div className="grid grid-cols-3 gap-2 sm:gap-4">
-          <div className="bg-white rounded-2xl shadow p-3 sm:p-4 text-center">
-            <p className="text-xs text-slate-500 mb-1">Revenus</p>
-            <p className="text-base sm:text-xl font-bold text-green-600">+{totalRevenus.toFixed(2)}€</p>
-          </div>
-          <div className="bg-white rounded-2xl shadow p-3 sm:p-4 text-center">
-            <p className="text-xs text-slate-500 mb-1">Dépenses</p>
-            <p className="text-base sm:text-xl font-bold text-red-500">-{totalDepenses.toFixed(2)}€</p>
-          </div>
-          <div className="bg-white rounded-2xl shadow p-3 sm:p-4 text-center">
-            <p className="text-xs text-slate-500 mb-1">Solde</p>
-            <p className={`text-base sm:text-xl font-bold ${solde >= 0 ? 'text-indigo-600' : 'text-red-500'}`}>
-              {solde >= 0 ? '+' : ''}{solde.toFixed(2)}€
-            </p>
-          </div>
-        </div>
-
-        {/* Formulaire ajout */}
-        {showForm && (
-          <div className="bg-white rounded-2xl shadow p-4 sm:p-6">
-            <h2 className="text-lg font-bold text-slate-900 mb-4">Nouvelle transaction</h2>
-            {message && (
-              <div className={`mb-4 p-3 rounded-lg text-sm ${message.includes('ajoutée') ? 'bg-green-50 text-green-700' : 'bg-red-50 text-red-600'}`}>
-                {message}
-              </div>
-            )}
-            <form onSubmit={handleAdd} className="space-y-4">
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                <div>
-                  <label htmlFor="tl-name" className="block text-sm font-medium text-slate-700 mb-1">Description</label>
-                  <input
-                    id="tl-name"
-                    type="text"
-                    placeholder="Ex: Courses Lidl"
-                    value={form.name}
-                    onChange={e => setForm({ ...form, name: e.target.value })}
-                    className="w-full px-3 py-2 border border-slate-300 rounded-xl text-slate-900 focus:outline-none focus:ring-2 focus:ring-indigo-500"
-                    required
-                  />
-                </div>
-                <div>
-                  <label htmlFor="tl-category" className="block text-sm font-medium text-slate-700 mb-1">Catégorie</label>
-                  <select
-                    id="tl-category"
-                    value={form.category}
-                    onChange={e => setForm({ ...form, category: e.target.value })}
-                    className="w-full px-3 py-2 border border-slate-300 rounded-xl text-slate-900 focus:outline-none focus:ring-2 focus:ring-indigo-500"
-                    required
-                  >
-                    <option value="">Choisir</option>
-                    {CATEGORIES.map(c => <option key={c} value={c}>{c}</option>)}
-                  </select>
-                </div>
-                <div>
-                  <label htmlFor="tl-amount" className="block text-sm font-medium text-slate-700 mb-1">Montant (€, négatif = dépense)</label>
-                  <input
-                    id="tl-amount"
-                    type="number"
-                    step="0.01"
-                    placeholder="Ex: -45.00"
-                    value={form.amount}
-                    onChange={e => setForm({ ...form, amount: e.target.value })}
-                    className="w-full px-3 py-2 border border-slate-300 rounded-xl text-slate-900 focus:outline-none focus:ring-2 focus:ring-indigo-500"
-                    required
-                  />
-                </div>
-                <div>
-                  <label htmlFor="tl-date" className="block text-sm font-medium text-slate-700 mb-1">Date</label>
-                  <input
-                    id="tl-date"
-                    type="date"
-                    value={form.date}
-                    onChange={e => setForm({ ...form, date: e.target.value })}
-                    className="w-full px-3 py-2 border border-slate-300 rounded-xl text-slate-900 focus:outline-none focus:ring-2 focus:ring-indigo-500"
-                    required
-                  />
-                </div>
-              </div>
-              <label className="flex items-center gap-2 cursor-pointer">
-                <input
-                  type="checkbox"
-                  checked={form.is_recurring}
-                  onChange={e => setForm({ ...form, is_recurring: e.target.checked })}
-                  className="w-4 h-4 accent-indigo-600"
-                />
-                <span className="text-sm text-slate-600">🔄 Prélèvement récurrent (mensuel)</span>
-              </label>
+          {/* Header */}
+          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+            <h1 className="text-2xl sm:text-3xl font-bold text-slate-900">Mes Transactions</h1>
+            <div className="flex gap-2">
               <button
-                type="submit"
-                className="w-full sm:w-auto px-6 py-2.5 bg-indigo-600 text-white rounded-xl font-medium hover:bg-indigo-700 transition"
+                onClick={() => exportCSV(transactions)}
+                disabled={transactions.length === 0}
+                className="flex items-center gap-2 px-3 sm:px-4 py-2 border border-slate-300 text-slate-700 rounded-xl text-sm font-medium hover:bg-slate-100 transition disabled:opacity-40"
               >
-                Ajouter
+                <Download size={16} />
+                <span className="hidden sm:inline">Export CSV</span>
               </button>
-            </form>
+              <button
+                onClick={() => setShowForm(v => !v)}
+                className="flex items-center gap-2 px-3 sm:px-4 py-2 bg-gradient-to-r from-indigo-500 to-purple-600 text-white rounded-xl text-sm font-medium hover:opacity-90 transition"
+              >
+                {showForm ? <><X size={16} /> Annuler</> : <><Plus size={16} /> Ajouter</>}
+              </button>
+            </div>
           </div>
-        )}
 
-        {/* Filtres */}
-        <div className="bg-white rounded-2xl shadow p-3 sm:p-4 flex flex-col sm:flex-row gap-3">
-          <input
-            type="text"
-            placeholder="🔍 Rechercher..."
-            value={search}
-            onChange={e => setSearch(e.target.value)}
-            className="flex-1 px-3 py-2 border border-slate-300 rounded-xl text-slate-900 focus:outline-none focus:ring-2 focus:ring-indigo-500 text-sm"
-          />
-          <select
-            value={filterCat}
-            onChange={e => setFilterCat(e.target.value)}
-            className="px-3 py-2 border border-slate-300 rounded-xl text-slate-900 focus:outline-none focus:ring-2 focus:ring-indigo-500 text-sm"
-          >
-            <option value="">Toutes catégories</option>
-            {CATEGORIES.map(c => <option key={c} value={c}>{c}</option>)}
-          </select>
-        </div>
+          {/* KPIs */}
+          <div className="grid grid-cols-3 gap-2 sm:gap-4">
+            <div className="bg-white rounded-2xl shadow p-3 sm:p-4 text-center">
+              <p className="text-xs text-slate-500 mb-1">Revenus</p>
+              <p className="text-base sm:text-xl font-bold text-green-600">+{totalRevenus.toFixed(2)}€</p>
+            </div>
+            <div className="bg-white rounded-2xl shadow p-3 sm:p-4 text-center">
+              <p className="text-xs text-slate-500 mb-1">Dépenses</p>
+              <p className="text-base sm:text-xl font-bold text-red-500">-{totalDepenses.toFixed(2)}€</p>
+            </div>
+            <div className="bg-white rounded-2xl shadow p-3 sm:p-4 text-center">
+              <p className="text-xs text-slate-500 mb-1">Solde</p>
+              <p className={`text-base sm:text-xl font-bold ${solde >= 0 ? 'text-indigo-600' : 'text-red-500'}`}>
+                {solde >= 0 ? '+' : ''}{solde.toFixed(2)}€
+              </p>
+            </div>
+          </div>
 
-        {/* Contenu */}
-        {loading ? (
-          <div className="bg-white rounded-2xl shadow text-center py-12 text-slate-500">
-            <div className="inline-block animate-spin text-2xl mb-2">⏳</div>
-            <p className="text-sm">Chargement...</p>
-          </div>
-        ) : filtered.length === 0 ? (
-          <div className="bg-white rounded-2xl shadow text-center py-12 text-slate-400">
-            <p className="text-3xl mb-2">📋</p>
-            <p className="font-medium">{transactions.length === 0 ? 'Aucune transaction' : 'Aucun résultat'}</p>
-          </div>
-        ) : (
-          <>
-            {/* === VUE MOBILE : cartes === */}
-            <div className="flex flex-col gap-3 sm:hidden">
-              {filtered.map(t => (
-                <div key={t.id} className="bg-white rounded-2xl shadow p-4">
-                  {editingId === t.id ? (
-                    <EditCardMobile
-                      transaction={t}
-                      onSave={handleSave}
-                      onCancel={() => setEditingId(null)}
+          {/* Formulaire ajout */}
+          {showForm && (
+            <div className="bg-white rounded-2xl shadow p-4 sm:p-6">
+              <h2 className="text-lg font-bold text-slate-900 mb-4">Nouvelle transaction</h2>
+              {message && (
+                <div className={`mb-4 p-3 rounded-lg text-sm ${message.includes('ajoutée') ? 'bg-green-50 text-green-700' : 'bg-red-50 text-red-600'}`}>
+                  {message}
+                </div>
+              )}
+              <form onSubmit={handleAdd} className="space-y-4">
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                  <div>
+                    <label htmlFor="tl-name" className="block text-sm font-medium text-slate-700 mb-1">Description</label>
+                    <input
+                      id="tl-name"
+                      type="text"
+                      placeholder="Ex: Courses Lidl"
+                      value={form.name}
+                      onChange={e => setForm({ ...form, name: e.target.value })}
+                      className="w-full px-3 py-2 border border-slate-300 rounded-xl text-slate-900 focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                      required
                     />
-                  ) : (
-                    <div className="flex items-start justify-between gap-2">
-                      <div className="flex-1 min-w-0">
-                        <p className="font-semibold text-slate-900 truncate">{t.name}</p>
-                        <p className="text-xs text-slate-500">{t.category}</p>
-                        <p className="text-xs text-slate-400 mt-1">
-                          {new Date(t.date).toLocaleDateString('fr-FR')}
-                          {t.is_recurring && <span className="ml-2 text-indigo-500">🔄</span>}
-                        </p>
-                      </div>
-                      <div className="flex flex-col items-end gap-2">
-                        <span className={`font-bold text-sm ${t.amount > 0 ? 'text-green-600' : 'text-red-500'}`}>
-                          {t.amount > 0 ? '+' : ''}{Number(t.amount).toFixed(2)}€
-                        </span>
-                        <div className="flex gap-1">
-                          <button
-                            onClick={() => { setEditingId(t.id); setShowForm(false); }}
-                            className="p-1.5 text-indigo-400 hover:bg-indigo-50 rounded-lg transition"
-                            aria-label="Modifier"
-                          >
-                            <Pencil size={14} />
-                          </button>
-                          <button
-                            onClick={() => handleDelete(t.id)}
-                            className="p-1.5 text-red-400 hover:bg-red-50 rounded-lg transition"
-                            aria-label="Supprimer"
-                          >
-                            <Trash2 size={14} />
-                          </button>
-                        </div>
+                  </div>
+                  <div>
+                    <label htmlFor="tl-category" className="block text-sm font-medium text-slate-700 mb-1">Catégorie</label>
+                    <select
+                      id="tl-category"
+                      value={form.category}
+                      onChange={e => setForm({ ...form, category: e.target.value })}
+                      className="w-full px-3 py-2 border border-slate-300 rounded-xl text-slate-900 focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                      required
+                    >
+                      <option value="">Choisir</option>
+                      {CATEGORIES.map(c => <option key={c} value={c}>{c}</option>)}
+                    </select>
+                  </div>
+                  <div>
+                    <label htmlFor="tl-amount" className="block text-sm font-medium text-slate-700 mb-1">Montant (€, négatif = dépense)</label>
+                    <input
+                      id="tl-amount"
+                      type="number"
+                      step="0.01"
+                      placeholder="Ex: -45.00"
+                      value={form.amount}
+                      onChange={e => setForm({ ...form, amount: e.target.value })}
+                      className="w-full px-3 py-2 border border-slate-300 rounded-xl text-slate-900 focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                      required
+                    />
+                  </div>
+                  <div>
+                    <label htmlFor="tl-date" className="block text-sm font-medium text-slate-700 mb-1">Date</label>
+                    <input
+                      id="tl-date"
+                      type="date"
+                      value={form.date}
+                      onChange={e => setForm({ ...form, date: e.target.value })}
+                      className="w-full px-3 py-2 border border-slate-300 rounded-xl text-slate-900 focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                      required
+                    />
+                  </div>
+                </div>
+                <label className="flex items-center gap-2 cursor-pointer">
+                  <input
+                    type="checkbox"
+                    checked={form.is_recurring}
+                    onChange={e => setForm({ ...form, is_recurring: e.target.checked })}
+                    className="w-4 h-4 accent-indigo-600"
+                  />
+                  <span className="text-sm text-slate-600">🔄 Prélèvement récurrent (mensuel)</span>
+                </label>
+                <button
+                  type="submit"
+                  className="w-full sm:w-auto px-6 py-2.5 bg-indigo-600 text-white rounded-xl font-medium hover:bg-indigo-700 transition"
+                >
+                  Ajouter
+                </button>
+              </form>
+            </div>
+          )}
+
+          {/* Filtres */}
+          <div className="bg-white rounded-2xl shadow p-3 sm:p-4 flex flex-col sm:flex-row gap-3">
+            <input
+              type="text"
+              placeholder="🔍 Rechercher..."
+              value={search}
+              onChange={e => setSearch(e.target.value)}
+              className="flex-1 px-3 py-2 border border-slate-300 rounded-xl text-slate-900 focus:outline-none focus:ring-2 focus:ring-indigo-500 text-sm"
+            />
+            <select
+              value={filterCat}
+              onChange={e => setFilterCat(e.target.value)}
+              className="px-3 py-2 border border-slate-300 rounded-xl text-slate-900 focus:outline-none focus:ring-2 focus:ring-indigo-500 text-sm"
+            >
+              <option value="">Toutes catégories</option>
+              {CATEGORIES.map(c => <option key={c} value={c}>{c}</option>)}
+            </select>
+          </div>
+
+          {/* Liste */}
+          {loading ? (
+            <div className="bg-white rounded-2xl shadow text-center py-12 text-slate-500">
+              <div className="inline-block animate-spin text-2xl mb-2">⏳</div>
+              <p className="text-sm">Chargement...</p>
+            </div>
+          ) : filtered.length === 0 ? (
+            <div className="bg-white rounded-2xl shadow text-center py-12 text-slate-400">
+              <p className="text-3xl mb-2">📋</p>
+              <p className="font-medium">{transactions.length === 0 ? 'Aucune transaction' : 'Aucun résultat'}</p>
+            </div>
+          ) : (
+            <>
+              {/* === MOBILE : cartes === */}
+              <div className="flex flex-col gap-3 sm:hidden">
+                {filtered.map(t => (
+                  <div key={t.id} className="bg-white rounded-2xl shadow p-4 flex items-start justify-between gap-2">
+                    <div className="flex-1 min-w-0">
+                      <p className="font-semibold text-slate-900 truncate">{t.name}</p>
+                      <p className="text-xs text-slate-500">{t.category}</p>
+                      <p className="text-xs text-slate-400 mt-1">
+                        {new Date(t.date).toLocaleDateString('fr-FR')}
+                        {t.is_recurring && <span className="ml-2 text-indigo-500">🔄</span>}
+                      </p>
+                    </div>
+                    <div className="flex flex-col items-end gap-2 shrink-0">
+                      <span className={`font-bold text-sm ${t.amount > 0 ? 'text-green-600' : 'text-red-500'}`}>
+                        {t.amount > 0 ? '+' : ''}{Number(t.amount).toFixed(2)}€
+                      </span>
+                      <div className="flex gap-1">
+                        <button
+                          onClick={() => setEditingTransaction(t)}
+                          className="p-1.5 text-indigo-400 hover:bg-indigo-50 rounded-lg transition"
+                          aria-label="Modifier"
+                        >
+                          <Pencil size={14} />
+                        </button>
+                        <button
+                          onClick={() => handleDelete(t.id)}
+                          className="p-1.5 text-red-400 hover:bg-red-50 rounded-lg transition"
+                          aria-label="Supprimer"
+                        >
+                          <Trash2 size={14} />
+                        </button>
                       </div>
                     </div>
-                  )}
-                </div>
-              ))}
-            </div>
+                  </div>
+                ))}
+              </div>
 
-            {/* === VUE DESKTOP : tableau === */}
-            <div className="hidden sm:block bg-white rounded-2xl shadow overflow-hidden">
-              <div className="overflow-x-auto">
-                <table className="w-full">
-                  <thead className="bg-slate-50 border-b border-slate-200">
-                    <tr>
-                      <th className="px-6 py-3 text-left text-xs font-semibold text-slate-500 uppercase tracking-wide">Description</th>
-                      <th className="px-6 py-3 text-left text-xs font-semibold text-slate-500 uppercase tracking-wide">Catégorie</th>
-                      <th className="px-6 py-3 text-left text-xs font-semibold text-slate-500 uppercase tracking-wide">Montant</th>
-                      <th className="px-6 py-3 text-left text-xs font-semibold text-slate-500 uppercase tracking-wide">Date</th>
-                      <th className="px-6 py-3 text-left text-xs font-semibold text-slate-500 uppercase tracking-wide">Récurrent</th>
-                      <th className="px-6 py-3 text-left text-xs font-semibold text-slate-500 uppercase tracking-wide">Modifié le</th>
-                      <th className="px-6 py-3" />
-                    </tr>
-                  </thead>
-                  <tbody className="divide-y divide-slate-100">
-                    {filtered.map(t => (
-                      editingId === t.id ? (
-                        <EditRowDesktop
-                          key={t.id}
-                          transaction={t}
-                          onSave={handleSave}
-                          onCancel={() => setEditingId(null)}
-                        />
-                      ) : (
+              {/* === DESKTOP : tableau === */}
+              <div className="hidden sm:block bg-white rounded-2xl shadow overflow-hidden">
+                <div className="overflow-x-auto">
+                  <table className="w-full">
+                    <thead className="bg-slate-50 border-b border-slate-200">
+                      <tr>
+                        <th className="px-6 py-3 text-left text-xs font-semibold text-slate-500 uppercase tracking-wide">Description</th>
+                        <th className="px-6 py-3 text-left text-xs font-semibold text-slate-500 uppercase tracking-wide">Catégorie</th>
+                        <th className="px-6 py-3 text-left text-xs font-semibold text-slate-500 uppercase tracking-wide">Montant</th>
+                        <th className="px-6 py-3 text-left text-xs font-semibold text-slate-500 uppercase tracking-wide">Date</th>
+                        <th className="px-6 py-3 text-left text-xs font-semibold text-slate-500 uppercase tracking-wide">Récurrent</th>
+                        <th className="px-6 py-3 text-left text-xs font-semibold text-slate-500 uppercase tracking-wide">Modifié le</th>
+                        <th className="px-6 py-3" />
+                      </tr>
+                    </thead>
+                    <tbody className="divide-y divide-slate-100">
+                      {filtered.map(t => (
                         <tr key={t.id} className="hover:bg-slate-50 transition">
                           <td className="px-6 py-4 font-medium text-slate-900">{t.name}</td>
                           <td className="px-6 py-4 text-slate-600 text-sm">{t.category}</td>
@@ -601,7 +535,7 @@ export default function TransactionList() {
                           <td className="px-6 py-4">
                             <div className="flex gap-1">
                               <button
-                                onClick={() => { setEditingId(t.id); setShowForm(false); }}
+                                onClick={() => setEditingTransaction(t)}
                                 className="p-2 text-indigo-400 hover:bg-indigo-50 rounded-lg transition"
                                 aria-label="Modifier"
                               >
@@ -617,21 +551,21 @@ export default function TransactionList() {
                             </div>
                           </td>
                         </tr>
-                      )
-                    ))}
-                  </tbody>
-                </table>
+                      ))}
+                    </tbody>
+                  </table>
+                </div>
               </div>
-            </div>
-          </>
-        )}
+            </>
+          )}
 
-        {filtered.length > 0 && (
-          <p className="text-center text-xs text-slate-400">
-            {filtered.length} transaction{filtered.length > 1 ? 's' : ''} affichée{filtered.length > 1 ? 's' : ''}
-          </p>
-        )}
+          {filtered.length > 0 && (
+            <p className="text-center text-xs text-slate-400">
+              {filtered.length} transaction{filtered.length > 1 ? 's' : ''} affichée{filtered.length > 1 ? 's' : ''}
+            </p>
+          )}
+        </div>
       </div>
-    </div>
+    </>
   );
 }

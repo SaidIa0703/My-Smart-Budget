@@ -49,21 +49,8 @@ CREATE TABLE IF NOT EXISTS savings_goals (
   updated_at TIMESTAMP DEFAULT NOW()
 );
 
-CREATE TABLE IF NOT EXISTS user_profiles (
-  id SERIAL PRIMARY KEY,
-  user_id INT UNIQUE REFERENCES users(id) ON DELETE CASCADE,
-  profile_type VARCHAR(255),
-  revenus_mensuels VARCHAR(255),
-  situation_familiale VARCHAR(255),
-  objectifs_epargne TEXT[],
-  categories_prioritaires TEXT[],
-  created_at TIMESTAMP DEFAULT NOW(),
-  updated_at TIMESTAMP DEFAULT NOW()
-);
-
 CREATE INDEX IF NOT EXISTS idx_transactions_user_id ON transactions(user_id);
 CREATE INDEX IF NOT EXISTS idx_transactions_created_at ON transactions(created_at);
 CREATE INDEX IF NOT EXISTS idx_budgets_user_id ON budgets(user_id);
 CREATE INDEX IF NOT EXISTS idx_savings_goals_user_id ON savings_goals(user_id);
-CREATE INDEX IF NOT EXISTS idx_user_profiles_user_id ON user_profiles(user_id);
 

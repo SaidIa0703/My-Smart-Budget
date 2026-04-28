@@ -2,21 +2,24 @@
 
 \section{Mise en œuvre de l'architecture 3-tiers}
 
-Ce chapitre détaille la phase de réalisation de l'application \textbf{My Smart Budget}. Il présente la traduction des choix architecturaux (vus au chapitre précédent) en code fonctionnel, en respectant la séparation stricte des trois couches : Présentation (React), Métier (Node.js/Express) et Données (PostgreSQL/MongoDB).
+Ce chapitre détaille la phase de réalisation de l'application \textbf{My Smart Budget}. Il présente la traduction des choix architecturaux (vus au chapitre précédent) en code fonctionnel, en respectant la séparation stricte des trois couches : Présentation (Next.js), Métier (Node.js/Express) et Données (PostgreSQL/MongoDB).
 
 \subsection{Vue d'ensemble de la stack}
 
 L'implémentation repose sur une stack moderne et robuste, choisie pour sa flexibilité et sa performance :
 
 \begin{itemize}
-    \item \textbf{Tier 1 (Client) :} React 18 + TypeScript + Redux Toolkit.
+    \item \textbf{Tier 1 (Client) :} Next.js 15 + React 19 + TypeScript.
     \item \textbf{Tier 2 (Serveur) :} Node.js + Express.js (API REST).
     \item \textbf{Tier 3 (Données) :} PostgreSQL (Transactionnel) + MongoDB (Logs/Analytics).
 \end{itemize}
 
-\begin{center}
-\small$\rightarrow$~\textit{Flux de données 3-tiers — voir Annexe~\ref{ann:figures}, figure~\ref{fig:arch_impl}}
-\end{center}
+\begin{figure}[H]
+    \centering
+    \safefig{chapters/assets/images/architecture_3_tiers.png}{0.90\textwidth}{architecture_3_tiers.png}
+    \caption{Flux de données implémenté dans l'architecture 3-tiers}
+    \label{fig:arch_impl}
+\end{figure}
 
 \section{Couche Présentation (Frontend)}
 
@@ -38,8 +41,8 @@ src/
 +-- hooks/                 # Logique réutilisable (Custom Hooks)
 |   +-- useTransactions.ts
 |   +-- useBudgetAlerts.ts
-+-- store/                 # Gestion d'état global (Redux)
-+-- services/              # Appels API (Axios)
++-- store/                 # Gestion d'état (React Context + useState)
++-- services/              # Appels API (fetch natif / Axios)
 \end{verbatim}
 \end{exemple}
 
@@ -81,16 +84,16 @@ const TransactionForm = ({ onSubmit, categories, budget }) => {
 
   return (
     <form onSubmit={handleSubmit} aria-label="Ajouter une transaction">
-      {/* Champs de formulaire Material-UI avec validation */}
-      <TextField
-        label="Montant"
+      {/* Champs natifs stylisés Tailwind CSS */}
+      <input
         type="number"
+        placeholder="Montant (€)"
         value={formData.amount}
         onChange={handleChange}
-        InputProps={{ startAdornment: <InputAdornment position="start">€</InputAdornment> }}
+        className="border rounded px-3 py-2 w-full"
       />
       {/* ... Selecteur de catégorie ... */}
-      <Button type="submit" variant="contained">Enregistrer</Button>
+      <button type="submit" className="bg-blue-600 text-white px-4 py-2 rounded">Enregistrer</button>
     </form>
   );
 };
@@ -98,14 +101,6 @@ const TransactionForm = ({ onSubmit, categories, budget }) => {
 
 Ce composant garantit que l'utilisateur est averti avant tout dépassement de budget, sans bloquer l'action si elle est confirmée.
 
-\begin{conseil}
-\textbf{Bonnes pratiques Frontend appliquées :}
-\begin{itemize}
-    \item Utilisation de \textbf{React Hook Form} pour la gestion performante des formulaires.
-    \item Typage strict avec \textbf{TypeScript} (Interfaces pour Props et State).
-    \item Séparation de la logique (Hooks) et de la vue (Components).
-\end{itemize}
-\end{conseil}
 
 \section{Couche Logique Métier (Backend)}
 
@@ -278,4 +273,4 @@ encryptData(text) {
 
 L'implémentation respecte l'architecture définie lors de la conception. L'utilisation de \textbf{Services} découplés des \textbf{Contrôleurs} facilite les tests unitaires, tandis que la séparation Frontend/Backend via une API REST permet d'envisager sereinement le développement futur d'une application mobile native utilisant les mêmes endpoints.
 
-En résumé, cette couche d'implémentation traduit fidèlement les choix de conception en code fonctionnel, testé et sécurisé. Ce que le jury doit retenir : chaque couche a une responsabilité claire, et aucune logique métier ne s'est glissée dans les contrôleurs ou les composants React.
+En résumé, cette couche d'implémentation traduit fidèlement les choix de conception en code fonctionnel, testé et sécurisé. Ce que le jury doit retenir : chaque couche a une responsabilité claire, et aucune logique métier ne s'est glissée dans les contrôleurs ou les composants Next.js.

@@ -62,7 +62,7 @@ services:
       - smart-budget-network
     restart: always
 
-frontend:
+  frontend:
     image: abedel/my-smart-budget-frontend:latest
     container_name: smart-budget-frontend
     ports:
@@ -71,12 +71,12 @@ frontend:
       NODE_ENV: production
       NEXT_PUBLIC_API_URL: https://smarterbudget.net/api
       API_URL: http://backend:5000
-      NEXT_PUBLIC_INTERNAL_API_URL: http://backend:5000
     depends_on:
       - backend
     networks:
       - smart-budget-network
     restart: always
+
 volumes:
   postgres_data:
   mongodb_data:
@@ -84,5 +84,3 @@ volumes:
 networks:
   smart-budget-network:
     driver: bridge
-
-    

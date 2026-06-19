@@ -41,9 +41,15 @@ router.post('/register', async (req, res) => {
       { expiresIn: '7d' }
     );
 
+    res.cookie('token', token, {
+      httpOnly: true,
+      secure: process.env.NODE_ENV === 'production',
+      sameSite: 'strict',
+      maxAge: 7 * 24 * 60 * 60 * 1000,
+    });
+
     res.status(201).json({
       message: 'Inscription réussie',
-      token,
       user: {
         id: newUser.id,
         email: newUser.email,
@@ -86,9 +92,15 @@ router.post('/login', async (req, res) => {
       { expiresIn: '7d' }
     );
 
+    res.cookie('token', token, {
+      httpOnly: true,
+      secure: process.env.NODE_ENV === 'production',
+      sameSite: 'strict',
+      maxAge: 7 * 24 * 60 * 60 * 1000,
+    });
+
     res.json({
       message: 'Connexion réussie',
-      token,
       user: {
         id: user.id,
         email: user.email,
@@ -104,7 +116,7 @@ router.post('/login', async (req, res) => {
 // VERIFY TOKEN
 router.get('/verify', (req, res) => {
   try {
-    const token = req.headers.authorization?.split(' ')[1];
+    const token = req.cookies?.token;
 
     if (!token) {
       return res.status(401).json({ message: 'Token manquant' });
@@ -115,6 +127,16 @@ router.get('/verify', (req, res) => {
   } catch (error) {
     res.status(401).json({ valid: false, message: 'Token invalide' });
   }
+});
+
+// LOGOUT
+router.post('/logout', (req, res) => {
+  res.clearCookie('token', {
+    httpOnly: true,
+    secure: process.env.NODE_ENV === 'production',
+    sameSite: 'strict',
+  });
+  res.json({ message: 'Déconnecté' });
 });
 
 module.exports = router;

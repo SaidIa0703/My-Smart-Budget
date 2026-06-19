@@ -7,7 +7,7 @@ import {
   Calendar, ChevronRight, X, Check, AlertCircle, ArrowUpRight,
   ArrowDownRight, Filter, Search, Eye, EyeOff, Menu, Trash2
 } from 'lucide-react';
-import Questionnaire from './Questionnaire';
+import Questionnaire from './questionnaire';
 
 // ─── PAGE D'ACCUEIL PERSONNALISÉE ─────────────────────────────────────────────
 const WelcomePage = ({ user, answers, onEnter }) => {

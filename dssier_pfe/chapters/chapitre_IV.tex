@@ -153,37 +153,207 @@ Pour l'utilisateur, cela signifie qu'une transaction mal saisie est rejetée imm
 
 \section{Conception de l'Interface (UI/UX)}
 
-La conception graphique a suivi une approche \textbf{"Mobile First"}, validée en trois étapes : Zoning, Wireframes, Maquettes.
+La conception graphique de \textbf{My Smart Budget} a suivi une démarche rigoureuse en trois niveaux de fidélité progressive : \textbf{Zoning} (structure fonctionnelle), \textbf{Wireframes} (mise en page détaillée) et \textbf{Maquettes Figma} (rendu haute fidélité). Cette approche \textbf{"Mobile First"} garantit une expérience cohérente sur tous les supports.
 
-\subsection{Zoning et Structure}
-
-Exemple de structuration de la page \textbf{Dashboard} :
+% ------------------------------------------------------------
+\subsection{Méthodologie UI/UX appliquée}
+% ------------------------------------------------------------
 
 \begin{center}
 \small
-\begin{tabular}{|p{0.3\textwidth}|p{0.6\textwidth}|}
+\begin{tabular}{|p{0.12\textwidth}|p{0.35\textwidth}|p{0.42\textwidth}|}
 \hline
-\multicolumn{2}{|c|}{\textbf{Header (Logo, Navigation, Profil)}} \\
+\textbf{Étape} & \textbf{Livrable} & \textbf{Objectif} \\
 \hline
-\textbf{Latéral (Mobile: Menu)} & \textbf{Zone Centrale (Contenu)} \\
+\textbf{1 — Zoning} & Schéma de découpage en zones & Valider la hiérarchie de l'information et la disposition des blocs fonctionnels \\
 \hline
-- Navigation & - \textbf{KPIs} : Revenus, Dépenses, Reste à vivre \\
-- Filtres dates & - \textbf{Graph 1} : Évolution mensuelle (Courbe) \\
-- Bouton "Ajouter" & - \textbf{Graph 2} : Répartition par catégorie (Pie) \\
+\textbf{2 — Wireframe} & Maquette basse fidélité & Définir la structure précise, les interactions et les contenus sans couleurs ni styles \\
 \hline
-\multicolumn{2}{|c|}{\textbf{Footer (Mentions, RGPD)}} \\
+\textbf{3 — Maquette HF} & Figma haute fidélité & Intégrer la charte graphique, les composants du Design System et les états interactifs \\
 \hline
 \end{tabular}
 \end{center}
 
-\subsection{Wireframes et Maquettes (Figma)}
+% ------------------------------------------------------------
+\subsection{Page d'inscription (Register)}
+% ------------------------------------------------------------
+
+\subsubsection{Zoning — Structure fonctionnelle}
+
+Le zoning de la page d'inscription (identifiant \textbf{Z-01}) définit cinq zones fonctionnelles empilées verticalement, conformément à l'approche Mobile First :
+
+\begin{figure}[H]
+    \centering
+    \safefig{chapters/assets/images/zoning-register.png}{0.55\textwidth}{zoning-register.png}
+    \caption{Zoning Z-01 — Page d'inscription (Register)}
+    \label{fig:zoning-register}
+\end{figure}
+
+\begin{center}
+\small
+\begin{tabular}{|p{0.22\textwidth}|p{0.65\textwidth}|}
+\hline
+\textbf{Zone} & \textbf{Contenu et rôle} \\
+\hline
+\textbf{Header} & Logo de l'application, lien de retour vers la page de connexion \\
+\hline
+\textbf{Titre} & Titre principal « Create Account » + sous-titre de réassurance \\
+\hline
+\textbf{Formulaire} & Champs : Nom complet, Adresse e-mail, Mot de passe, Confirmation + case CGU \\
+\hline
+\textbf{CTA Create Account} & Bouton d'action principal — soumission du formulaire \\
+\hline
+\textbf{CTA Google / Apple} & Connexion sociale — alternative rapide sans saisie de mot de passe \\
+\hline
+\end{tabular}
+\end{center}
+
+\subsubsection{Wireframe haute fidélité}
+
+\begin{figure}[H]
+    \centering
+    \safefig{chapters/assets/images/wireframe-register.png}{0.62\textwidth}{wireframe-register.png}
+    \caption{Maquette haute fidélité — Page d'inscription}
+    \label{fig:wireframe-register}
+\end{figure}
+
+La maquette finale reprend fidèlement le zoning et y ajoute :
+\begin{itemize}
+    \item Un formulaire en deux colonnes pour les champs \textit{Password} et \textit{Confirm}, optimisant l'espace sur écran.
+    \item Un bouton « Create Account » à fond sombre (\texttt{\#2D3748}) pour un fort contraste visuel.
+    \item Une section « Or Continue With » proposant deux alternatives d'authentification sociale (Google, Apple).
+    \item Un footer minimaliste avec le copyright \textit{MSB The Ledger}.
+\end{itemize}
+
+\begin{jury}
+\textbf{Décision de conception :} L'obligation de cocher les CGU avant de soumettre le formulaire répond à une exigence RGPD — l'utilisateur donne un consentement explicite avant la création de son compte.
+\end{jury}
+
+% ------------------------------------------------------------
+\subsection{Structure générale des pages — Systèmes de grille}
+% ------------------------------------------------------------
+
+\subsubsection{Grille mobile (layout vertical)}
+
+\begin{figure}[H]
+    \centering
+    \safefig{chapters/assets/images/wireframe-mobile-layout.png}{0.35\textwidth}{wireframe-mobile-layout.png}
+    \caption{Schéma de grille mobile — Structure des pages principales}
+    \label{fig:wireframe-mobile-layout}
+\end{figure}
+
+Sur mobile, toutes les pages de l'application partagent la même structure en colonne unique :
+\begin{itemize}
+    \item \textbf{Header} : Logo MSB + icônes de notifications et de profil utilisateur.
+    \item \textbf{Titre} : Titre de la page courante.
+    \item \textbf{Formulaire / Main Content Canvas} : Zone de contenu principale (graphiques, listes, formulaires).
+    \item \textbf{Side Module A \& B} : Modules latéraux reformatés en blocs empilés sur mobile.
+    \item \textbf{CTA Primary / Secondary} : Boutons d'action accessibles en bas de page.
+    \item \textbf{Liens de navigation} : Grid 2×2 de liens secondaires.
+\end{itemize}
+
+\subsubsection{Grille desktop (layout multi-colonnes)}
+
+\begin{figure}[H]
+    \centering
+    \safefig{chapters/assets/images/zoning-desktop.png}{0.92\textwidth}{zoning-desktop.png}
+    \caption{Zoning desktop — Structure multi-colonnes des pages principales}
+    \label{fig:zoning-desktop}
+\end{figure}
+
+Sur desktop, la grille adopte une structure à trois colonnes :
+\begin{itemize}
+    \item \textbf{Colonne gauche (Z-03)} : Barre de navigation latérale fixe avec les liens principaux (Overview, Transactions, Budgets, Savings).
+    \item \textbf{Zone centrale (Z-02)} : Contenu principal — graphiques, tableaux, formulaires.
+    \item \textbf{Colonne droite (Z-04)} : Modules contextuels — résumés, alertes, actions rapides.
+    \item \textbf{Header (Z-01)} : Bandeau supérieur avec logo, navigation globale et profil.
+\end{itemize}
+
+Cette grille adaptative garantit que le contenu affiché sur mobile (colonnes empilées) et sur desktop (colonnes côte-à-côte) reste identique — seule la disposition spatiale change.
+
+% ------------------------------------------------------------
+\subsection{Page Dashboard}
+% ------------------------------------------------------------
+
+\subsubsection{Dashboard Desktop}
+
+\begin{figure}[H]
+    \centering
+    \safefig{chapters/assets/images/wireframe-dashboard-desktop.png}{0.92\textwidth}{wireframe-dashboard-desktop.png}
+    \caption{Wireframe — Dashboard Desktop (Smart Budget)}
+    \label{fig:wireframe-dashboard-desktop}
+\end{figure}
+
+Le tableau de bord desktop est structuré en deux zones principales :
+\begin{itemize}
+    \item \textbf{Navigation latérale} : Menu fixe avec quatre entrées — \textit{Overview}, \textit{Transactions}, \textit{Budgets}, \textit{Savings} — et un accès aux \textit{Settings} en bas.
+    \item \textbf{Zone centrale} : Deux rangées de modules graphiques (graphiques de synthèse + modules contextuels), suivies du tableau \textit{Recent Ledger} affichant les dernières transactions avec entité, catégorie, date et montant.
+\end{itemize}
+
+\subsubsection{Zoning — Dashboard Mobile}
+
+\begin{figure}[H]
+    \centering
+    \safefig{chapters/assets/images/zoning-dashboard-mobile.png}{0.38\textwidth}{zoning-dashboard-mobile.png}
+    \caption{Zoning — Dashboard Mobile (structure des zones)}
+    \label{fig:zoning-dashboard-mobile}
+\end{figure}
+
+Le zoning du dashboard mobile décompose la page en zones empilées selon leur priorité d'affichage :
+
+\begin{center}
+\small
+\begin{tabular}{|p{0.18\textwidth}|p{0.69\textwidth}|}
+\hline
+\textbf{Zone} & \textbf{Contenu et rôle} \\
+\hline
+\textbf{Z-01} & Header — Logo MSB + icône profil utilisateur \\
+\hline
+\textbf{Z-02 (large)} & KPI principal — Solde total (Total Balance) \\
+\hline
+\textbf{Z-02 × 2} & Modules secondaires côte-à-côte — Revenus et Dépenses du mois \\
+\hline
+\textbf{Z-02 (pleine largeur)} & Graphique de synthèse mensuelle \\
+\hline
+\textbf{Z-02 × 2} & Category Breakdown — deux catégories principales \\
+\hline
+\textbf{Z-02 (pleine largeur)} & Troisième catégorie (ligne complète) \\
+\hline
+\textbf{Z-02 (liste)} & Recent Transactions — liste des dernières opérations \\
+\hline
+\textbf{Z-02} & Bouton « View All » — lien vers la page Transactions \\
+\hline
+\textbf{Z-05} & Footer de navigation \\
+\hline
+\end{tabular}
+\end{center}
+
+\subsubsection{Wireframe — Dashboard Mobile}
+
+\begin{figure}[H]
+    \centering
+    \safefig{chapters/assets/images/wireframe-dashboard-mobile.png}{0.42\textwidth}{wireframe-dashboard-mobile.png}
+    \caption{Wireframe — Dashboard Mobile (MSB)}
+    \label{fig:wireframe-dashboard-mobile}
+\end{figure}
+
+Sur mobile, le dashboard condense l'information en une colonne scrollable :
+\begin{itemize}
+    \item \textbf{Carte Total Balance} : Solde total affiché en grand, avec \textit{Monthly Income} et \textit{Monthly Expenses} en sous-titres.
+    \item \textbf{Category Breakdown} : Grille 2×1 + ligne complète pour les catégories prioritaires (Shopping, Food \& Drink, Transport) avec leur pourcentage consommé.
+    \item \textbf{Recent Transactions} : Liste des trois dernières opérations avec icône, nom du vendeur, horodatage et montant coloré (vert pour les crédits, rouge pour les débits).
+\end{itemize}
+
+% ------------------------------------------------------------
+\subsection{Wireframes existants — Transactions et Ajout}
+% ------------------------------------------------------------
 
 \begin{figure}[H]
     \centering
     \begin{minipage}{0.48\textwidth}
         \centering
         \safefig{chapters/assets/images/wireframe-dashboard.png}{\textwidth}{wireframe-dashboard.png}
-        \caption{Wireframe basse fidélité — Dashboard}
+        \caption{Wireframe basse fidélité — Dashboard (version initiale)}
         \label{fig:wireframe-dashboard}
     \end{minipage}\hfill
     \begin{minipage}{0.48\textwidth}
@@ -194,7 +364,7 @@ Exemple de structuration de la page \textbf{Dashboard} :
     \end{minipage}
 \end{figure}
 
-Les maquettes Haute Fidélité intègrent la charte graphique finale, les interactions (hover, focus) et les composants réutilisables du Design System.
+Ces wireframes basse fidélité ont constitué la première itération de conception, validant les flux utilisateurs avant la production des maquettes haute fidélité dans Figma.
 
 \subsection{Charte Graphique (Design System)}
 

@@ -1,0 +1,93 @@
+@startuml mld-my-smart-budget
+
+skinparam defaultFontSize 13
+skinparam defaultFontName Arial
+skinparam shadowing false
+skinparam linetype ortho
+
+skinparam class {
+  BackgroundColor #1E1E2E
+  BorderColor #4F46E5
+  BorderThickness 2
+  FontColor #E2E8F0
+  FontSize 13
+  HeaderBackgroundColor #2D2B55
+  HeaderFontColor #A5B4FC
+  HeaderFontStyle bold
+  AttributeFontColor #CBD5E1
+}
+
+skinparam ArrowColor #818CF8
+skinparam ArrowThickness 1.5
+skinparam ArrowFontColor #A5B4FC
+skinparam ArrowFontSize 11
+
+title Modèle Logique de Données — My Smart Budget
+
+' ═══════════════════════════════════════════
+' TABLES
+' ═══════════════════════════════════════════
+
+class UTILISATEUR {
+  <u><b>id_utilisateur</b></u> : INT (PK)
+  --
+  email : VARCHAR (UNIQUE)
+  password : VARCHAR
+  name : VARCHAR
+  created_at : TIMESTAMP
+}
+
+class PROFIL {
+  <u><b>id_profil</b></u> : INT (PK)
+  --
+  <b>#id_utilisateur</b> : INT (FK, UNIQUE)
+  profile_type : VARCHAR
+  revenus_mensuels : DECIMAL
+  situation_familiale : VARCHAR
+  objectifs_epargne : JSON
+  categories_prioritaires : JSON
+}
+
+class TRANSACTION {
+  <u><b>id_transaction</b></u> : INT (PK)
+  --
+  <b>#id_utilisateur</b> : INT (FK)
+  name : VARCHAR
+  category : VARCHAR
+  amount : DECIMAL
+  date : DATE
+  created_at : TIMESTAMP
+}
+
+class BUDGET {
+  <u><b>id_budget</b></u> : INT (PK)
+  --
+  <b>#id_utilisateur</b> : INT (FK)
+  category : VARCHAR
+  limit : DECIMAL
+  created_at : TIMESTAMP
+}
+
+class RAPPORT {
+  <u><b>id_rapport</b></u> : VARCHAR (PK)
+  --
+  <b>#id_utilisateur</b> : VARCHAR
+  title : VARCHAR
+  description : TEXT
+  type : ENUM(monthly,yearly,custom)
+  data : JSON
+  createdAt : TIMESTAMP
+  updatedAt : TIMESTAMP
+}
+
+' ═══════════════════════════════════════════
+' ASSOCIATIONS (FK)
+' ═══════════════════════════════════════════
+
+UTILISATEUR ||--o| PROFIL : "id_utilisateur"
+UTILISATEUR ||--o{ TRANSACTION : "id_utilisateur"
+UTILISATEUR ||--o{ BUDGET : "id_utilisateur"
+UTILISATEUR ||--o{ RAPPORT : "id_utilisateur"
+BUDGET }o..o{ TRANSACTION : "category (implicite)"
+
+@enduml

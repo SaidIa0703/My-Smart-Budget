@@ -9,10 +9,11 @@ export default function BudgetsPage() {
   const router = useRouter();
 
   useEffect(() => {
-    const token = localStorage.getItem('token');
-    if (!token) {
-      router.push('/login');
-    }
+    fetch(`${process.env.NEXT_PUBLIC_API_URL}/auth/verify`, {
+      credentials: 'include',
+    }).then((res) => {
+      if (!res.ok) router.push('/login');
+    }).catch(() => router.push('/login'));
   }, []);
 
   return (

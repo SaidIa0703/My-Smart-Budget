@@ -1,0 +1,109 @@
+@startuml
+
+skinparam actorStyle awesome
+skinparam defaultFontSize 14
+skinparam defaultFontName Arial
+
+skinparam usecase {
+  BackgroundColor #EEF2FF
+  BorderColor #4F46E5
+  BorderThickness 2
+  FontSize 13
+  FontColor #1E1B4B
+}
+skinparam actor {
+  BackgroundColor #C7D2FE
+  BorderColor #4338CA
+  FontSize 14
+  FontStyle bold
+  FontColor #1E1B4B
+}
+skinparam package {
+  BackgroundColor #F5F3FF
+  BorderColor #818CF8
+  BorderThickness 2
+  FontSize 13
+  FontStyle bold
+  FontColor #3730A3
+  Padding 14
+}
+skinparam ArrowColor #4F46E5
+skinparam ArrowThickness 2
+skinparam ArrowFontSize 12
+skinparam ArrowFontColor #4338CA
+skinparam shadowing false
+skinparam nodesep 60
+skinparam ranksep 70
+
+title Diagramme des cas d'utilisation - My Smart Budget
+
+left to right direction
+
+' ── Acteurs ─────────────────────────────────────────────────────────────────
+actor "Visiteur" as Visiteur
+actor "Utilisateur" as User
+actor "Systeme" as Sys
+
+Visiteur -down-|> User
+
+' ── Packages ─────────────────────────────────────────────────────────────────
+
+package "Authentification" as PKG_AUTH {
+  usecase "S'inscrire (CU-01)" as CU01
+  usecase "Se connecter (CU-02)" as CU02
+  usecase "Se deconnecter (CU-03)" as CU03
+}
+
+package "Tableau de bord" as PKG_DASH {
+  usecase "Consulter le dashboard (CU-05)" as CU05
+  usecase "Voir les statistiques (CU-09)" as CU09
+  usecase "Afficher/masquer solde (CU-14)" as CU14
+}
+
+package "Transactions" as PKG_TRANS {
+  usecase "Ajouter une transaction (CU-06)" as CU06
+  usecase "Supprimer une transaction (CU-07)" as CU07
+  usecase "Rechercher et filtrer (CU-08)" as CU08
+}
+
+package "Profil et Onboarding" as PKG_PROFIL {
+  usecase "Remplir le questionnaire (CU-04)" as CU04
+  usecase "Consulter son profil (CU-11)" as CU11
+  usecase "Recevoir des conseils (CU-12)" as CU12
+}
+
+package "Budgets" as PKG_BUDG {
+  usecase "Gerer les budgets (CU-10)" as CU10
+}
+
+' ── Ordre vertical forcé ─────────────────────────────────────────────────────
+PKG_AUTH -[hidden]down- PKG_DASH
+PKG_DASH -[hidden]down- PKG_TRANS
+PKG_TRANS -[hidden]down- PKG_PROFIL
+PKG_PROFIL -[hidden]down- PKG_BUDG
+
+' ── Associations acteurs → cas ───────────────────────────────────────────────
+Visiteur --> CU01
+Visiteur --> CU02
+
+User --> CU03
+User --> CU04
+User --> CU05
+User --> CU06
+User --> CU07
+User --> CU08
+User --> CU10
+User --> CU11
+User --> CU14
+
+Sys --> CU12
+
+' ── Inclut / Etend ───────────────────────────────────────────────────────────
+CU01 ..> CU04 : <<inclut>>
+CU02 ..> CU05 : <<inclut>>
+CU05 ..> CU09 : <<inclut>>
+CU05 ..> CU14 : <<inclut>>
+CU04 ..> CU12 : <<etend>>
+CU05 ..> CU12 : <<etend>>
+
+@enduml

@@ -104,7 +104,7 @@ const generateAdvice = (answers) => {
 // ─── Composant principal ──────────────────────────────────────────────────────
 const Questionnaire = ({ currentUser, onComplete }) => {
   const [step, setStep] = useState(1);
-  const [direction, setDirection] = useState('forward'); // pour l'animation
+  const [direction, setDirection] = useState('forward'); 
   const [animating, setAnimating] = useState(false);
   const [saving, setSaving] = useState(false);
   const [savedOk, setSavedOk] = useState(false);
@@ -158,8 +158,8 @@ const Questionnaire = ({ currentUser, onComplete }) => {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
-          'Authorization': `Bearer ${localStorage.getItem('token')}`
         },
+        credentials: 'include',
         body: JSON.stringify({ userId: currentUser.id, ...answers })
       });
       setSavedOk(true);

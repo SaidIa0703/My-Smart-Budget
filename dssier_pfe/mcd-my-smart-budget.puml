@@ -1,0 +1,98 @@
+@startuml mcd-my-smart-budget
+
+skinparam defaultFontSize 13
+skinparam defaultFontName Arial
+skinparam shadowing false
+skinparam linetype ortho
+
+skinparam class {
+  BackgroundColor #1E1E2E
+  BorderColor #4F46E5
+  BorderThickness 2
+  FontColor #E2E8F0
+  FontSize 13
+  HeaderBackgroundColor #2D2B55
+  HeaderFontColor #A5B4FC
+  HeaderFontStyle bold
+  AttributeFontColor #CBD5E1
+}
+
+skinparam ellipse {
+  BackgroundColor #312E81
+  BorderColor #818CF8
+  BorderThickness 2
+  FontColor #E0E7FF
+  FontSize 12
+  FontStyle bold
+}
+
+skinparam ArrowColor #818CF8
+skinparam ArrowThickness 1.5
+skinparam ArrowFontColor #A5B4FC
+skinparam ArrowFontSize 11
+
+title Modèle Conceptuel de Données — My Smart Budget
+
+' ═══════════════════════════════════════════
+' ENTITÉS
+' ═══════════════════════════════════════════
+
+entity UTILISATEUR {
+  + id_utilisateur
+  --
+  email
+  password
+  name
+  created_at
+}
+
+entity PROFIL {
+  + id_profil
+  --
+  profile_type
+  revenus_mensuels
+  situation_familiale
+  objectifs_epargne
+  categories_prioritaires
+}
+
+entity TRANSACTION {
+  + id_transaction
+  --
+  name
+  category
+  amount
+  date
+  created_at
+}
+
+entity BUDGET {
+  + id_budget
+  --
+  category
+  limit
+  created_at
+}
+
+entity RAPPORT {
+  + id_rapport
+  --
+  title
+  description
+  type
+  data
+  createdAt
+  updatedAt
+}
+
+' ═══════════════════════════════════════════
+' RELATIONS (style Merise avec cardinalités)
+' ═══════════════════════════════════════════
+
+UTILISATEUR "1,1" -- "0,1" PROFIL : configure >
+UTILISATEUR "1,1" -- "0,N" TRANSACTION : effectue >
+UTILISATEUR "1,1" -- "0,N" BUDGET : définit >
+UTILISATEUR "1,1" -- "0,N" RAPPORT : génère >
+BUDGET "1,1" -- "0,N" TRANSACTION : encadre\n(via category) >
+
+@enduml

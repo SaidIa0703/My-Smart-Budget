@@ -28,6 +28,7 @@ export default function LoginPage() {
       const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}${endpoint}`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
+        credentials: 'include',
         body: JSON.stringify(body),
       });
 
@@ -38,11 +39,9 @@ export default function LoginPage() {
         return;
       }
 
-      // ✅ Stocker le user et le token dans localStorage
+      // Le token est stocké dans un cookie HttpOnly par le serveur
       localStorage.setItem('user', JSON.stringify(data.user));
-      localStorage.setItem('token', data.token);
 
-      // ✅ Rediriger vers le dashboard
       window.location.href = '/dashboard';
 
     } catch (err) {

@@ -1,5 +1,6 @@
 const express = require('express');
 const cors = require('cors');
+const cookieParser = require('cookie-parser');
 const { db, connectMongo, testPostgres } = require('./db');
 const authRoutes = require('./routes/auth');
 const profileRoutes = require('./routes/profile');
@@ -7,7 +8,11 @@ const transactionsRoutes = require('./routes/transactions');
 const app = express();
 
 // Middleware
-app.use(cors());
+app.use(cors({
+  origin: process.env.FRONTEND_URL || 'http://localhost:3000',
+  credentials: true,
+}));
+app.use(cookieParser());
 app.use('/api/profile', profileRoutes);
 app.use(express.json());
 app.use('/api/transactions', transactionsRoutes);

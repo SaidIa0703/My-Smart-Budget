@@ -13,8 +13,8 @@ app.use(cors({
   credentials: true,
 }));
 app.use(cookieParser());
-app.use('/api/profile', profileRoutes);
 app.use(express.json());
+app.use('/api/profile', profileRoutes);
 app.use('/api/transactions', transactionsRoutes);
 app.use('/api/auth', authRoutes);
 

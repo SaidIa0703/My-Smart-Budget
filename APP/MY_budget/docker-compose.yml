@@ -53,6 +53,9 @@ services:
       DB_PASSWORD: smart_password
       DB_NAME: smart_budget
       MONGO_URI: mongodb://smart_user:smart_password@mongodb:27017/smart_budget?authSource=admin
+      JWT_SECRET: your-very-secret-key-change-this-in-production-12345
+      FRONTEND_URL: https://smarterbudget.net
+      COOKIE_SECURE: "false"
     depends_on:
       postgres:
         condition: service_healthy

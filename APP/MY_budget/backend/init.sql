@@ -2,8 +2,12 @@ CREATE TABLE IF NOT EXISTS users (
   id SERIAL PRIMARY KEY,
   name VARCHAR(255),
   email VARCHAR(255) UNIQUE,
+  password VARCHAR(255),
   created_at TIMESTAMP DEFAULT NOW()
 );
+
+-- Ajoute la colonne si la table existe déjà sans elle
+ALTER TABLE users ADD COLUMN IF NOT EXISTS password VARCHAR(255);
 
 CREATE TABLE IF NOT EXISTS transactions (
   id SERIAL PRIMARY KEY,

@@ -21,7 +21,7 @@ jobs:
         run: docker build -t abedel/my-smart-budget-backend:latest ./APP/MY_budget/backend
       
       - name: Build Frontend
-        run: docker build --build-arg NEXT_PUBLIC_API_URL=http://smarterbudget.net/api -t abedel/my-smart-budget-frontend:latest ./APP/MY_budget/frontend
+        run: docker build --build-arg NEXT_PUBLIC_API_URL=https://smarterbudget.net/api -t abedel/my-smart-budget-frontend:latest ./APP/MY_budget/frontend
 
       - name: Save images
         run: |

@@ -178,8 +178,8 @@ const MySmartBudget = () => {
   };
 
   const calculateStats = () => {
-    const revenus = transactions.filter(t => t.amount > 0).reduce((sum, t) => sum + t.amount, 0);
-    const depenses = Math.abs(transactions.filter(t => t.amount < 0).reduce((sum, t) => sum + t.amount, 0));
+    const revenus = transactions.filter(t => parseFloat(t.amount) > 0).reduce((sum, t) => sum + parseFloat(t.amount), 0);
+    const depenses = Math.abs(transactions.filter(t => parseFloat(t.amount) < 0).reduce((sum, t) => sum + parseFloat(t.amount), 0));
     const solde = revenus - depenses;
     return { revenus, depenses, solde };
   };

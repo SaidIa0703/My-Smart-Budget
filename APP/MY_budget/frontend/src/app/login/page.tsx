@@ -42,7 +42,7 @@ export default function LoginPage() {
       // Le token est stocké dans un cookie HttpOnly par le serveur
       localStorage.setItem('user', JSON.stringify(data.user));
 
-      window.location.href = '/dashboard';
+      window.location.href = '/';
 
     } catch (err) {
       setError('Erreur serveur — vérifie ta connexion');

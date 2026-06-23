@@ -154,7 +154,7 @@ const Questionnaire = ({ currentUser, onComplete }) => {
   const handleSubmit = async () => {
     setSaving(true);
     try {
-      await fetch(`${API_URL}/api/profile/save`, {
+      await fetch(`${API_URL}/profile/save`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',

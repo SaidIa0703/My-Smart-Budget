@@ -37,7 +37,23 @@ router.get('/:userId', async (req, res) =>{
     }
 });
 
-//suprimer une transactions 
+// modifier une transaction
+router.put('/:id', async (req, res) => {
+    try {
+        const { id } = req.params;
+        const { name, category, amount, date } = req.body;
+        const transaction = await db.one(
+            'UPDATE transactions SET name=$1, category=$2, amount=$3, date=$4 WHERE id=$5 RETURNING *',
+            [name, category, amount, date, id]
+        );
+        res.json(transaction);
+    } catch (error) {
+        console.error('Error:', error);
+        res.status(500).json({ message: 'Erreur serveur' });
+    }
+});
+
+//suprimer une transactions
 router.delete('/:id', async (req, res) => {
     try{
         const {id} = req.params;

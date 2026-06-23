@@ -61,13 +61,12 @@ app.delete('/api/transactions/:id', async (req, res) => {
   }
 });
 
-// GET budgets
-app.get('/api/budgets', async (req, res) => {
+// GET budgets par user
+app.get('/api/budgets/:userId', async (req, res) => {
   try {
-    const budgets = await db.query('SELECT * FROM budgets ORDER BY created_at DESC');
+    const budgets = await db.any('SELECT * FROM budgets WHERE user_id = $1 ORDER BY created_at DESC', [req.params.userId]);
     res.json(budgets);
   } catch (err) {
-    console.error('Erreur:', err);
     res.status(500).json({ error: err.message });
   }
 });
@@ -77,12 +76,35 @@ app.post('/api/budgets', async (req, res) => {
   const { user_id, category, limit } = req.body;
   try {
     const budget = await db.one(
-      'INSERT INTO budgets (user_id, category, limit, created_at) VALUES ($1, $2, $3, NOW()) RETURNING *',
-      [user_id || 1, category, limit]
+      'INSERT INTO budgets (user_id, category, "limit", created_at) VALUES ($1, $2, $3, NOW()) RETURNING *',
+      [user_id, category, limit]
     );
     res.status(201).json(budget);
   } catch (err) {
-    console.error('Erreur:', err);
+    res.status(500).json({ error: err.message });
+  }
+});
+
+// PUT modifier un budget
+app.put('/api/budgets/:id', async (req, res) => {
+  const { category, limit } = req.body;
+  try {
+    const budget = await db.one(
+      'UPDATE budgets SET category=$1, "limit"=$2, updated_at=NOW() WHERE id=$3 RETURNING *',
+      [category, limit, req.params.id]
+    );
+    res.json(budget);
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+});
+
+// DELETE un budget
+app.delete('/api/budgets/:id', async (req, res) => {
+  try {
+    await db.none('DELETE FROM budgets WHERE id = $1', [req.params.id]);
+    res.json({ message: 'Budget supprimé' });
+  } catch (err) {
     res.status(500).json({ error: err.message });
   }
 });

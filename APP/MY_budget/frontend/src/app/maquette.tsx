@@ -99,14 +99,13 @@ const MySmartBudget = () => {
     } else {
       setScreen('questionnaire');
     }
-    const savedGoals = localStorage.getItem('goals');
-    if (savedGoals) setGoals(JSON.parse(savedGoals));
   }, []);
 
   useEffect(() => {
     if (user && screen === 'dashboard') {
       fetchTransactions();
       fetchBudgets();
+      fetchObjectifs();
     }
   }, [user, screen]);
 
@@ -123,6 +122,13 @@ const MySmartBudget = () => {
     try {
       const res = await fetch(`${API}/budgets/${user?.id}`, { credentials: 'include' });
       if (res.ok) setBudgets(await res.json());
+    } catch {}
+  };
+
+  const fetchObjectifs = async () => {
+    try {
+      const res = await fetch(`${API}/objectifs/${user?.id}`, { credentials: 'include' });
+      if (res.ok) setGoals(await res.json());
     } catch {}
   };
 
@@ -194,26 +200,38 @@ const MySmartBudget = () => {
     } catch {}
   };
 
-  const saveGoals = (newGoals: any[]) => {
-    setGoals(newGoals);
-    localStorage.setItem('goals', JSON.stringify(newGoals));
-  };
-
-  const handleAddGoal = (e: React.FormEvent) => {
+  const handleAddGoal = async (e: React.FormEvent) => {
     e.preventDefault();
-    const newGoal = { id: Date.now(), ...goalForm, target: parseFloat(goalForm.target), current: parseFloat(goalForm.current || '0') };
-    saveGoals([...goals, newGoal]);
-    setGoalForm({ name: '', target: '', current: '', icon: '🎯', deadline: '' });
-    setShowGoalForm(false);
+    try {
+      const res = await fetch(`${API}/objectifs`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        credentials: 'include',
+        body: JSON.stringify({ user_id: user?.id, name: goalForm.name, icon: goalForm.icon, target: parseFloat(goalForm.target), current_amount: parseFloat(goalForm.current || '0'), deadline: goalForm.deadline || null })
+      });
+      if (res.ok) { setGoalForm({ name:'', target:'', current:'', icon:'🎯', deadline:'' }); setShowGoalForm(false); fetchObjectifs(); }
+    } catch {}
   };
 
-  const handleEditGoal = (e: React.FormEvent) => {
+  const handleEditGoal = async (e: React.FormEvent) => {
     e.preventDefault();
-    saveGoals(goals.map(g => g.id === editingGoal.id ? { ...g, ...goalForm, target: parseFloat(goalForm.target), current: parseFloat(goalForm.current || '0') } : g));
-    setEditingGoal(null);
+    try {
+      const res = await fetch(`${API}/objectifs/${editingGoal.id}`, {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        credentials: 'include',
+        body: JSON.stringify({ name: goalForm.name, icon: goalForm.icon, target: parseFloat(goalForm.target), current_amount: parseFloat(goalForm.current || '0'), deadline: goalForm.deadline || null })
+      });
+      if (res.ok) { setEditingGoal(null); fetchObjectifs(); }
+    } catch {}
   };
 
-  const handleDeleteGoal = (id: number) => saveGoals(goals.filter(g => g.id !== id));
+  const handleDeleteGoal = async (id: number) => {
+    try {
+      await fetch(`${API}/objectifs/${id}`, { method: 'DELETE', credentials: 'include' });
+      fetchObjectifs();
+    } catch {}
+  };
 
   const logout = () => { localStorage.clear(); window.location.href = '/login'; };
 
@@ -665,7 +683,8 @@ const MySmartBudget = () => {
         ) : (
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             {goals.map(g => {
-              const pct = g.target > 0 ? Math.min((g.current / g.target) * 100, 100) : 0;
+              const current = parseFloat(g.current_amount ?? g.current ?? 0);
+              const pct = g.target > 0 ? Math.min((current / parseFloat(g.target)) * 100, 100) : 0;
               const done = pct >= 100;
               return (
                 <div key={g.id} className={`group p-5 rounded-2xl border-2 transition-all ${done ? 'border-green-300 bg-green-50' : 'border-gray-100 bg-gray-50 hover:border-indigo-200'}`}>
@@ -678,14 +697,14 @@ const MySmartBudget = () => {
                       </div>
                     </div>
                     <div className="flex gap-1 opacity-0 group-hover:opacity-100 transition-all">
-                      <button onClick={() => { setGoalForm({ name: g.name, target: String(g.target), current: String(g.current), icon: g.icon, deadline: g.deadline || '' }); setEditingGoal(g); }}
+                      <button onClick={() => { setGoalForm({ name: g.name, target: String(g.target), current: String(g.current_amount ?? g.current ?? 0), icon: g.icon, deadline: g.deadline || '' }); setEditingGoal(g); }}
                         className="p-2 text-indigo-500 hover:bg-indigo-100 rounded-lg"><Edit2 size={16} /></button>
                       <button onClick={() => handleDeleteGoal(g.id)} className="p-2 text-red-500 hover:bg-red-50 rounded-lg"><Trash2 size={16} /></button>
                     </div>
                   </div>
                   <div className="flex justify-between text-sm mb-2">
-                    <span className="text-gray-600">€{g.current.toFixed(2)} épargnés</span>
-                    <span className="font-bold text-gray-800">€{g.target.toFixed(2)}</span>
+                    <span className="text-gray-600">€{current.toFixed(2)} épargnés</span>
+                    <span className="font-bold text-gray-800">€{parseFloat(g.target).toFixed(2)}</span>
                   </div>
                   <div className="h-3 bg-gray-200 rounded-full overflow-hidden">
                     <div className={`h-full rounded-full transition-all duration-700 ${done ? 'bg-green-500' : 'bg-gradient-to-r from-indigo-500 to-purple-600'}`}
@@ -694,7 +713,7 @@ const MySmartBudget = () => {
                   <div className="flex justify-between items-center mt-2">
                     <span className={`text-sm font-bold ${done ? 'text-green-600' : 'text-indigo-600'}`}>{Math.round(pct)}%</span>
                     {done ? <span className="text-green-600 text-sm font-bold flex items-center gap-1"><CheckCircle size={16} /> Objectif atteint !</span>
-                      : <span className="text-sm text-gray-500">Reste €{(g.target - g.current).toFixed(2)}</span>}
+                      : <span className="text-sm text-gray-500">Reste €{(parseFloat(g.target) - current).toFixed(2)}</span>}
                   </div>
                 </div>
               );

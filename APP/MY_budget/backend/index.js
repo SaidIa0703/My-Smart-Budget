@@ -5,6 +5,7 @@ const { db, connectMongo, testPostgres } = require('./db');
 const authRoutes = require('./routes/auth');
 const profileRoutes = require('./routes/profile');
 const transactionsRoutes = require('./routes/transactions');
+const objectifsRoutes = require('./routes/objectifs');
 const app = express();
 
 // Middleware
@@ -17,6 +18,7 @@ app.use(express.json());
 app.use('/api/profile', profileRoutes);
 app.use('/api/transactions', transactionsRoutes);
 app.use('/api/auth', authRoutes);
+app.use('/api/objectifs', objectifsRoutes);
 
 // Connecter MongoDB et PostgreSQL au démarrage
 connectMongo();

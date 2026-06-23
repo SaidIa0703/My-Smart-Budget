@@ -2,9 +2,9 @@
 import { ResponsiveContainer, PieChart, Pie, Cell, Tooltip, BarChart, CartesianGrid, XAxis, YAxis, Bar } from 'recharts';
 import React, { useState, useEffect, useCallback } from 'react';
 import {
-  TrendingUp, Target, PiggyBank, Bell, Settings, Plus, Home, Receipt,
+  Target, Settings, Plus, Home, Receipt,
   Wallet, User, ChevronRight, X, ArrowUpRight, ArrowDownRight,
-  Search, Eye, EyeOff, Menu, Trash2, Edit2, Download, FileText, CheckCircle
+  Search, Eye, EyeOff, Menu, Trash2, Edit2, Download, FileText, CheckCircle, BarChart2
 } from 'lucide-react';
 import Questionnaire from './questionnaire';
 
@@ -160,6 +160,7 @@ const MySmartBudget = () => {
   const [showAddGoal, setShowAddGoal] = useState(false);
   const [editingGoal, setEditingGoal] = useState<any>(null);
   const [goalForm, setGoalForm] = useState({ name:'', target:'', current:'', icon:'🎯', deadline:'' });
+  const [reports, setReports] = useState<any[]>([]);
 
   // ─── INIT ────────────────────────────────────────────────────────────────
   useEffect(() => {
@@ -180,7 +181,7 @@ const MySmartBudget = () => {
 
   useEffect(() => {
     if (user && screen === 'dashboard') {
-      fetchTransactions(); fetchBudgets(); fetchObjectifs();
+      fetchTransactions(); fetchBudgets(); fetchObjectifs(); fetchReports();
     }
   }, [user, screen]);
 
@@ -203,6 +204,13 @@ const MySmartBudget = () => {
     try {
       const res = await fetch(`${API}/objectifs/${user?.id}`, { credentials:'include' });
       if (res.ok) setGoals(await res.json());
+    } catch {}
+  };
+
+  const fetchReports = async () => {
+    try {
+      const res = await fetch(`${API}/reports/${user?.id}`, { credentials:'include' });
+      if (res.ok) setReports(await res.json());
     } catch {}
   };
 
@@ -290,12 +298,14 @@ const MySmartBudget = () => {
     return Object.keys(cats).map((name,i) => ({ name, spent: Math.round(cats[name]*100)/100, color: COLORS[i%COLORS.length] }));
   };
 
-  const exportPDF = () => {
+  const deleteReport = async (id: string) => {
+    await fetch(`${API}/reports/${id}`, { method:'DELETE', credentials:'include' }).catch(()=>null);
+    fetchReports();
+  };
+
+  const generatePDFHtml = (stats: any, cats: any[], title: string) => {
     const now = new Date();
-    const month = now.toLocaleDateString('fr-FR', { month:'long', year:'numeric' });
-    const stats = calculateStats();
-    const cats = getCategories();
-    const html = `<html><head><meta charset="utf-8"><style>
+    return `<html><head><meta charset="utf-8"><style>
       body{font-family:Arial,sans-serif;padding:40px;color:#333}
       h1{color:#4f46e5;border-bottom:3px solid #4f46e5;padding-bottom:10px}
       h2{color:#7c3aed;margin-top:30px}
@@ -306,7 +316,7 @@ const MySmartBudget = () => {
       td{padding:10px;border-bottom:1px solid #e5e7eb}
       .pos{color:#10b981;font-weight:bold}.neg{color:#ef4444;font-weight:bold}
     </style></head><body>
-    <h1>📊 Résumé Financier — ${month}</h1>
+    <h1>📊 ${title}</h1>
     <p>Généré le ${now.toLocaleDateString('fr-FR')} • ${user?.name}</p>
     <div class="stats">
       <div class="card" style="background:#eef2ff"><p style="color:#666;font-size:12px">Solde</p><p style="font-size:24px;font-weight:bold;color:#4f46e5">€${stats.solde.toFixed(2)}</p></div>
@@ -314,14 +324,48 @@ const MySmartBudget = () => {
       <div class="card" style="background:#fff1f2"><p style="color:#666;font-size:12px">Dépenses</p><p style="font-size:24px;font-weight:bold;color:#ef4444">-€${stats.depenses.toFixed(2)}</p></div>
     </div>
     <h2>Dépenses par catégorie</h2>
-    <table><tr><th>Catégorie</th><th>Montant</th><th>% du total</th></tr>
+    <table><tr><th>Catégorie</th><th>Montant</th><th>%</th></tr>
     ${cats.map(c=>`<tr><td>${CAT_ICONS[c.name]||'💸'} ${c.name}</td><td class="neg">-€${c.spent.toFixed(2)}</td><td>${stats.depenses>0?Math.round(c.spent/stats.depenses*100):0}%</td></tr>`).join('')}
     </table>
     <h2>Toutes les transactions</h2>
     <table><tr><th>Date</th><th>Description</th><th>Catégorie</th><th>Montant</th></tr>
     ${transactions.map(t=>`<tr><td>${new Date(t.date).toLocaleDateString('fr-FR')}</td><td>${t.name}</td><td>${t.category}</td><td class="${parseFloat(t.amount)>0?'pos':'neg'}">${parseFloat(t.amount)>0?'+':''}€${Math.abs(parseFloat(t.amount)).toFixed(2)}</td></tr>`).join('')}
     </table></body></html>`;
-    const win = window.open('','_blank');
+  };
+
+  const exportPDF = async () => {
+    const now = new Date();
+    const month = now.toLocaleDateString('fr-FR', { month:'long', year:'numeric' });
+    const stats = calculateStats();
+    const cats = getCategories();
+    const title = `Résumé Financier — ${month}`;
+    const html = generatePDFHtml(stats, cats, title);
+
+    // Sauvegarde dans MongoDB
+    await fetch(`${API}/reports`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      credentials: 'include',
+      body: JSON.stringify({
+        userId: String(user?.id),
+        title,
+        description: `Revenus: €${stats.revenus.toFixed(2)} | Dépenses: €${stats.depenses.toFixed(2)} | Solde: €${stats.solde.toFixed(2)}`,
+        type: 'monthly',
+        data: { stats, categories: cats, transactionCount: transactions.length }
+      })
+    }).catch(() => null);
+
+    fetchReports();
+
+    const win = window.open('', '_blank');
+    if (win) { win.document.write(html); win.document.close(); win.print(); }
+  };
+
+  const replayReport = (report: any) => {
+    const stats = report.data?.stats || { revenus: 0, depenses: 0, solde: 0 };
+    const cats = report.data?.categories || [];
+    const html = generatePDFHtml(stats, cats, report.title);
+    const win = window.open('', '_blank');
     if (win) { win.document.write(html); win.document.close(); win.print(); }
   };
 
@@ -393,6 +437,7 @@ const MySmartBudget = () => {
             <NavItem icon={Receipt} label="Transactions" page="transactions" />
             <NavItem icon={Wallet} label="Budget" page="budget" />
             <NavItem icon={Target} label="Objectifs" page="goals" />
+            <NavItem icon={BarChart2} label="Rapports" page="reports" />
             <NavItem icon={User} label="Profil" page="profile" />
           </nav>
           <div className="mt-6 p-4 bg-indigo-50 rounded-2xl border border-indigo-100">
@@ -644,6 +689,61 @@ const MySmartBudget = () => {
                         </div>
                       );
                     })}
+                  </div>
+                )}
+              </div>
+            </div>
+          )}
+
+          {/* RAPPORTS */}
+          {currentPage === 'reports' && (
+            <div className="space-y-5">
+              <div className="bg-white rounded-3xl p-6 shadow-xl border border-gray-100">
+                <div className="flex justify-between items-center mb-6">
+                  <h3 className="text-xl font-bold text-gray-800">Mes Rapports PDF</h3>
+                  <button onClick={exportPDF}
+                    className="flex items-center gap-2 px-4 py-2 bg-gradient-to-r from-emerald-500 to-teal-600 text-white rounded-xl font-medium hover:scale-105 transition-transform">
+                    <Download size={18}/> Générer PDF
+                  </button>
+                </div>
+                {reports.length === 0 ? (
+                  <div className="text-center py-12 bg-gray-50 rounded-2xl">
+                    <FileText size={48} className="mx-auto mb-4 text-gray-300"/>
+                    <h3 className="text-xl font-bold text-gray-700 mb-2">Aucun rapport</h3>
+                    <p className="text-gray-500 mb-6">Génère ton premier rapport mensuel</p>
+                    <button onClick={exportPDF}
+                      className="px-6 py-3 bg-gradient-to-r from-emerald-500 to-teal-600 text-white rounded-2xl font-medium">
+                      Générer maintenant
+                    </button>
+                  </div>
+                ) : (
+                  <div className="space-y-3">
+                    {reports.map(r => (
+                      <div key={r._id} className="group flex items-center justify-between p-4 rounded-2xl bg-gray-50 hover:bg-indigo-50 transition-all border border-gray-100 hover:border-indigo-200">
+                        <div className="flex items-center gap-4">
+                          <div className="w-12 h-12 bg-gradient-to-br from-indigo-100 to-purple-100 rounded-xl flex items-center justify-center">
+                            <FileText size={22} className="text-indigo-600"/>
+                          </div>
+                          <div>
+                            <p className="font-bold text-gray-800">{r.title}</p>
+                            <p className="text-sm text-gray-500">{r.description}</p>
+                            <p className="text-xs text-gray-400 mt-1">
+                              {new Date(r.createdAt).toLocaleDateString('fr-FR', { day:'numeric', month:'long', year:'numeric', hour:'2-digit', minute:'2-digit' })}
+                            </p>
+                          </div>
+                        </div>
+                        <div className="flex items-center gap-2 opacity-0 group-hover:opacity-100 transition-all">
+                          <button onClick={() => replayReport(r)}
+                            className="flex items-center gap-1 px-3 py-2 bg-indigo-600 text-white rounded-xl text-sm font-medium hover:bg-indigo-700">
+                            <Download size={14}/> Télécharger
+                          </button>
+                          <button onClick={() => deleteReport(r._id)}
+                            className="p-2 text-red-500 hover:bg-red-50 rounded-xl">
+                            <Trash2 size={16}/>
+                          </button>
+                        </div>
+                      </div>
+                    ))}
                   </div>
                 )}
               </div>

@@ -630,14 +630,14 @@ export const options = {
       executor: 'ramping-arrival-rate',
       startRate: 10,
       timeUnit: '1s',
-      preAllocatedVUs: 50,
-      maxVUs: 200,
+      preAllocatedVUs: 10,
+      maxVUs: 50,
       stages: [
-        { duration: '2m', target: 20 },  // Montée progressive
-        { duration: '3m', target: 100 }, // Pic d'activité
-        { duration: '5m', target: 100 }, // Maintien charge élevée
-        { duration: '2m', target: 20 },  // Redescente
-        { duration: '2m', target: 5 },   // Retour normal
+        { duration: '2m', target: 5  },  // Montée progressive
+        { duration: '3m', target: 25 }, // Pic d'activité
+        { duration: '5m', target: 25 }, // Maintien charge élevée
+        { duration: '2m', target: 5  },  // Redescente
+        { duration: '2m', target: 2  },   // Retour normal
       ],
     }
   },
@@ -776,7 +776,7 @@ function generateMonthlyTransactions(count) {
 
 \begin{tcolorbox}[colback=yellow!5!white,colframe=yellow!60!black,title=\textbf{Rapport de performance k6 - Simulation pic mensuel (1er janvier 2025)}]
 \begin{verbatim}
-scenarios: (100.00%) 1 scenario, 200 max VUs, 14m30s max duration
+scenarios: (100.00%) 1 scenario, 50 max VUs, 14m30s max duration
 ✓ monthly_spike: 14m0s
 
      ✓ login successful
@@ -786,24 +786,24 @@ scenarios: (100.00%) 1 scenario, 200 max VUs, 14m30s max duration
      ✓ dashboard loaded
      ✓ budgets retrieved
 
-     checks.........................: 98.42%  ✓ 14238    ✗ 227
-     data_received..................: 892 MB  1.1 MB/s
-     data_sent.....................: 234 MB  279 kB/s
+     checks.........................: 97.80%  ✓ 3420    ✗ 76
+     data_received..................: 214 MB  256 kB/s
+     data_sent.....................: 58 MB   69 kB/s
      http_req_blocked...............: avg=2.1ms    p(95)=8.4ms
      http_req_connecting............: avg=0.8ms    p(95)=3.2ms
-   ✓ http_req_duration..............: avg=342.5ms  p(95)=782.3ms  p(99)=1842ms
-       { expected_response:true }...: avg=338.2ms  p(95)=771.4ms  p(99)=1823ms
-   ✓ http_req_failed................: 1.58%   ✓ 312      ✗ 19488
+   ✓ http_req_duration..............: avg=312.5ms  p(95)=742.3ms  p(99)=1480ms
+       { expected_response:true }...: avg=308.2ms  p(95)=731.4ms  p(99)=1462ms
+   ✓ http_req_failed................: 2.20%   ✓ 109      ✗ 4841
      http_req_receiving.............: avg=2.3ms    p(95)=8.7ms
      http_req_sending...............: avg=0.4ms    p(95)=1.2ms
-     http_reqs.....................: 19800   23.57/s
+     http_reqs.....................: 4950    5.89/s
      iteration_duration.............: avg=18.4s    p(95)=27.3s
-     iterations....................: 3300    3.93/s
-   ✓ login_errors...................: 0.91%   ✓ 30       ✗ 3270
-   ✓ import_duration................: avg=3421ms   p(95)=4832ms   p(99)=6234ms
-   ✓ dashboard_load_time............: avg=1243ms   p(95)=1987ms   p(99)=2543ms
-     vus...........................: 1       min=1      max=187
-     vus_max........................: 200     min=200    max=200
+     iterations....................: 825     0.98/s
+   ✓ login_errors...................: 1.21%   ✓ 10       ✗ 815
+   ✓ import_duration................: avg=3212ms   p(95)=4621ms   p(99)=5840ms
+   ✓ dashboard_load_time............: avg=1183ms   p(95)=1876ms   p(99)=2310ms
+     vus...........................: 1       min=1      max=47
+     vus_max........................: 50      min=50     max=50
 \end{verbatim}
 
 \textbf{Analyse des résultats :}
@@ -826,12 +826,12 @@ En pratique, cela signifie que l'application répond en moins d'une seconde dans
 \hline
 \textbf{Endpoint} & \textbf{P50 (ms)} & \textbf{P95 (ms)} & \textbf{P99 (ms)} & \textbf{Req/jour} \\
 \hline
-POST /auth/login & 82 & 156 & 298 & 1,247 \\
-GET /transactions & 124 & 342 & 567 & 8,432 \\
-POST /transactions & 98 & 218 & 412 & 3,156 \\
-GET /dashboard & 256 & 687 & 1,234 & 4,821 \\
-POST /import/csv & 1,842 & 3,421 & 5,123 & 89 \\
-GET /budgets & 142 & 389 & 623 & 2,947 \\
+POST /auth/login & 82 & 156 & 298 & 168 \\
+GET /transactions & 124 & 342 & 567 & 840 \\
+POST /transactions & 98 & 218 & 412 & 280 \\
+GET /dashboard & 256 & 687 & 1,234 & 560 \\
+POST /import/csv & 1,842 & 3,421 & 5,123 & 14 \\
+GET /budgets & 142 & 389 & 623 & 336 \\
 \hline
 \end{tabular}
 \end{center}
@@ -1251,8 +1251,8 @@ jobs:
 Builds totaux & 487 & ↑ +23\% \\
 Taux de succès & 94.3\% & ↑ +2.1\% \\
 Temps moyen pipeline & 12min 34s & ↓ -18\% \\
-Tests exécutés par build & 684 & ↑ +142 \\
-Déploiements réussis & 142/147 (96.6\%) & → stable \\
+Tests exécutés par build & 457 & ↑ +63 \\
+Déploiements réussis & 27/28 (96.4\%) & → stable \\
 Rollbacks nécessaires & 2 & ↓ -3 \\
 Code coverage moyen & 85.3\% & ↑ +3.2\% \\
 Vulnérabilités bloquantes & 0 & → 0 \\

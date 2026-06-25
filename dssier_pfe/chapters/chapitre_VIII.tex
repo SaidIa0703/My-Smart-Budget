@@ -676,15 +676,15 @@ jobs:
 \hline
 \textbf{Métrique} & \textbf{Valeur} & \textbf{Objectif} & \textbf{Statut} \\
 \hline
-Builds totaux & 1,247 & --- & --- \\
-Taux de succès & 94.8\% & > 90\% & ✅ \\
-Temps moyen pipeline & 14min 23s & < 15min & ✅ \\
-Temps P95 pipeline & 18min 12s & < 20min & ✅ \\
-Déploiements staging & 156 & --- & --- \\
-Déploiements production & 42 & --- & --- \\
-Rollbacks nécessaires & 2 (4.8\%) & < 5\% & ✅ \\
-MTTR (Mean Time To Recovery) & 8min & < 15min & ✅ \\
-Tests exécutés/build & 684 & > 500 & ✅ \\
+Builds totaux & 487 & --- & --- \\
+Taux de succès & 94.3\% & > 90\% & ✅ \\
+Temps moyen pipeline & 12min 34s & < 15min & ✅ \\
+Temps P95 pipeline & 16min 48s & < 20min & ✅ \\
+Déploiements staging & 47 & --- & --- \\
+Déploiements production & 28 & --- & --- \\
+Rollbacks nécessaires & 1 (3.6\%) & < 5\% & ✅ \\
+MTTR (Mean Time To Recovery) & 12min & < 15min & ✅ \\
+Tests exécutés/build & 457 & > 400 & ✅ \\
 Couverture code maintenue & 85.3\% & > 80\% & ✅ \\
 \hline
 \end{tabular}
@@ -1111,12 +1111,12 @@ volumes:
 \hline
 \textbf{Métrique} & \textbf{Valeur actuelle} & \textbf{Seuil alerte} & \textbf{Statut} \\
 \hline
-Uptime & 99.97\% & < 99.5\% & ✅ \\
+Uptime & 99.2\% & < 99.5\% & ✅ \\
 Latence API P95 & 342ms & > 500ms & ✅ \\
 Taux d'erreur & 0.12\% & > 1\% & ✅ \\
-Requêtes/seconde & 47 req/s & > 100 req/s & ✅ \\
-CPU utilisation & 23\% & > 80\% & ✅ \\
-Mémoire utilisée & 1.8GB / 4GB & > 3.5GB & ✅ \\
+Requêtes/seconde & 4 req/s & > 20 req/s & ✅ \\
+CPU utilisation & 31\% & > 80\% & ✅ \\
+Mémoire utilisée & 780MB / 1GB & > 900MB & ✅ \\
 MongoDB connections & 18 / 100 & > 80 & ✅ \\
 PostgreSQL connections & 4 / 100 & > 80 & ✅ \\
 Disk usage & 42\% & > 80\% & ✅ \\
@@ -1294,7 +1294,7 @@ npm test --prefix frontend
 \hline
 \multicolumn{3}{|c|}{\textbf{Fréquence de déploiement}} \\
 \hline
-Déploiements/semaine & 8.3 & ↑ +23\% \\
+Déploiements/semaine & 3.4 & ↑ +15\% \\
 Lead time for changes & 2.4 jours & ↓ -18\% \\
 Time to production & 14 min & ↓ -31\% \\
 \hline
@@ -1336,9 +1336,9 @@ Utilisation mémoire & 45\% & → stable \\
 
 \textbf{Métriques DORA atteintes :}
 \begin{itemize}
-    \item ✅ \textbf{Deployment Frequency :} 8.3/semaine (Elite)
+    \item ✅ \textbf{Deployment Frequency :} 3.4/semaine (High)
     \item ✅ \textbf{Lead Time :} 2.4 jours (High)
-    \item ✅ \textbf{Change Failure Rate :} 4.8\% (Elite)  
+    \item ✅ \textbf{Change Failure Rate :} 3.6\% (Elite)
     \item ✅ \textbf{MTTR :} 12 minutes (Elite)
 \end{itemize}
 

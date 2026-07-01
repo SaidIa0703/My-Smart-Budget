@@ -3,22 +3,71 @@ const {db} = require('../db');
 
 const router = express.Router();
 
-router.post('/add',  async (req, res) =>{
-    try{
+async function checkBudgetAlert(db, userId, category) {
+    const budget = await db.oneOrNone(
+        'SELECT * FROM budgets WHERE user_id = $1 AND category = $2',
+        [userId, category]
+    );
+    if (!budget || !budget.limit || parseFloat(budget.limit) === 0) return null;
+
+    const result = await db.one(
+        `SELECT COALESCE(SUM(ABS(amount)), 0) AS total
+         FROM transactions
+         WHERE user_id = $1 AND category = $2
+           AND amount < 0
+           AND date >= date_trunc('month', CURRENT_DATE)`,
+        [userId, category]
+    );
+
+    const spent = parseFloat(result.total);
+    const limit = parseFloat(budget.limit);
+    const percentage = (spent / limit) * 100;
+
+    let threshold = null;
+    if (percentage >= 100) threshold = '100';
+    else if (percentage >= 90) threshold = '90';
+    else if (percentage >= 70) threshold = '70';
+
+    if (!threshold) return null;
+
+    const existing = await db.oneOrNone(
+        `SELECT id FROM notifications
+         WHERE user_id = $1 AND budget_id = $2 AND type = $3
+           AND created_at >= date_trunc('month', CURRENT_DATE)`,
+        [userId, budget.id, threshold]
+    );
+    if (existing) return null;
+
+    await db.none(
+        'INSERT INTO notifications (user_id, budget_id, type, category, percentage) VALUES ($1, $2, $3, $4, $5)',
+        [userId, budget.id, threshold, category, percentage.toFixed(2)]
+    );
+
+    return { threshold, percentage: Math.round(percentage), category, limit };
+}
+
+router.post('/add', async (req, res) => {
+    try {
         const { userId, name, category, amount, date } = req.body;
 
-        if(!userId || !name || !category || !amount) {
-            return res.status(400).json({message: 'Tout les champs sont requis'})
+        if (!userId || !name || !category || !amount) {
+            return res.status(400).json({ message: 'Tout les champs sont requis' });
         }
 
-        const transactions = await db.one(
+        const transaction = await db.one(
             'INSERT INTO transactions (user_id, name, category, amount, date, created_at) VALUES ($1, $2, $3, $4, $5, NOW()) RETURNING *',
-[userId, name, category, amount, date]
+            [userId, name, category, amount, date]
         );
-        res.status(201).json(transactions);
-    }catch(error) {
+
+        let alert = null;
+        if (parseFloat(amount) < 0) {
+            alert = await checkBudgetAlert(db, userId, category);
+        }
+
+        res.status(201).json({ transaction, alert });
+    } catch (error) {
         console.error('Error:', error);
-        res.status(501).json({ message: 'Erreur serveur'});
+        res.status(500).json({ message: 'Erreur serveur' });
     }
 });
 
@@ -84,6 +133,26 @@ router.get('/stats/:userId', async (req, res) => {
     }catch (error) {
         console.error('Error:', error);
         res.status(500).json({ message : 'Erreur serveur'});
+    }
+});
+
+// notifications du mois courant par user
+router.get('/notifications/:userId', async (req, res) => {
+    try {
+        const { userId } = req.params;
+        const notifications = await db.any(
+            `SELECT n.*, b.category, b.limit
+             FROM notifications n
+             JOIN budgets b ON n.budget_id = b.id
+             WHERE n.user_id = $1
+               AND n.created_at >= date_trunc('month', CURRENT_DATE)
+             ORDER BY n.created_at DESC`,
+            [userId]
+        );
+        res.json(notifications);
+    } catch (error) {
+        console.error('Error:', error);
+        res.status(500).json({ message: 'Erreur serveur' });
     }
 });
 

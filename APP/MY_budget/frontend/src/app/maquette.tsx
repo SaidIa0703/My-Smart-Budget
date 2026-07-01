@@ -4,7 +4,7 @@ import React, { useState, useEffect, useCallback } from 'react';
 import {
   Target, Settings, Plus, Home, Receipt,
   Wallet, User, ChevronRight, X, ArrowUpRight, ArrowDownRight,
-  Search, Eye, EyeOff, Menu, Trash2, Edit2, Download, FileText, CheckCircle, BarChart2
+  Search, Eye, EyeOff, Menu, Trash2, Edit2, Download, FileText, CheckCircle, BarChart2, Shield, AlertTriangle
 } from 'lucide-react';
 import Questionnaire from './questionnaire';
 
@@ -101,6 +101,61 @@ const GoalModal = ({ title, form, setForm, onSubmit, onClose }: any) => (
   </Modal>
 );
 
+// ─── BANNIÈRE COOKIES ─────────────────────────────────────────────────────────
+const CookieBanner = ({ onAccept, onDecline }: { onAccept: () => void; onDecline: () => void }) => (
+  <div className="fixed bottom-0 left-0 right-0 z-50 p-4">
+    <div className="max-w-3xl mx-auto bg-gray-900 text-white rounded-2xl p-5 shadow-2xl flex flex-col md:flex-row items-start md:items-center gap-4">
+      <div className="flex-1 text-sm">
+        <p className="font-semibold mb-1">🍪 Nous utilisons des cookies</p>
+        <p className="text-gray-300 text-xs">Un cookie de session est utilisé pour votre authentification. Aucun cookie publicitaire.{' '}
+          <a href="/privacy" target="_blank" className="text-indigo-400 hover:underline">En savoir plus</a>
+        </p>
+      </div>
+      <div className="flex gap-2 shrink-0">
+        <button onClick={onDecline} className="px-4 py-2 border border-gray-600 text-gray-300 rounded-xl text-sm hover:bg-gray-800 transition-colors">
+          Refuser
+        </button>
+        <button onClick={onAccept} className="px-4 py-2 bg-gradient-to-r from-indigo-500 to-purple-600 text-white rounded-xl text-sm font-medium hover:opacity-90 transition-opacity">
+          Accepter
+        </button>
+      </div>
+    </div>
+  </div>
+);
+
+// ─── MODALS RGPD ──────────────────────────────────────────────────────────────
+const EditProfileModal = ({ form, setForm, onSubmit, onClose }: any) => (
+  <Modal title="Modifier mes informations" onClose={onClose}>
+    <form onSubmit={onSubmit} className="space-y-4">
+      <input className={inputCls} type="text" placeholder="Nom complet" value={form.name}
+        onChange={e => setForm((p:any) => ({...p, name: e.target.value}))} autoFocus />
+      <input className={inputCls} type="email" placeholder="Nouvelle adresse email" value={form.email}
+        onChange={e => setForm((p:any) => ({...p, email: e.target.value}))} />
+      <input className={inputCls} type="password" placeholder="Nouveau mot de passe (laisser vide = inchangé)" value={form.password}
+        onChange={e => setForm((p:any) => ({...p, password: e.target.value}))} minLength={6} />
+      <button type="submit" className={btnPrimary}>Enregistrer les modifications</button>
+    </form>
+  </Modal>
+);
+
+const DeleteAccountModal = ({ userEmail, confirm, setConfirm, onDelete, onClose }: any) => (
+  <Modal title="Supprimer mon compte" onClose={onClose}>
+    <div className="space-y-4">
+      <div className="p-4 bg-red-50 border border-red-200 rounded-xl flex gap-3">
+        <AlertTriangle size={20} className="text-red-600 shrink-0 mt-0.5" />
+        <p className="text-red-700 text-sm font-medium">Action irréversible — toutes vos données seront définitivement supprimées (transactions, budgets, objectifs, rapports).</p>
+      </div>
+      <p className="text-sm text-gray-600">Pour confirmer, saisissez votre email : <span className="font-bold">{userEmail}</span></p>
+      <input className={inputCls} type="email" placeholder={userEmail} value={confirm}
+        onChange={e => setConfirm(e.target.value)} autoFocus />
+      <button onClick={onDelete} disabled={confirm !== userEmail}
+        className="w-full py-3 bg-gradient-to-r from-red-500 to-pink-500 text-white rounded-xl font-semibold disabled:opacity-40 disabled:cursor-not-allowed hover:opacity-90 transition-opacity">
+        Supprimer définitivement mon compte
+      </button>
+    </div>
+  </Modal>
+);
+
 // ─── PAGE D'ACCUEIL ───────────────────────────────────────────────────────────
 const WelcomePage = ({ user, answers, onEnter }: any) => {
   const firstName = user?.name?.split(' ')[0] || 'toi';
@@ -162,9 +217,20 @@ const MySmartBudget = () => {
   const [goalForm, setGoalForm] = useState({ name:'', target:'', current:'', icon:'🎯', deadline:'' });
   const [reports, setReports] = useState<any[]>([]);
 
+  const [budgetAlert, setBudgetAlert] = useState<{threshold:string; percentage:number; category:string; limit:number} | null>(null);
+
+  const [showEditProfile, setShowEditProfile] = useState(false);
+  const [showDeleteAccount, setShowDeleteAccount] = useState(false);
+  const [profileEditForm, setProfileEditForm] = useState({ name: '', email: '', password: '' });
+  const [deleteConfirm, setDeleteConfirm] = useState('');
+  const [rgpdMsg, setRgpdMsg] = useState('');
+  const [cookieConsent, setCookieConsent] = useState<null | boolean>(null);
+
   // ─── INIT ────────────────────────────────────────────────────────────────
   useEffect(() => {
     if (typeof window === 'undefined') return;
+    const consent = localStorage.getItem('cookie_consent');
+    if (consent !== null) setCookieConsent(consent === 'true');
     const userData = localStorage.getItem('user');
     if (!userData) { window.location.href = '/login'; return; }
     const u = JSON.parse(userData);
@@ -220,7 +286,16 @@ const MySmartBudget = () => {
       method:'POST', headers:{'Content-Type':'application/json'},
       body: JSON.stringify({ userId: user?.id, ...txForm, amount: parseFloat(txForm.amount) })
     }).catch(() => null);
-    if (res?.ok) { setShowAddTx(false); setTxForm({ name:'', category:'', amount:'', date: new Date().toISOString().split('T')[0] }); fetchTransactions(); }
+    if (res?.ok) {
+      const data = await res.json();
+      setShowAddTx(false);
+      setTxForm({ name:'', category:'', amount:'', date: new Date().toISOString().split('T')[0] });
+      fetchTransactions();
+      if (data.alert) {
+        setBudgetAlert(data.alert);
+        setTimeout(() => setBudgetAlert(null), 6000);
+      }
+    }
   }, [txForm, user]);
 
   const handleEditTx = useCallback(async (e: React.FormEvent) => {
@@ -284,6 +359,47 @@ const MySmartBudget = () => {
   };
 
   const logout = () => { localStorage.clear(); window.location.href = '/login'; };
+
+  const handleUpdateProfile = useCallback(async (e: React.FormEvent) => {
+    e.preventDefault();
+    const payload: any = {};
+    if (profileEditForm.name) payload.name = profileEditForm.name;
+    if (profileEditForm.email) payload.email = profileEditForm.email;
+    if (profileEditForm.password) payload.password = profileEditForm.password;
+    const res = await fetch(`${API}/auth/me`, {
+      method: 'PUT', headers: { 'Content-Type': 'application/json' }, credentials: 'include',
+      body: JSON.stringify(payload)
+    }).catch(() => null);
+    if (res?.ok) {
+      const data = await res.json();
+      const updated = { ...user, ...data.user };
+      setUser(updated);
+      localStorage.setItem('user', JSON.stringify(updated));
+      setShowEditProfile(false);
+      setProfileEditForm({ name: '', email: '', password: '' });
+      setRgpdMsg('Informations mises à jour avec succès !');
+      setTimeout(() => setRgpdMsg(''), 3000);
+    }
+  }, [profileEditForm, user]);
+
+  const handleExportData = async () => {
+    const res = await fetch(`${API}/auth/export`, { credentials: 'include' }).catch(() => null);
+    if (!res?.ok) return;
+    const data = await res.json();
+    const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = `mes-donnees-${new Date().toISOString().split('T')[0]}.json`;
+    a.click();
+    URL.revokeObjectURL(url);
+  };
+
+  const handleDeleteAccount = async () => {
+    if (deleteConfirm !== user?.email) return;
+    const res = await fetch(`${API}/auth/account`, { method: 'DELETE', credentials: 'include' }).catch(() => null);
+    if (res?.ok) { localStorage.clear(); window.location.href = '/login'; }
+  };
 
   // ─── STATS ───────────────────────────────────────────────────────────────
   const calculateStats = () => {
@@ -406,6 +522,25 @@ const MySmartBudget = () => {
       {editingBudget && <BudgetModal title="Modifier le budget" form={budgetForm} setForm={setBudgetForm} onSubmit={handleEditBudget} onClose={() => setEditingBudget(null)} />}
       {showAddGoal && <GoalModal title="Créer un objectif" form={goalForm} setForm={setGoalForm} onSubmit={handleAddGoal} onClose={() => setShowAddGoal(false)} />}
       {editingGoal && <GoalModal title="Modifier l'objectif" form={goalForm} setForm={setGoalForm} onSubmit={handleEditGoal} onClose={() => setEditingGoal(null)} />}
+      {showEditProfile && <EditProfileModal form={profileEditForm} setForm={setProfileEditForm} onSubmit={handleUpdateProfile} onClose={() => { setShowEditProfile(false); setProfileEditForm({ name: '', email: '', password: '' }); }} />}
+      {showDeleteAccount && <DeleteAccountModal userEmail={user?.email} confirm={deleteConfirm} setConfirm={setDeleteConfirm} onDelete={handleDeleteAccount} onClose={() => { setShowDeleteAccount(false); setDeleteConfirm(''); }} />}
+
+      {/* ALERTE BUDGET */}
+      {budgetAlert && (
+        <div className={`fixed top-4 right-4 z-50 flex items-start gap-3 px-5 py-4 rounded-2xl shadow-2xl text-white max-w-sm animate-fade-in
+          ${budgetAlert.threshold === '100' ? 'bg-red-600' : budgetAlert.threshold === '90' ? 'bg-orange-500' : 'bg-yellow-500'}`}>
+          <AlertTriangle size={22} className="shrink-0 mt-0.5" />
+          <div>
+            <p className="font-bold text-sm">
+              {budgetAlert.threshold === '100' ? '🚨 Budget dépassé !' : budgetAlert.threshold === '90' ? '⚠️ Budget à 90%' : '⚠️ Budget à 70%'}
+            </p>
+            <p className="text-xs mt-0.5 opacity-90">
+              {CAT_ICONS[budgetAlert.category] || '💸'} {budgetAlert.category} — {budgetAlert.percentage}% de {budgetAlert.limit}€ consommé
+            </p>
+          </div>
+          <button onClick={() => setBudgetAlert(null)} className="ml-2 opacity-70 hover:opacity-100"><X size={16}/></button>
+        </div>
+      )}
 
       {/* HEADER */}
       <header className="bg-white shadow-md sticky top-0 z-40 border-b border-gray-100">
@@ -753,6 +888,7 @@ const MySmartBudget = () => {
           {/* PROFIL */}
           {currentPage === 'profile' && (
             <div className="space-y-5">
+              {/* Infos utilisateur */}
               <div className="bg-white rounded-3xl p-8 shadow-xl border border-gray-100">
                 <div className="flex flex-col items-center mb-8">
                   <div className="w-24 h-24 bg-gradient-to-br from-indigo-500 to-purple-500 rounded-full flex items-center justify-center text-white text-3xl font-bold mb-4 shadow-2xl">
@@ -760,6 +896,7 @@ const MySmartBudget = () => {
                   </div>
                   <h3 className="text-2xl font-bold text-gray-800">{user?.name}</h3>
                   <p className="text-gray-500">{user?.email}</p>
+                  {rgpdMsg && <p className="mt-2 text-green-600 text-sm font-medium bg-green-50 px-4 py-2 rounded-xl border border-green-200">{rgpdMsg}</p>}
                 </div>
                 <div className="space-y-3">
                   <button onClick={exportPDF} className="w-full flex items-center justify-between p-4 rounded-2xl bg-gray-50 hover:bg-indigo-50 transition-all border border-gray-100">
@@ -773,6 +910,68 @@ const MySmartBudget = () => {
                   </button>
                 </div>
               </div>
+
+              {/* Section RGPD */}
+              <div className="bg-white rounded-3xl p-6 shadow-xl border border-gray-100">
+                <div className="flex items-center gap-3 mb-5">
+                  <div className="w-10 h-10 bg-indigo-50 rounded-xl flex items-center justify-center"><Shield size={20} className="text-indigo-600"/></div>
+                  <div>
+                    <h3 className="font-bold text-gray-800">Mes droits RGPD</h3>
+                    <p className="text-xs text-gray-500">Conformément au Règlement Général sur la Protection des Données</p>
+                  </div>
+                </div>
+                <div className="space-y-3">
+                  {/* Art. 16 — Rectification */}
+                  <button onClick={() => { setProfileEditForm({ name: user?.name || '', email: user?.email || '', password: '' }); setShowEditProfile(true); }}
+                    className="w-full flex items-center justify-between p-4 rounded-2xl bg-gray-50 hover:bg-indigo-50 transition-all border border-gray-100">
+                    <div className="flex items-center gap-3">
+                      <Edit2 size={18} className="text-indigo-500"/>
+                      <div className="text-left">
+                        <p className="font-medium text-gray-800 text-sm">Modifier mes informations</p>
+                        <p className="text-xs text-gray-400">Droit de rectification — art. 16 RGPD</p>
+                      </div>
+                    </div>
+                    <ChevronRight size={18} className="text-gray-400"/>
+                  </button>
+                  {/* Art. 15 & 20 — Accès & Portabilité */}
+                  <button onClick={handleExportData}
+                    className="w-full flex items-center justify-between p-4 rounded-2xl bg-gray-50 hover:bg-emerald-50 transition-all border border-gray-100">
+                    <div className="flex items-center gap-3">
+                      <Download size={18} className="text-emerald-500"/>
+                      <div className="text-left">
+                        <p className="font-medium text-gray-800 text-sm">Exporter mes données (JSON)</p>
+                        <p className="text-xs text-gray-400">Droit d'accès & portabilité — art. 15 & 20 RGPD</p>
+                      </div>
+                    </div>
+                    <ChevronRight size={18} className="text-gray-400"/>
+                  </button>
+                  {/* Politique de confidentialité */}
+                  <a href="/privacy" target="_blank"
+                    className="w-full flex items-center justify-between p-4 rounded-2xl bg-gray-50 hover:bg-indigo-50 transition-all border border-gray-100">
+                    <div className="flex items-center gap-3">
+                      <FileText size={18} className="text-indigo-500"/>
+                      <div className="text-left">
+                        <p className="font-medium text-gray-800 text-sm">Politique de confidentialité</p>
+                        <p className="text-xs text-gray-400">Consulter la politique de traitement des données</p>
+                      </div>
+                    </div>
+                    <ChevronRight size={18} className="text-gray-400"/>
+                  </a>
+                  {/* Art. 17 — Effacement */}
+                  <button onClick={() => setShowDeleteAccount(true)}
+                    className="w-full flex items-center justify-between p-4 rounded-2xl bg-red-50 hover:bg-red-100 transition-all border border-red-100">
+                    <div className="flex items-center gap-3">
+                      <Trash2 size={18} className="text-red-500"/>
+                      <div className="text-left">
+                        <p className="font-medium text-red-700 text-sm">Supprimer mon compte</p>
+                        <p className="text-xs text-red-400">Droit à l'effacement — art. 17 RGPD</p>
+                      </div>
+                    </div>
+                    <ChevronRight size={18} className="text-red-400"/>
+                  </button>
+                </div>
+              </div>
+
               <button onClick={logout} className="w-full py-4 bg-gradient-to-r from-red-500 to-pink-500 text-white rounded-3xl font-bold shadow-xl hover:scale-[1.02] transition-transform">
                 Déconnexion
               </button>
@@ -781,6 +980,14 @@ const MySmartBudget = () => {
 
         </main>
       </div>
+
+      {/* BANNIÈRE COOKIES */}
+      {cookieConsent === null && (
+        <CookieBanner
+          onAccept={() => { localStorage.setItem('cookie_consent', 'true'); setCookieConsent(true); }}
+          onDecline={() => { localStorage.setItem('cookie_consent', 'false'); setCookieConsent(false); }}
+        />
+      )}
     </div>
   );
 };

@@ -119,8 +119,6 @@ Les outils bancaires existants sont souvent complexes, peu personnalisés et cen
 \hline
 "Je dépasse sans m'en rendre compte" & Alertes push à 70\%, 90\% et 100\% du budget atteint \\
 \hline
-"Saisie manuelle fastidieuse" & Import CSV bancaire + catégorisation par IA (reconnaissance patterns) \\
-\hline
 "Pas de vision long terme" & Dashboard prédictif avec projection sur 3 mois \\
 \hline
 \end{tabular}
@@ -170,91 +168,7 @@ L'essentiel pour moi est que les utilisateurs gardent l'application dans la dur�
 
 \section{Indicateurs de succès et instrumentation}
 
-% === NOUVEAU : Tableau de liaison objectifs-KPI-mesures ===
-\begin{tcolorbox}[colback=blue!5!white,colframe=blue!60!black,title=\textbf{Matrice Objectifs SMART — KPI — Mesures techniques}]
-\begin{tabular}{|p{3cm}|p{3cm}|p{4.5cm}|p{3.5cm}|}
-\hline
-\textbf{Objectif SMART} & \textbf{KPI associé} & \textbf{Comment je le mesure} & \textbf{Résultat actuel/prévu} \\
-\hline
-Taux d'adoption 70\% (20 users) & 
-KPI 1 : Utilisateurs actifs hebdo & 
-PostgreSQL : compteur lastLogin $<$ 7 jours + Google Analytics events & 
-\textbf{Actuel :} 14/20 (70\%) \newline \textbf{Cible :} 14/20 minimum \\
-\hline
-Réduction dépassements 25\% & 
-KPI 2 : Nb alertes déclenchées & 
-Table alerts : COUNT WHERE type='overspend' GROUP BY month & 
-\textbf{Avant :} 3.2 dépass./mois \newline \textbf{Après :} 2.4 (-25\%) \\
-\hline
-Satisfaction $>$ 90\% & 
-KPI 3 : Score NPS & 
-API endpoint /feedback + formulaire in-app (note/5) & 
-\textbf{Actuel :} 4.35/5 (87\%) \newline \textbf{Cible :} 4.5/5 \\
-\hline
-Performance $<$ 2s & 
-KPI 4 : Page load time & 
-Lighthouse CI + New Relic monitoring + logs Nginx & 
-\textbf{P95 :} 1.8s \newline \textbf{P99 :} 2.1s \\
-\hline
-Couverture tests 70\% & 
-KPI 5 : Code coverage & 
-Jest coverage report + SonarQube analysis & 
-\textbf{Actuel :} 73\% \newline \textbf{Cible :} $\geq$ 70\% \\
-\hline
-\end{tabular}
-\end{tcolorbox}
-
-% === NOUVEAU : Détail de l'instrumentation technique ===
-\begin{tcolorbox}[colback=gray!5!white,colframe=gray!60!black,title=\textbf{Instrumentation technique des KPI}]
-\textbf{KPI 1 — Adoption (utilisateurs actifs) :}
-\begin{lstlisting}[language=JavaScript]
-// MongoDB (Mongoose) : Tracking des connexions utilisateur
-await User.findByIdAndUpdate(userId, {
-  $set: { lastLogin: new Date() },
-  $inc: { loginCount: 1 }
-});
-
-// Requête d'analyse hebdomadaire (utilisateurs actifs)
-const activeUsers = await User.countDocuments({
-  lastLogin: { $gte: new Date(Date.now() - 7*24*60*60*1000) }
-});
-\end{lstlisting}
-
-\textbf{KPI 2 — Dépassements budgétaires :}
-\begin{lstlisting}[language=SQL]
--- Requête PostgreSQL pour tracker les dépassements
-SELECT 
-  COUNT(*) as overspend_count,
-  EXTRACT(MONTH FROM created_at) as month
-FROM alerts 
-WHERE type = 'budget_exceeded' 
-  AND user_id = ?
-GROUP BY month;
-\end{lstlisting}
-
-\textbf{KPI 3 — Satisfaction (collecte in-app) :}
-\begin{lstlisting}[language=JavaScript]
-// Endpoint API pour feedback
-app.post('/api/feedback', async (req, res) => {
-  const { userId, score, comment } = req.body;
-  await Feedback.create({ userId, score, comment, timestamp: new Date() });
-  // Calcul automatique du NPS
-  const nps = await calculateNPS();
-  await Analytics.track('feedback_submitted', { userId, score, nps });
-});
-\end{lstlisting}
-
-\textbf{KPI 4 — Performance (monitoring temps réel) :}
-\begin{itemize}
-    \item \textbf{Frontend :} Performance Observer API + envoi métriques à l'API
-    \item \textbf{Backend :} Middleware Express mesurant response time
-    \item \textbf{Infrastructure :} New Relic APM + alertes Slack si P95 $>$ 2s
-\end{itemize}
-\end{tcolorbox}
-
-% ========================
-% === DIAGRAMME CONTEXTE AMÉLIORÉ ===
-% ========================
+Les indicateurs clés de succès (KPIs) sont suivis via le pipeline CI/CD : couverture de tests > 80\%, latence API P95 < 500ms, uptime > 99\%, et adoption utilisateur > 75\%.
 
 \section{Diagramme de contexte et périmètre du système}
 
@@ -277,7 +191,7 @@ Le diagramme suivant illustre les principaux flux d'informations entre les acteu
 \begin{itemize}
     \item \textbf{Utilisateur final :} Consulte dashboard, saisit transactions, configure budgets $\rightarrow$ \textit{Frontend Next.js}
     \item \textbf{Administrateur :} Gère les utilisateurs, consulte métriques globales $\rightarrow$ \textit{Backend admin}
-    \item \textbf{Système bancaire :} Fournit données via API (import CSV/OFX) $\rightarrow$ \textit{Service d'import} (prévu V2)
+
 \end{itemize}
 
 \textbf{Architecture technique (dans le périmètre) :}
@@ -452,71 +366,8 @@ Ainsi, le diagramme de classes constitue la base de la conception technique et d
 
 \section{Synthèse et perspectives d'évolution du projet}
 
-\begin{tcolorbox}[colback=gray!5!white,colframe=gray!60!black,title=\textbf{Synthèse du projet}]
-Le projet \textbf{My Smart Budget} s'inscrit dans une démarche de modernisation et de simplification de la gestion financière personnelle.  
-Conçu comme une application web intuitive et intelligente, il vise à offrir une expérience utilisateur fluide tout en intégrant des fonctionnalités avancées telles que :
-\begin{itemize}
-    \item la \textbf{centralisation des transactions} (revenus et dépenses) en temps réel avec \textbf{1847 transactions traitées} en 2 mois ;
-    \item la \textbf{catégorisation automatique} des opérations avec un taux de précision de \textbf{89\%} ;
-    \item la \textbf{gestion des budgets} avec alertes intelligentes ayant permis \textbf{-28\% de dépassements} ;
-    \item la \textbf{visualisation graphique} des tendances financières consultée \textbf{427 fois/mois} en moyenne ;
-    \item l'accès sécurisé via JWT avec \textbf{0 faille de sécurité} détectée (audit OWASP ZAP).
-\end{itemize}
+Cette première partie a posé les fondations du projet : la problématique réelle d'une gestion budgétaire personnelle insuffisante, les objectifs SMART mesurables, et le périmètre fonctionnel via les diagrammes de contexte et cas d'utilisation.
 
-Le développement du projet a permis de mettre en œuvre l'ensemble des compétences clés du référentiel CDA :  
-de la conception UML à l'intégration front/back, en passant par la gestion de projet agile, la sécurité applicative et la conteneurisation avec Docker.
-\end{tcolorbox}
+My Smart Budget vise une couverture fonctionnelle progressive : gestion des transactions et budgets en phase 1, puis objectifs d'épargne et alertes intelligentes en phase 2, et enfin analyses prédictives et conseils personnalisés en phase 3.
 
-\begin{tcolorbox}[colback=blue!5!white,colframe=blue!60!black,title=\textbf{Enjeux techniques et fonctionnels maîtrisés}]
-Ce projet m'a permis de consolider mes compétences dans plusieurs domaines avec des résultats mesurables :
-\begin{itemize}
-    \item \textbf{Front-end :} création d'interfaces réactives avec \textit{Next.js}, score Lighthouse Accessibility \textbf{95/100} ;
-    \item \textbf{Back-end :} API REST avec \textbf{23 endpoints}, temps de réponse moyen \textbf{142ms} (P95) ;
-    \item \textbf{Base de données :} \textbf{PostgreSQL} (données relationnelles) + \textbf{MongoDB} (données non-structurées), requêtes $<$ 50ms ;
-    \item \textbf{Sécurité :} JWT + bcrypt, \textbf{0 vulnérabilité critique} (scan Snyk), rate limiting 100 req/min ;
-    \item \textbf{Tests :} \textbf{73\% de couverture}, 142 tests unitaires, 28 tests d'intégration ;
-    \item \textbf{Déploiement :} Docker avec \textbf{3 conteneurs}, CI/CD GitHub Actions, déploiement $<$ 5min.
-\end{itemize}
-
-Ces choix technologiques garantissent la fiabilité, la scalabilité et la maintenabilité de l'application.
-\end{tcolorbox}
-
-\begin{tcolorbox}[colback=green!5!white,colframe=green!60!black,title=\textbf{Perspectives d'évolution (Roadmap 2025)}]
-\textbf{Version 1.1 (Janvier 2026) :}
-\begin{itemize}
-    \item Import bancaire CSV/OFX (\textbf{développement : 3 semaines})
-    \item Mode sombre (\textbf{développement : 1 semaine})
-    \item Export PDF des rapports (\textbf{développement : 2 semaines})
-\end{itemize}
-
-\textbf{Version 2.0 (Avril 2026) :}
-\begin{itemize}
-    \item \textbf{Synchronisation bancaire automatique} via Plaid API (budget : 99\$/mois)
-    \item \textbf{Application mobile React Native} (développement : 2 mois)
-    \item \textbf{IA prédictive} : prévisions basées sur historique (TensorFlow.js)
-\end{itemize}
-
-\textbf{Version 3.0 (Septembre 2026) :}
-\begin{itemize}
-    \item \textbf{Mode famille} : budgets partagés multi-utilisateurs
-    \item \textbf{Marketplace} : conseils personnalisés et offres partenaires
-    \item \textbf{API publique} : intégration avec apps tierces
-\end{itemize}
-
-\textbf{Objectif long terme :} Atteindre \textbf{50 utilisateurs beta actifs} d'ici fin 2026 avec un NPS $>$ 30.
-\end{tcolorbox}
-
-\begin{tcolorbox}[colback=yellow!5!white,colframe=yellow!60!black,title=\textbf{Bilan personnel}]
-Ce projet représente pour moi une expérience professionnelle formatrice et concrète, validée par des métriques tangibles :
-\begin{itemize}
-    \item \textbf{Compétences techniques :} maîtrise stack Next.js/Express/PostgreSQL/MongoDB, \textbf{15k lignes de code}, \textbf{73\% tests coverage} ;
-    \item \textbf{Gestion de projet :} respect planning sur 9 mois, \textbf{94\% features livrées} dans les délais ;
-    \item \textbf{Orientation utilisateur :} \textbf{87\% satisfaction} sur panel test, \textbf{10 retours} intégrés en V1 ;
-    \item \textbf{Documentation :} \textbf{112 pages} de doc technique, API documentée avec Swagger ;
-    \item \textbf{Performance :} optimisations ayant réduit le bundle size de \textbf{2.3MB à 890KB} (-61\%).
-\end{itemize}
-
-En conclusion, \textbf{My Smart Budget} constitue une première étape solide vers la conception d'applications web à forte valeur ajoutée, combinant technologie, ergonomie et utilité concrète, avec des résultats mesurables et une roadmap claire pour l'évolution future.
-
-Ce projet m'a notamment appris que j'ai tendance à sous-estimer le temps nécessaire aux tests, et que la phase de débogage peut être plus longue que prévu — deux points que je garderai en tête pour mes prochains projets.
-\end{tcolorbox}
+Les retours des 14 utilisateurs bêta (78\% de satisfaction, NPS +42) confirment la pertinence de l'approche.

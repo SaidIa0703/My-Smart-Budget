@@ -102,9 +102,9 @@ Bien que travaillant seul, je me suis astreint à des rituels stricts pour maint
 
 \begin{tcolorbox}[colback=yellow!5!white,colframe=yellow!60!black,title=\textbf{Exemple concret : Sprint du 14/02/2025}]
 \textbf{Lors de la Sprint Review :}
-J'ai présenté la fonctionnalité \textit{"Import CSV"}. Un bug critique a été détecté sur le mapping des catégories.
+J'ai présenté la fonctionnalité \textit{"Tableau de bord"}. Un retour utilisateur a souligné un temps de chargement trop élevé sur mobile.
 \begin{itemize}
-    \item[$\rightarrow$] \textbf{Action :} Création immédiate de l'issue \#37 \textit{"Fix CSV Category Mapping"} priorisée dans le Sprint suivant.
+    \item[$\rightarrow$] \textbf{Action :} Création de l'issue \#38 \textit{"Optimize Dashboard Loading"} — mise en place de la pagination côté serveur et d'un index composé sur \texttt{user\_id + date}.
 \end{itemize}
 
 \textbf{Lors de la Rétrospective :}
@@ -171,7 +171,7 @@ Le projet est jalonné par 4 étapes majeures (Milestones GitHub), avec des crit
 \hline
 \textbf{MVP (v1.0)} & 15/10/2024 & Auth JWT, CRUD complet, Dashboard v1. \\
 \hline
-\textbf{Bêta (v1.1)} & 30/10/2024 & Import CSV, Alertes, CI/CD complet. \\
+\textbf{Bêta (v1.1)} & 30/10/2024 & Alertes budgétaires, CI/CD complet. \\
 \hline
 \textbf{Finale (v2.0)} & 15/11/2024 & Export PDF, Optimisations Perf, Documentation finale. \\
 \hline
@@ -198,65 +198,6 @@ Les estimations reposent sur une complexité relative (Story Points), où \textb
     \safefig{chapters/assets/images/burndown-sprint3.png}{0.85\textwidth}{burndown-sprint3.png}
     \caption{Burndown Chart du Sprint 3 : visualisation du travail restant jour par jour}
     \label{fig:burndown}
-\end{figure}
-
-\section{Traçabilité totale : De l'idée au code}
-
-J'ai mis en place une chaîne de traçabilité complète pour lier le besoin métier (User Story) à la réalisation technique.
-
-\subsection{Le flux de traçabilité (Workflow)}
-
-\begin{enumerate}
-    \item \textbf{User Story :} Définition du besoin (ex: US-03 "Créer transaction").
-    \item \textbf{Issue GitHub :} Création du ticket technique (\#12).
-    \item \textbf{Branche :} Création d'une branche dédiée (\texttt{feature/us-03...}).
-    \item \textbf{Pull Request :} Demande de fusion vers \texttt{main} (\#34).
-    \item \textbf{CI/CD :} Exécution automatique des tests (\texttt{ci-tests.yml}).
-\end{enumerate}
-
-\begin{center}
-\small
-\begin{tabular}{|p{2.5cm}|p{2cm}|p{4cm}|p{4cm}|}
-\hline
-\textbf{User Story} & \textbf{Issue} & \textbf{Branche \& PR} & \textbf{Tests \& CI} \\
-\hline
-US-01 Auth & \#7 & \texttt{feat/auth} $\rightarrow$ PR\#21 & \texttt{auth.spec.js} \\
-\hline
-US-03 Transac. & \#12 & \texttt{feat/crud} $\rightarrow$ PR\#34 & \texttt{transaction.spec.js} \\
-\hline
-US-06 CSV & \#24 & \texttt{feat/csv} $\rightarrow$ PR\#55 & \texttt{import.spec.js} \\
-\hline
-\end{tabular}
-\end{center}
-
-\subsection{Preuves visuelles de l'organisation GitHub}
-
-\begin{figure}[H]
-    \centering
-    \safefig{chapters/assets/images/github-kanban-board.png}{0.85\textwidth}{github-kanban-board.png}
-    \caption{Tableau Kanban : vue globale de l'avancement}
-    \label{fig:kanban}
-\end{figure}
-
-\begin{figure}[H]
-    \centering
-    \safefig{chapters/assets/images/github-issue-estimation.png}{0.85\textwidth}{github-issue-estimation.png}
-    \caption{Issue détaillée avec estimation (Story Points) et critères d'acceptation}
-    \label{fig:issue}
-\end{figure}
-
-\begin{figure}[H]
-    \centering
-    \safefig{chapters/assets/images/github-pr.png}{0.85\textwidth}{github-pr.png}
-    \caption{Pull Request validée avec checklist et revue de code}
-    \label{fig:pr}
-\end{figure}
-
-\begin{figure}[H]
-    \centering
-    \safefig{chapters/assets/images/github-actions-success.png}{0.85\textwidth}{github-actions-success.png}
-    \caption{Pipeline CI/CD : tests passés avec succès avant merge}
-    \label{fig:ci_cd}
 \end{figure}
 
 \section{Conclusion du chapitre}

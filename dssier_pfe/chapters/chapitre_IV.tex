@@ -39,8 +39,7 @@ Les interactions du système sont définies par trois acteurs principaux :
     \item \textbf{UC02 -- Transactions :} CRUD complet, filtres (Revenus/Dépenses). Cas central : l'utilisateur ajoute une dépense et voit son budget mis à jour en temps réel.
     \item \textbf{UC03 -- Enveloppes :} Définition des plafonds, suivi consommation.
     \item \textbf{UC04 -- Dashboard :} Visualisation des KPIs et graphiques.
-    \item \textbf{UC05 -- Import :} Traitement fichiers CSV bancaires.
-    \item \textbf{UC06 -- Export :} Portabilité des données (RGPD).
+    \item \textbf{UC05 -- Export :} Portabilité des données (RGPD).
 \end{itemize}
 
 \begin{figure}[H]
@@ -50,14 +49,7 @@ Les interactions du système sont définies par trois acteurs principaux :
     \label{fig:usage_global}
 \end{figure}
 
-\begin{jury}
-\textbf{Points de vigilance contrôlés :}
-\begin{itemize}
-    \item Les cas d'usage critiques sont tous traçables vers des User Stories.
-    \item Les flux alternatifs (erreurs) sont documentés dans les critères d'acceptation.
-    \item La distinction des rôles (User vs Admin) est claire.
-\end{itemize}
-\end{jury}
+
 
 % ============================================================
 % DIAGRAMME DE CLASSES
@@ -225,9 +217,7 @@ La maquette finale reprend fidèlement le zoning et y ajoute :
     \item Un footer minimaliste avec le copyright \textit{MSB The Ledger}.
 \end{itemize}
 
-\begin{jury}
-\textbf{Décision de conception :} L'obligation de cocher les CGU avant de soumettre le formulaire répond à une exigence RGPD — l'utilisateur donne un consentement explicite avant la création de son compte.
-\end{jury}
+
 
 % ------------------------------------------------------------
 \subsection{Structure générale des pages — Systèmes de grille}
@@ -252,36 +242,24 @@ Sur mobile, toutes les pages de l'application partagent la même structure en co
     \item \textbf{Liens de navigation} : Grid 2×2 de liens secondaires.
 \end{itemize}
 
-\subsubsection{Grille desktop (layout multi-colonnes)}
+\subsubsection{Grille desktop et Wireframe Dashboard}
+
+Sur desktop, la grille adopte une structure à trois colonnes : navigation latérale fixe (Z-03), contenu principal (Z-02) et modules contextuels (Z-04), surmontée du header (Z-01).
 
 \begin{figure}[H]
     \centering
-    \safefig{chapters/assets/images/zoning-desktop.png}{0.92\textwidth}{zoning-desktop.png}
-    \caption{Zoning desktop — Structure multi-colonnes des pages principales}
-    \label{fig:zoning-desktop}
-\end{figure}
-
-Sur desktop, la grille adopte une structure à trois colonnes :
-\begin{itemize}
-    \item \textbf{Colonne gauche (Z-03)} : Barre de navigation latérale fixe avec les liens principaux (Overview, Transactions, Budgets, Savings).
-    \item \textbf{Zone centrale (Z-02)} : Contenu principal — graphiques, tableaux, formulaires.
-    \item \textbf{Colonne droite (Z-04)} : Modules contextuels — résumés, alertes, actions rapides.
-    \item \textbf{Header (Z-01)} : Bandeau supérieur avec logo, navigation globale et profil.
-\end{itemize}
-
-Cette grille adaptative garantit que le contenu affiché sur mobile (colonnes empilées) et sur desktop (colonnes côte-à-côte) reste identique — seule la disposition spatiale change.
-
-% ------------------------------------------------------------
-\subsection{Page Dashboard}
-% ------------------------------------------------------------
-
-\subsubsection{Dashboard Desktop}
-
-\begin{figure}[H]
-    \centering
-    \safefig{chapters/assets/images/wireframe-dashboard-desktop.png}{0.92\textwidth}{wireframe-dashboard-desktop.png}
-    \caption{Wireframe — Dashboard Desktop (Smart Budget)}
-    \label{fig:wireframe-dashboard-desktop}
+    \begin{minipage}{0.48\textwidth}
+        \centering
+        \safefig{chapters/assets/images/zoning-desktop.png}{\textwidth}{zoning-desktop.png}
+        \caption{Zoning desktop — Structure multi-colonnes}
+        \label{fig:zoning-desktop}
+    \end{minipage}\hfill
+    \begin{minipage}{0.48\textwidth}
+        \centering
+        \safefig{chapters/assets/images/wireframe-dashboard-desktop.png}{\textwidth}{wireframe-dashboard-desktop.png}
+        \caption{Wireframe Dashboard Desktop}
+        \label{fig:wireframe-dashboard-desktop}
+    \end{minipage}
 \end{figure}
 
 Le tableau de bord desktop est structuré en deux zones principales :
@@ -299,34 +277,7 @@ Le tableau de bord desktop est structuré en deux zones principales :
     \label{fig:zoning-dashboard-mobile}
 \end{figure}
 
-Le zoning du dashboard mobile décompose la page en zones empilées selon leur priorité d'affichage :
-
-\begin{center}
-\small
-\begin{tabular}{|p{0.18\textwidth}|p{0.69\textwidth}|}
-\hline
-\textbf{Zone} & \textbf{Contenu et rôle} \\
-\hline
-\textbf{Z-01} & Header — Logo MSB + icône profil utilisateur \\
-\hline
-\textbf{Z-02 (large)} & KPI principal — Solde total (Total Balance) \\
-\hline
-\textbf{Z-02 × 2} & Modules secondaires côte-à-côte — Revenus et Dépenses du mois \\
-\hline
-\textbf{Z-02 (pleine largeur)} & Graphique de synthèse mensuelle \\
-\hline
-\textbf{Z-02 × 2} & Category Breakdown — deux catégories principales \\
-\hline
-\textbf{Z-02 (pleine largeur)} & Troisième catégorie (ligne complète) \\
-\hline
-\textbf{Z-02 (liste)} & Recent Transactions — liste des dernières opérations \\
-\hline
-\textbf{Z-02} & Bouton « View All » — lien vers la page Transactions \\
-\hline
-\textbf{Z-05} & Footer de navigation \\
-\hline
-\end{tabular}
-\end{center}
+Le zoning mobile empile les zones dans l'ordre de priorité : Header (Z-01), KPI solde total, modules Revenus/Dépenses côte-à-côte, activité récente, modules secondaires, Footer et Navbar.
 
 \subsubsection{Wireframe — Dashboard Mobile}
 
@@ -404,6 +355,28 @@ Le modèle de données a été conçu selon la méthode Merise (MCD/MLD/MPD) pui
     \label{fig:mcd}
 \end{figure}
 
+\subsection{Modèle Logique (MLD)}
+
+Le MLD est dérivé du MCD par application des règles de passage Merise : chaque entité devient une table, chaque association porteuse de cardinalité \textit{1,N} génère une clé étrangère.
+
+\begin{figure}[H]
+    \centering
+    \safefig{chapters/assets/images/mld-app-budget.png}{0.95\textwidth}{mld-app-budget.png}
+    \caption{Modèle Logique de Données (MLD) — tables et clés étrangères}
+    \label{fig:mld}
+\end{figure}
+
+\subsection{Modèle Physique (MPD)}
+
+Le MPD précise les types SQL, contraintes (\texttt{NOT NULL}, \texttt{UNIQUE}, \texttt{ON DELETE CASCADE}) et index de chaque table tels qu'implémentés sous PostgreSQL 15.
+
+\begin{figure}[H]
+    \centering
+    \safefig{chapters/assets/images/mpd-app-budget.png}{0.95\textwidth}{mpd-app-budget.png}
+    \caption{Modèle Physique de Données (MPD) — types SQL et contraintes}
+    \label{fig:mpd}
+\end{figure}
+
 \subsection{Implémentation Physique (SQL)}
 
 Extrait du script de création des tables (écrit et exécuté via pg-promise au démarrage du serveur) :
@@ -446,42 +419,3 @@ L'application repose sur une séparation stricte des responsabilités.
     \item \textbf{Tier 3 (Données) :} \textbf{PostgreSQL 16} (pg-promise) + \textbf{MongoDB} (Mongoose). Données relationnelles et non-structurées, intégrité référentielle et schémas flexibles.
 \end{itemize}
 
-\section{Matrice de Cohérence Globale}
-
-Le tableau ci-dessous démontre la traçabilité complète du besoin jusqu'au code :
-
-\begin{center}
-\small
-\begin{tabular}{|p{0.15\textwidth}|p{0.15\textwidth}|p{0.2\textwidth}|p{0.2\textwidth}|p{0.15\textwidth}|}
-\hline
-\textbf{Use Case} & \textbf{Classe UML} & \textbf{Endpoint API} & \textbf{Table SQL} & \textbf{Écran UI} \\
-\hline
-UC01 Auth & User & \texttt{POST /auth/login} & \texttt{users} & Login \\
-\hline
-UC02 Transac. & Transaction & \texttt{POST /transactions} & \texttt{transactions} & Formulaire \\
-\hline
-UC03 Budget & BudgetEnv. & \texttt{GET /budgets} & \texttt{budget\_envelopes} & Liste env. \\
-\hline
-UC04 Dash. & (Agregats) & \texttt{GET /analytics} & (Join queries) & Dashboard \\
-\hline
-UC05 Import & ImportJob & \texttt{POST /import} & \texttt{import\_jobs} & Upload \\
-\hline
-\end{tabular}
-\end{center}
-
-\begin{tcolorbox}[colback=green!5!white,colframe=green!60!black,title=\textbf{Exemple de traçabilité : UC02 Transactions}]
-\textbf{Besoin :} US-03 "Créer une transaction" \\
-$\rightarrow$ \textbf{UML :} Classe \texttt{Transaction}, Séquence \texttt{CreateTransaction} \\
-$\rightarrow$ \textbf{API :} \texttt{TransactionsController.create()} \\
-$\rightarrow$ \textbf{DB :} Table \texttt{transactions} (FK user\_id, category\_id) \\
-$\rightarrow$ \textbf{UI :} Page \texttt{/transactions/new}
-\end{tcolorbox}
-
-\section{Ressources et Références}
-
-\begin{itemize}
-    \item \textbf{UML \& Merise :} \url{https://www.uml-diagrams.org/}
-    \item \textbf{Frameworks :} \url{https://nextjs.org/} (Front), \url{https://expressjs.com/} (Back)
-    \item \textbf{Base de données :} \url{https://www.postgresql.org/docs/}
-    \item \textbf{Outils :} Figma (UI), Draw.io (Diagrammes)
-\end{itemize}

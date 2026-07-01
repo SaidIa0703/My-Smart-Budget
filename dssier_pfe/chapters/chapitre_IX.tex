@@ -136,31 +136,7 @@ function TransactionList() {
   
   const filteredTransactions = useMemo(
     () => filterTransactions(transactions, filter),
-    [transactions, filter]
-  );
-  
-  return (
-    <>
-      <FilterBar 
-        onFilterChange={(f) => startTransition(() => setFilter(f))}
-        isPending={isPending}
-      />
-      <TransitionGroup>
-        {filteredTransactions.map(t => (
-          <CSSTransition key={t.id} timeout={200}>
-            <Transaction {...t} />
-          </CSSTransition>
-        ))}
-      </TransitionGroup>
-    </>
-  );
-}
-
-// Métriques post-migration :
-// - Bundle size : -31% (2.1MB → 1.45MB)
-// - Time to Interactive : -28% (3.2s → 2.3s)
-// - Re-renders : -67% (grâce à useMemo/useCallback)
-// - UX : Transitions fluides avec startTransition
+// ... (migration vers hooks fonctionnels complète)
 \end{lstlisting}
 \end{exemple}
 
@@ -234,91 +210,7 @@ jobs:
           
       - name: OWASP Dependency Check
         uses: dependency-check/Dependency-Check_Action@main
-        with:
-          path: '.'
-          format: 'HTML'
-          args: >
-            --enableRetired
-            --enableExperimental
-            
-      - name: Trivy Scan
-        uses: aquasecurity/trivy-action@master
-        with:
-          scan-type: 'fs'
-          scan-ref: '.'
-          format: 'sarif'
-          severity: 'MEDIUM,HIGH,CRITICAL'
-          
-  secret-scanning:
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v4
-      
-      - name: TruffleHog Secret Scan
-        uses: trufflesecurity/trufflehog@main
-        with:
-          path: ./
-          base: ${{ github.event.repository.default_branch }}
-          head: HEAD
-          
-      - name: GitLeaks
-        uses: zricethezav/gitleaks-action@master
-        with:
-          config-path: .gitleaks.toml
-          
-  sast-analysis:
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v4
-      
-      - name: Semgrep SAST
-        uses: returntocorp/semgrep-action@v1
-        with:
-          config: >-
-            p/security-audit
-            p/owasp-top-ten
-            p/nodejs
-            p/react
-            
-      - name: CodeQL Analysis
-        uses: github/codeql-action/analyze@v2
-        with:
-          languages: javascript, typescript
-          
-  container-scanning:
-    runs-on: ubuntu-latest
-    if: github.ref == 'refs/heads/main'
-    steps:
-      - uses: actions/checkout@v4
-      
-      - name: Build Docker Images
-        run: |
-          docker build -t mysmartbudget/backend:scan ./backend
-          docker build -t mysmartbudget/frontend:scan ./frontend
-          
-      - name: Scan Backend Image
-        uses: aquasecurity/trivy-action@master
-        with:
-          image-ref: mysmartbudget/backend:scan
-          format: 'json'
-          output: 'backend-vulnerabilities.json'
-          severity: 'CRITICAL,HIGH'
-          
-      - name: Scan Frontend Image  
-        uses: aquasecurity/trivy-action@master
-        with:
-          image-ref: mysmartbudget/frontend:scan
-          format: 'json'
-          output: 'frontend-vulnerabilities.json'
-          severity: 'CRITICAL,HIGH'
-          
-      - name: Upload scan results
-        uses: actions/upload-artifact@v3
-        with:
-          name: container-scan-results
-          path: |
-            backend-vulnerabilities.json
-            frontend-vulnerabilities.json
+# ... (jobs Snyk, OWASP ZAP, Dependabot omis)
 \end{lstlisting}
 \end{exemple}
 
@@ -404,63 +296,7 @@ app.use(helmet.contentSecurityPolicy({
   directives: {
     defaultSrc: ["'self'"],
     scriptSrc: [
-      "'self'",
-      (req, res) => `'nonce-${res.locals.nonce}'`
-    ],
-    styleSrc: ["'self'", "'unsafe-inline'"],  // CSS uniquement
-    imgSrc: ["'self'", "data:", "https:"],
-    connectSrc: ["'self'"],
-    fontSrc: ["'self'"],
-    objectSrc: ["'none'"],
-    mediaSrc: ["'none'"],
-    frameSrc: ["'none'"],
-    sandbox: ['allow-forms', 'allow-scripts', 'allow-same-origin'],
-    reportUri: '/api/csp-report',
-    upgradeInsecureRequests: []
-  }
-}));
-// Résultat : 0 XSS possible, score A+ Observatory
-
-// 3. Rate limiting intelligent (Décembre 2025)
-// AVANT : Rate limit fixe
-const rateLimit = require('express-rate-limit');
-app.use(rateLimit({
-  windowMs: 15 * 60 * 1000,
-  max: 100
-}));
-
-// APRÈS : Rate limiting adaptatif par endpoint
-const rateLimit = require('express-rate-limit');
-
-const rateLimiter = rateLimit({
-  windowMs: 15 * 60 * 1000,
-  max: 100,
-  standardHeaders: true,
-  legacyHeaders: false,
-  message: 'Trop de requêtes, veuillez patienter.',
-});
-
-// Limites différenciées par endpoint
-const endpointLimits = {
-  '/api/auth/login': { points: 5, duration: 900 },
-  '/api/auth/register': { points: 3, duration: 3600 },
-  '/api/transactions': { points: 50, duration: 60 },
-  '/api/import': { points: 1, duration: 300 }
-};
-
-app.use(async (req, res, next) => {
-  try {
-    const limit = endpointLimits[req.path] || { points: 100, duration: 900 };
-    await rateLimiter.consume(req.ip, limit.points);
-    next();
-  } catch (rejRes) {
-    res.status(429).json({
-      error: 'Too many requests',
-      retryAfter: Math.round(rejRes.msBeforeNext / 1000)
-    });
-  }
-});
-// Résultat : -94% attaques brute force, 0 DoS réussi
+// ... (autres améliorations sécurité et perf)
 \end{lstlisting}
 \end{exemple}
 
@@ -606,29 +442,3 @@ L'essentiel est de garder une stack à jour sans mettre en danger la stabilité 
 \end{itemize}
 \end{tcolorbox}
 
-\section{Liens et ressources}
-
-\begin{itemize}
-    \item \textbf{Next.js Blog :} \url{https://nextjs.org/blog}
-    \item \textbf{Node.js Security :} \url{https://nodejs.org/en/docs/guides/security/}
-    \item \textbf{PostgreSQL Docs :} \url{https://www.postgresql.org/docs/}
-    \item \textbf{OWASP Top 10 :} \url{https://owasp.org/www-project-top-ten/}
-    \item \textbf{CVE Database :} \url{https://cve.mitre.org/}
-    \item \textbf{Snyk Vulnerability DB :} \url{https://security.snyk.io/}
-    \item \textbf{Tech Radar Thoughtworks :} \url{https://www.thoughtworks.com/radar}
-    \item \textbf{State of JS :} \url{https://stateofjs.com/}
-\end{itemize}
-
-
-\begin{jury}
-\textbf{Questions fréquentes du jury :}
-\begin{itemize}
-    \item Comment organisez-vous votre veille technologique ?
-    \item Quelles CVE avez-vous traitées récemment ?
-    \item Comment mesurez-vous l'impact de votre veille ?
-    \item Votre veille influence-t-elle vos choix techniques ?
-    \item Comment partagez-vous les connaissances acquises ?
-    \item Avez-vous un plan de migration technologique ?
-    \item Quel est le ROI de votre veille ?
-\end{itemize}
-\end{jury}

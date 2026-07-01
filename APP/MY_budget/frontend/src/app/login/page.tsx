@@ -35,7 +35,13 @@ export default function LoginPage() {
       const data = await response.json();
 
       if (!response.ok) {
-        setError(data.message || 'Une erreur est survenue');
+        if (response.status === 404) {
+          setError('Identifiant inconnu');
+        } else if (response.status === 401) {
+          setError('Identifiant ou mot de passe incorrect');
+        } else {
+          setError(data.message || 'Une erreur est survenue');
+        }
         return;
       }
 
@@ -154,6 +160,18 @@ export default function LoginPage() {
                 {showPassword ? <EyeOff size={18} /> : <Eye size={18} />}
               </button>
             </div>
+
+            {/* Consentement RGPD (inscription seulement) */}
+            {mode === 'register' && (
+              <div className="flex items-start gap-3">
+                <input type="checkbox" id="rgpd-consent" required className="mt-1 w-4 h-4 accent-indigo-600 shrink-0" />
+                <label htmlFor="rgpd-consent" className="text-sm text-gray-600 leading-relaxed">
+                  J'accepte la{' '}
+                  <a href="/privacy" target="_blank" className="text-indigo-600 hover:underline font-medium">politique de confidentialité</a>
+                  {' '}et le traitement de mes données personnelles conformément au RGPD.
+                </label>
+              </div>
+            )}
 
             {/* Bouton submit */}
             <button

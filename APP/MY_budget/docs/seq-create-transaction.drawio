@@ -1,0 +1,539 @@
+<mxGraphModel dx="1422" dy="762" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="1169" pageHeight="1600" math="0" shadow="0">
+  <root>
+    <mxCell id="0"/>
+    <mxCell id="1" parent="0"/>
+
+    <!-- ═══ TITRE ═══ -->
+    <mxCell id="title" value="Séquence — Création d&apos;une transaction (US-03)"
+      style="text;html=1;strokeColor=none;fillColor=none;align=center;fontSize=15;fontStyle=1;"
+      vertex="1" parent="1">
+      <mxGeometry x="60" y="10" width="980" height="40" as="geometry"/>
+    </mxCell>
+
+    <!-- ═══ PARTICIPANTS ═══ -->
+
+    <!-- Utilisateur -->
+    <mxCell id="pU" value="Utilisateur"
+      style="shape=mxgraph.uml.actor;whiteSpace=wrap;html=1;fillColor=#f5f5f5;strokeColor=#666666;fontColor=#333333;fontSize=11;fontStyle=1;"
+      vertex="1" parent="1">
+      <mxGeometry x="20" y="65" width="60" height="70" as="geometry"/>
+    </mxCell>
+
+    <!-- Frontend -->
+    <mxCell id="pFE" value="Frontend&#xa;(Next.js 14)"
+      style="rounded=1;whiteSpace=wrap;html=1;fillColor=#dae8fc;strokeColor=#6c8ebf;fontSize=11;fontStyle=1;"
+      vertex="1" parent="1">
+      <mxGeometry x="175" y="75" width="140" height="50" as="geometry"/>
+    </mxCell>
+
+    <!-- Router -->
+    <mxCell id="pR" value="Backend&#xa;TransactionsRouter"
+      style="rounded=1;whiteSpace=wrap;html=1;fillColor=#d5e8d4;strokeColor=#82b366;fontSize=11;fontStyle=1;"
+      vertex="1" parent="1">
+      <mxGeometry x="385" y="75" width="160" height="50" as="geometry"/>
+    </mxCell>
+
+    <!-- Service -->
+    <mxCell id="pS" value="Backend&#xa;TransactionsService"
+      style="rounded=1;whiteSpace=wrap;html=1;fillColor=#d5e8d4;strokeColor=#82b366;fontSize=11;fontStyle=1;"
+      vertex="1" parent="1">
+      <mxGeometry x="615" y="75" width="160" height="50" as="geometry"/>
+    </mxCell>
+
+    <!-- PostgreSQL -->
+    <mxCell id="pDB" value="PostgreSQL&#xa;(transactions, budgets)"
+      style="shape=cylinder3;whiteSpace=wrap;html=1;fillColor=#ffe6cc;strokeColor=#d6b656;fontSize=11;fontStyle=1;verticalAlign=bottom;boundedLbl=1;backgroundOutline=1;size=12;"
+      vertex="1" parent="1">
+      <mxGeometry x="840" y="58" width="155" height="80" as="geometry"/>
+    </mxCell>
+
+    <!-- ═══ LIGNES DE VIE ═══ -->
+
+    <mxCell id="lU" value="" style="endArrow=none;dashed=1;strokeColor=#888888;strokeWidth=1.5;html=1;" edge="1" parent="1">
+      <mxGeometry relative="1" as="geometry">
+        <mxPoint x="50" y="135" as="sourcePoint"/>
+        <mxPoint x="50" y="1350" as="targetPoint"/>
+      </mxGeometry>
+    </mxCell>
+
+    <mxCell id="lFE" value="" style="endArrow=none;dashed=1;strokeColor=#888888;strokeWidth=1.5;html=1;" edge="1" parent="1">
+      <mxGeometry relative="1" as="geometry">
+        <mxPoint x="245" y="125" as="sourcePoint"/>
+        <mxPoint x="245" y="1350" as="targetPoint"/>
+      </mxGeometry>
+    </mxCell>
+
+    <mxCell id="lR" value="" style="endArrow=none;dashed=1;strokeColor=#888888;strokeWidth=1.5;html=1;" edge="1" parent="1">
+      <mxGeometry relative="1" as="geometry">
+        <mxPoint x="465" y="125" as="sourcePoint"/>
+        <mxPoint x="465" y="1350" as="targetPoint"/>
+      </mxGeometry>
+    </mxCell>
+
+    <mxCell id="lS" value="" style="endArrow=none;dashed=1;strokeColor=#888888;strokeWidth=1.5;html=1;" edge="1" parent="1">
+      <mxGeometry relative="1" as="geometry">
+        <mxPoint x="695" y="125" as="sourcePoint"/>
+        <mxPoint x="695" y="1350" as="targetPoint"/>
+      </mxGeometry>
+    </mxCell>
+
+    <mxCell id="lDB" value="" style="endArrow=none;dashed=1;strokeColor=#888888;strokeWidth=1.5;html=1;" edge="1" parent="1">
+      <mxGeometry relative="1" as="geometry">
+        <mxPoint x="917" y="138" as="sourcePoint"/>
+        <mxPoint x="917" y="1350" as="targetPoint"/>
+      </mxGeometry>
+    </mxCell>
+
+    <!-- ═══ SÉPARATEUR : Saisie ═══ -->
+    <mxCell id="sep1" value="Saisie"
+      style="text;html=1;strokeColor=#555555;fillColor=#f0f0f0;align=center;fontSize=11;fontStyle=1;rounded=1;"
+      vertex="1" parent="1">
+      <mxGeometry x="410" y="155" width="120" height="24" as="geometry"/>
+    </mxCell>
+    <mxCell id="sep1L" value="" style="endArrow=none;strokeColor=#aaaaaa;dashed=1;html=1;" edge="1" parent="1">
+      <mxGeometry relative="1" as="geometry">
+        <mxPoint x="60" y="167" as="sourcePoint"/>
+        <mxPoint x="410" y="167" as="targetPoint"/>
+      </mxGeometry>
+    </mxCell>
+    <mxCell id="sep1R" value="" style="endArrow=none;strokeColor=#aaaaaa;dashed=1;html=1;" edge="1" parent="1">
+      <mxGeometry relative="1" as="geometry">
+        <mxPoint x="530" y="167" as="sourcePoint"/>
+        <mxPoint x="1000" y="167" as="targetPoint"/>
+      </mxGeometry>
+    </mxCell>
+
+    <!-- M1: U → FE -->
+    <mxCell id="m1" value="Clic « Ajouter une transaction »&#xa;+ saisie des champs (montant, catégorie, date, label)"
+      style="endArrow=block;endFill=1;html=1;strokeColor=#333333;fontSize=10;align=center;"
+      edge="1" parent="1">
+      <mxGeometry relative="1" as="geometry">
+        <mxPoint x="50" y="200" as="sourcePoint"/>
+        <mxPoint x="245" y="200" as="targetPoint"/>
+      </mxGeometry>
+    </mxCell>
+
+    <!-- ═══ ALT 1 : validation côté client ═══ -->
+    <mxCell id="alt1" value=""
+      style="rounded=0;whiteSpace=wrap;html=1;fillColor=none;strokeColor=#000000;strokeWidth=1.5;verticalAlign=top;align=left;spacingLeft=5;"
+      vertex="1" parent="1">
+      <mxGeometry x="28" y="220" width="970" height="900" as="geometry"/>
+    </mxCell>
+
+    <!-- Pentagon alt1 -->
+    <mxCell id="alt1tag" value="alt"
+      style="shape=mxgraph.uml.comb_frag;strokeColor=#000000;fillColor=#f0f0f0;fontSize=11;fontStyle=1;align=center;"
+      vertex="1" parent="1">
+      <mxGeometry x="28" y="220" width="50" height="26" as="geometry"/>
+    </mxCell>
+
+    <!-- Guard 1a -->
+    <mxCell id="g1a" value="[ validation côté client échouée ]"
+      style="text;html=1;strokeColor=none;fillColor=none;align=left;fontSize=10;fontStyle=2;"
+      vertex="1" parent="1">
+      <mxGeometry x="88" y="222" width="280" height="22" as="geometry"/>
+    </mxCell>
+
+    <!-- M2: FE → U (erreurs) -->
+    <mxCell id="m2" value="Affiche erreurs de formulaire&#xa;(Zod — champs invalides ou manquants)"
+      style="endArrow=open;dashed=1;html=1;strokeColor=#cc0000;fontSize=10;align=center;"
+      edge="1" parent="1">
+      <mxGeometry relative="1" as="geometry">
+        <mxPoint x="245" y="260" as="sourcePoint"/>
+        <mxPoint x="50" y="260" as="targetPoint"/>
+      </mxGeometry>
+    </mxCell>
+
+    <!-- Divider ALT 1 (else) -->
+    <mxCell id="div1" value=""
+      style="endArrow=none;dashed=1;strokeColor=#000000;strokeWidth=1.5;html=1;"
+      edge="1" parent="1">
+      <mxGeometry relative="1" as="geometry">
+        <mxPoint x="28" y="290" as="sourcePoint"/>
+        <mxPoint x="998" y="290" as="targetPoint"/>
+      </mxGeometry>
+    </mxCell>
+
+    <!-- Guard 1b -->
+    <mxCell id="g1b" value="[ validation côté client OK ]"
+      style="text;html=1;strokeColor=none;fillColor=none;align=left;fontSize=10;fontStyle=2;"
+      vertex="1" parent="1">
+      <mxGeometry x="38" y="292" width="250" height="22" as="geometry"/>
+    </mxCell>
+
+    <!-- M3: FE → FE (Zod) self-message -->
+    <mxCell id="m3" value="Validation Zod réussie"
+      style="endArrow=block;endFill=1;html=1;strokeColor=#333333;fontSize=10;exitX=1;exitY=0.5;entryX=1;entryY=0.5;"
+      edge="1" parent="1">
+      <mxGeometry relative="1" as="geometry">
+        <mxPoint x="245" y="320" as="sourcePoint"/>
+        <mxPoint x="245" y="350" as="targetPoint"/>
+        <Array as="points">
+          <mxPoint x="295" y="320"/>
+          <mxPoint x="295" y="350"/>
+        </Array>
+      </mxGeometry>
+    </mxCell>
+
+    <!-- M4: FE → Router (POST /transactions) -->
+    <mxCell id="m4" value="POST /transactions&#xa;{ date, amount, type, categoryId, label }&#xa;+ accessToken (cookie HTTPOnly)"
+      style="endArrow=block;endFill=1;html=1;strokeColor=#333333;fontSize=10;align=center;"
+      edge="1" parent="1">
+      <mxGeometry relative="1" as="geometry">
+        <mxPoint x="245" y="390" as="sourcePoint"/>
+        <mxPoint x="465" y="390" as="targetPoint"/>
+      </mxGeometry>
+    </mxCell>
+
+    <!-- ═══ SÉPARATEUR : Vérification token ═══ -->
+    <mxCell id="sep2" value="Vérification du token"
+      style="text;html=1;strokeColor=#555555;fillColor=#f0f0f0;align=center;fontSize=11;fontStyle=1;rounded=1;"
+      vertex="1" parent="1">
+      <mxGeometry x="360" y="416" width="200" height="24" as="geometry"/>
+    </mxCell>
+    <mxCell id="sep2L" value="" style="endArrow=none;strokeColor=#aaaaaa;dashed=1;html=1;" edge="1" parent="1">
+      <mxGeometry relative="1" as="geometry">
+        <mxPoint x="60" y="428" as="sourcePoint"/>
+        <mxPoint x="360" y="428" as="targetPoint"/>
+      </mxGeometry>
+    </mxCell>
+    <mxCell id="sep2R" value="" style="endArrow=none;strokeColor=#aaaaaa;dashed=1;html=1;" edge="1" parent="1">
+      <mxGeometry relative="1" as="geometry">
+        <mxPoint x="560" y="428" as="sourcePoint"/>
+        <mxPoint x="1000" y="428" as="targetPoint"/>
+      </mxGeometry>
+    </mxCell>
+
+    <!-- M5: Router self → jwt.verify -->
+    <mxCell id="m5" value="Middleware authenticate&#xa;→ jwt.verify(accessToken)"
+      style="endArrow=block;endFill=1;html=1;strokeColor=#333333;fontSize=10;"
+      edge="1" parent="1">
+      <mxGeometry relative="1" as="geometry">
+        <mxPoint x="465" y="455" as="sourcePoint"/>
+        <mxPoint x="465" y="485" as="targetPoint"/>
+        <Array as="points">
+          <mxPoint x="515" y="455"/>
+          <mxPoint x="515" y="485"/>
+        </Array>
+      </mxGeometry>
+    </mxCell>
+
+    <!-- ═══ ALT 2 : token ═══ -->
+    <mxCell id="alt2" value=""
+      style="rounded=0;whiteSpace=wrap;html=1;fillColor=none;strokeColor=#000000;strokeWidth=1.5;verticalAlign=top;align=left;"
+      vertex="1" parent="1">
+      <mxGeometry x="48" y="500" width="940" height="600" as="geometry"/>
+    </mxCell>
+
+    <mxCell id="alt2tag" value="alt"
+      style="shape=mxgraph.uml.comb_frag;strokeColor=#000000;fillColor=#f0f0f0;fontSize=11;fontStyle=1;align=center;"
+      vertex="1" parent="1">
+      <mxGeometry x="48" y="500" width="50" height="26" as="geometry"/>
+    </mxCell>
+
+    <!-- Guard 2a -->
+    <mxCell id="g2a" value="[ token absent ou invalide ]"
+      style="text;html=1;strokeColor=none;fillColor=none;align=left;fontSize=10;fontStyle=2;"
+      vertex="1" parent="1">
+      <mxGeometry x="108" y="502" width="240" height="22" as="geometry"/>
+    </mxCell>
+
+    <!-- M6: Router → FE 401 -->
+    <mxCell id="m6" value="401 Unauthorized&#xa;{ message: &quot;Non authentifié&quot; }"
+      style="endArrow=open;dashed=1;html=1;strokeColor=#cc0000;fontSize=10;align=center;"
+      edge="1" parent="1">
+      <mxGeometry relative="1" as="geometry">
+        <mxPoint x="465" y="540" as="sourcePoint"/>
+        <mxPoint x="245" y="540" as="targetPoint"/>
+      </mxGeometry>
+    </mxCell>
+
+    <!-- M7: FE → U Redirection -->
+    <mxCell id="m7" value="Redirection vers /login"
+      style="endArrow=open;dashed=1;html=1;strokeColor=#cc0000;fontSize=10;align=center;"
+      edge="1" parent="1">
+      <mxGeometry relative="1" as="geometry">
+        <mxPoint x="245" y="570" as="sourcePoint"/>
+        <mxPoint x="50" y="570" as="targetPoint"/>
+      </mxGeometry>
+    </mxCell>
+
+    <!-- Divider ALT 2 (else) -->
+    <mxCell id="div2" value=""
+      style="endArrow=none;dashed=1;strokeColor=#000000;strokeWidth=1.5;html=1;"
+      edge="1" parent="1">
+      <mxGeometry relative="1" as="geometry">
+        <mxPoint x="48" y="600" as="sourcePoint"/>
+        <mxPoint x="988" y="600" as="targetPoint"/>
+      </mxGeometry>
+    </mxCell>
+
+    <!-- Guard 2b -->
+    <mxCell id="g2b" value="[ token valide → userId extrait ]"
+      style="text;html=1;strokeColor=none;fillColor=none;align=left;fontSize=10;fontStyle=2;"
+      vertex="1" parent="1">
+      <mxGeometry x="58" y="602" width="270" height="22" as="geometry"/>
+    </mxCell>
+
+    <!-- M8: Router → Service createTransaction -->
+    <mxCell id="m8" value="createTransaction(dto, userId)"
+      style="endArrow=block;endFill=1;html=1;strokeColor=#333333;fontSize=10;align=center;"
+      edge="1" parent="1">
+      <mxGeometry relative="1" as="geometry">
+        <mxPoint x="465" y="638" as="sourcePoint"/>
+        <mxPoint x="695" y="638" as="targetPoint"/>
+      </mxGeometry>
+    </mxCell>
+
+    <!-- ═══ SÉPARATEUR : Vérification catégorie ═══ -->
+    <mxCell id="sep3" value="Vérification de la catégorie"
+      style="text;html=1;strokeColor=#555555;fillColor=#f0f0f0;align=center;fontSize=11;fontStyle=1;rounded=1;"
+      vertex="1" parent="1">
+      <mxGeometry x="340" y="660" width="260" height="24" as="geometry"/>
+    </mxCell>
+    <mxCell id="sep3L" value="" style="endArrow=none;strokeColor=#aaaaaa;dashed=1;html=1;" edge="1" parent="1">
+      <mxGeometry relative="1" as="geometry">
+        <mxPoint x="60" y="672" as="sourcePoint"/>
+        <mxPoint x="340" y="672" as="targetPoint"/>
+      </mxGeometry>
+    </mxCell>
+    <mxCell id="sep3R" value="" style="endArrow=none;strokeColor=#aaaaaa;dashed=1;html=1;" edge="1" parent="1">
+      <mxGeometry relative="1" as="geometry">
+        <mxPoint x="600" y="672" as="sourcePoint"/>
+        <mxPoint x="990" y="672" as="targetPoint"/>
+      </mxGeometry>
+    </mxCell>
+
+    <!-- M9: Service → DB SELECT -->
+    <mxCell id="m9" value="SELECT * FROM budgets&#xa;WHERE id = $1 AND user_id = $2"
+      style="endArrow=block;endFill=1;html=1;strokeColor=#333333;fontSize=10;align=center;"
+      edge="1" parent="1">
+      <mxGeometry relative="1" as="geometry">
+        <mxPoint x="695" y="700" as="sourcePoint"/>
+        <mxPoint x="917" y="700" as="targetPoint"/>
+      </mxGeometry>
+    </mxCell>
+
+    <!-- ═══ ALT 3 : catégorie ═══ -->
+    <mxCell id="alt3" value=""
+      style="rounded=0;whiteSpace=wrap;html=1;fillColor=none;strokeColor=#000000;strokeWidth=1.5;verticalAlign=top;align=left;"
+      vertex="1" parent="1">
+      <mxGeometry x="68" y="720" width="910" height="360" as="geometry"/>
+    </mxCell>
+
+    <mxCell id="alt3tag" value="alt"
+      style="shape=mxgraph.uml.comb_frag;strokeColor=#000000;fillColor=#f0f0f0;fontSize=11;fontStyle=1;align=center;"
+      vertex="1" parent="1">
+      <mxGeometry x="68" y="720" width="50" height="26" as="geometry"/>
+    </mxCell>
+
+    <!-- Guard 3a -->
+    <mxCell id="g3a" value="[ catégorie / budget inexistant ]"
+      style="text;html=1;strokeColor=none;fillColor=none;align=left;fontSize=10;fontStyle=2;"
+      vertex="1" parent="1">
+      <mxGeometry x="128" y="722" width="270" height="22" as="geometry"/>
+    </mxCell>
+
+    <!-- M10: DB → Service aucune ligne -->
+    <mxCell id="m10" value="aucune ligne retournée"
+      style="endArrow=open;dashed=1;html=1;strokeColor=#cc0000;fontSize=10;align=center;"
+      edge="1" parent="1">
+      <mxGeometry relative="1" as="geometry">
+        <mxPoint x="917" y="758" as="sourcePoint"/>
+        <mxPoint x="695" y="758" as="targetPoint"/>
+      </mxGeometry>
+    </mxCell>
+
+    <!-- M11: Service → Router 404 -->
+    <mxCell id="m11" value="404 { message: &quot;Catégorie introuvable&quot; }"
+      style="endArrow=open;dashed=1;html=1;strokeColor=#cc0000;fontSize=10;align=center;"
+      edge="1" parent="1">
+      <mxGeometry relative="1" as="geometry">
+        <mxPoint x="695" y="788" as="sourcePoint"/>
+        <mxPoint x="465" y="788" as="targetPoint"/>
+      </mxGeometry>
+    </mxCell>
+
+    <!-- M12: Router → FE 404 -->
+    <mxCell id="m12" value="404 Not Found"
+      style="endArrow=open;dashed=1;html=1;strokeColor=#cc0000;fontSize=10;align=center;"
+      edge="1" parent="1">
+      <mxGeometry relative="1" as="geometry">
+        <mxPoint x="465" y="818" as="sourcePoint"/>
+        <mxPoint x="245" y="818" as="targetPoint"/>
+      </mxGeometry>
+    </mxCell>
+
+    <!-- M13: FE → U erreur -->
+    <mxCell id="m13" value="Affiche message « Catégorie introuvable »"
+      style="endArrow=open;dashed=1;html=1;strokeColor=#cc0000;fontSize=10;align=center;"
+      edge="1" parent="1">
+      <mxGeometry relative="1" as="geometry">
+        <mxPoint x="245" y="848" as="sourcePoint"/>
+        <mxPoint x="50" y="848" as="targetPoint"/>
+      </mxGeometry>
+    </mxCell>
+
+    <!-- Divider ALT 3 (else) -->
+    <mxCell id="div3" value=""
+      style="endArrow=none;dashed=1;strokeColor=#000000;strokeWidth=1.5;html=1;"
+      edge="1" parent="1">
+      <mxGeometry relative="1" as="geometry">
+        <mxPoint x="68" y="875" as="sourcePoint"/>
+        <mxPoint x="978" y="875" as="targetPoint"/>
+      </mxGeometry>
+    </mxCell>
+
+    <!-- Guard 3b -->
+    <mxCell id="g3b" value="[ catégorie / budget valide ]"
+      style="text;html=1;strokeColor=none;fillColor=none;align=left;fontSize=10;fontStyle=2;"
+      vertex="1" parent="1">
+      <mxGeometry x="78" y="877" width="250" height="22" as="geometry"/>
+    </mxCell>
+
+    <!-- M14: DB → Service budget OK -->
+    <mxCell id="m14" value="budget OK"
+      style="endArrow=open;dashed=1;html=1;strokeColor=#009900;fontSize=10;align=center;"
+      edge="1" parent="1">
+      <mxGeometry relative="1" as="geometry">
+        <mxPoint x="917" y="910" as="sourcePoint"/>
+        <mxPoint x="695" y="910" as="targetPoint"/>
+      </mxGeometry>
+    </mxCell>
+
+    <!-- ═══ SÉPARATEUR : Insertion ═══ -->
+    <mxCell id="sep4" value="Insertion"
+      style="text;html=1;strokeColor=#555555;fillColor=#f0f0f0;align=center;fontSize=11;fontStyle=1;rounded=1;"
+      vertex="1" parent="1">
+      <mxGeometry x="430" y="930" width="120" height="24" as="geometry"/>
+    </mxCell>
+    <mxCell id="sep4L" value="" style="endArrow=none;strokeColor=#aaaaaa;dashed=1;html=1;" edge="1" parent="1">
+      <mxGeometry relative="1" as="geometry">
+        <mxPoint x="80" y="942" as="sourcePoint"/>
+        <mxPoint x="430" y="942" as="targetPoint"/>
+      </mxGeometry>
+    </mxCell>
+    <mxCell id="sep4R" value="" style="endArrow=none;strokeColor=#aaaaaa;dashed=1;html=1;" edge="1" parent="1">
+      <mxGeometry relative="1" as="geometry">
+        <mxPoint x="550" y="942" as="sourcePoint"/>
+        <mxPoint x="980" y="942" as="targetPoint"/>
+      </mxGeometry>
+    </mxCell>
+
+    <!-- M15: Service → DB INSERT -->
+    <mxCell id="m15" value="INSERT INTO transactions&#xa;(user_id, budget_id, name, category, amount, date)&#xa;RETURNING *"
+      style="endArrow=block;endFill=1;html=1;strokeColor=#333333;fontSize=10;align=center;"
+      edge="1" parent="1">
+      <mxGeometry relative="1" as="geometry">
+        <mxPoint x="695" y="975" as="sourcePoint"/>
+        <mxPoint x="917" y="975" as="targetPoint"/>
+      </mxGeometry>
+    </mxCell>
+
+    <!-- M16: DB → Service transaction créée -->
+    <mxCell id="m16" value="transaction créée (objet complet)"
+      style="endArrow=open;dashed=1;html=1;strokeColor=#009900;fontSize=10;align=center;"
+      edge="1" parent="1">
+      <mxGeometry relative="1" as="geometry">
+        <mxPoint x="917" y="1010" as="sourcePoint"/>
+        <mxPoint x="695" y="1010" as="targetPoint"/>
+      </mxGeometry>
+    </mxCell>
+
+    <!-- M17: Service → Router -->
+    <mxCell id="m17" value="transaction"
+      style="endArrow=open;dashed=1;html=1;strokeColor=#009900;fontSize=10;align=center;"
+      edge="1" parent="1">
+      <mxGeometry relative="1" as="geometry">
+        <mxPoint x="695" y="1040" as="sourcePoint"/>
+        <mxPoint x="465" y="1040" as="targetPoint"/>
+      </mxGeometry>
+    </mxCell>
+
+    <!-- M18: Router → FE 201 -->
+    <mxCell id="m18" value="201 Created { transaction }"
+      style="endArrow=open;dashed=1;html=1;strokeColor=#009900;fontSize=10;align=center;"
+      edge="1" parent="1">
+      <mxGeometry relative="1" as="geometry">
+        <mxPoint x="465" y="1070" as="sourcePoint"/>
+        <mxPoint x="245" y="1070" as="targetPoint"/>
+      </mxGeometry>
+    </mxCell>
+
+    <!-- ═══ SÉPARATEUR : Mise à jour UI ═══ -->
+    <mxCell id="sep5" value="Mise à jour UI"
+      style="text;html=1;strokeColor=#555555;fillColor=#f0f0f0;align=center;fontSize=11;fontStyle=1;rounded=1;"
+      vertex="1" parent="1">
+      <mxGeometry x="390" y="1095" width="180" height="24" as="geometry"/>
+    </mxCell>
+    <mxCell id="sep5L" value="" style="endArrow=none;strokeColor=#aaaaaa;dashed=1;html=1;" edge="1" parent="1">
+      <mxGeometry relative="1" as="geometry">
+        <mxPoint x="80" y="1107" as="sourcePoint"/>
+        <mxPoint x="390" y="1107" as="targetPoint"/>
+      </mxGeometry>
+    </mxCell>
+    <mxCell id="sep5R" value="" style="endArrow=none;strokeColor=#aaaaaa;dashed=1;html=1;" edge="1" parent="1">
+      <mxGeometry relative="1" as="geometry">
+        <mxPoint x="570" y="1107" as="sourcePoint"/>
+        <mxPoint x="980" y="1107" as="targetPoint"/>
+      </mxGeometry>
+    </mxCell>
+
+    <!-- M19: FE self → Ajout liste + recalcul -->
+    <mxCell id="m19" value="Ajout à la liste des transactions&#xa;+ recalcul des totaux et du dashboard"
+      style="endArrow=block;endFill=1;html=1;strokeColor=#333333;fontSize=10;"
+      edge="1" parent="1">
+      <mxGeometry relative="1" as="geometry">
+        <mxPoint x="245" y="1133" as="sourcePoint"/>
+        <mxPoint x="245" y="1163" as="targetPoint"/>
+        <Array as="points">
+          <mxPoint x="295" y="1133"/>
+          <mxPoint x="295" y="1163"/>
+        </Array>
+      </mxGeometry>
+    </mxCell>
+
+    <!-- M20: FE → U tableau mis à jour -->
+    <mxCell id="m20" value="Tableau mis à jour"
+      style="endArrow=open;dashed=1;html=1;strokeColor=#009900;fontSize=10;align=center;"
+      edge="1" parent="1">
+      <mxGeometry relative="1" as="geometry">
+        <mxPoint x="245" y="1193" as="sourcePoint"/>
+        <mxPoint x="50" y="1193" as="targetPoint"/>
+      </mxGeometry>
+    </mxCell>
+
+    <!-- ═══ PARTICIPANTS BAS (répétition des boîtes) ═══ -->
+
+    <mxCell id="pU2" value="Utilisateur"
+      style="shape=mxgraph.uml.actor;whiteSpace=wrap;html=1;fillColor=#f5f5f5;strokeColor=#666666;fontColor=#333333;fontSize=11;fontStyle=1;"
+      vertex="1" parent="1">
+      <mxGeometry x="20" y="1360" width="60" height="70" as="geometry"/>
+    </mxCell>
+
+    <mxCell id="pFE2" value="Frontend&#xa;(Next.js 14)"
+      style="rounded=1;whiteSpace=wrap;html=1;fillColor=#dae8fc;strokeColor=#6c8ebf;fontSize=11;fontStyle=1;"
+      vertex="1" parent="1">
+      <mxGeometry x="175" y="1370" width="140" height="50" as="geometry"/>
+    </mxCell>
+
+    <mxCell id="pR2" value="Backend&#xa;TransactionsRouter"
+      style="rounded=1;whiteSpace=wrap;html=1;fillColor=#d5e8d4;strokeColor=#82b366;fontSize=11;fontStyle=1;"
+      vertex="1" parent="1">
+      <mxGeometry x="385" y="1370" width="160" height="50" as="geometry"/>
+    </mxCell>
+
+    <mxCell id="pS2" value="Backend&#xa;TransactionsService"
+      style="rounded=1;whiteSpace=wrap;html=1;fillColor=#d5e8d4;strokeColor=#82b366;fontSize=11;fontStyle=1;"
+      vertex="1" parent="1">
+      <mxGeometry x="615" y="1370" width="160" height="50" as="geometry"/>
+    </mxCell>
+
+    <mxCell id="pDB2" value="PostgreSQL&#xa;(transactions, budgets)"
+      style="shape=cylinder3;whiteSpace=wrap;html=1;fillColor=#ffe6cc;strokeColor=#d6b656;fontSize=11;fontStyle=1;verticalAlign=bottom;boundedLbl=1;backgroundOutline=1;size=12;"
+      vertex="1" parent="1">
+      <mxGeometry x="840" y="1353" width="155" height="80" as="geometry"/>
+    </mxCell>
+
+  </root>
+</mxGraphModel>

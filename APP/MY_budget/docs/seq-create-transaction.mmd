@@ -1,0 +1,42 @@
+sequenceDiagram
+    actor U as Utilisateur
+    participant FE as Frontend (Next.js 14)
+    participant Router as TransactionsRouter
+    participant Service as TransactionsService
+    participant DB as PostgreSQL
+
+    U->>+FE: Clic "Ajouter une transaction" + saisie des champs
+
+    alt validation côté client échouée
+        FE-->>U: Erreurs de formulaire (Zod)
+    else validation côté client OK
+        FE->>+Router: POST /transactions + accessToken (cookie HTTPOnly)
+        Router->>Router: jwt.verify(accessToken)
+
+        alt token absent ou invalide
+            Router-->>FE: 401 Unauthorized
+            FE-->>U: Redirection vers /login
+        else token valide → userId extrait
+            Router->>+Service: createTransaction(dto, userId)
+            Service->>+DB: SELECT * FROM budgets WHERE id=$1 AND user_id=$2
+
+            alt catégorie inexistante
+                DB-->>Service: aucune ligne retournée
+                Service-->>Router: 404 Catégorie introuvable
+                Router-->>FE: 404 Not Found
+                FE-->>U: Affiche "Catégorie introuvable"
+            else catégorie valide
+                DB-->>Service: budget OK
+                Service->>DB: INSERT INTO transactions RETURNING *
+                DB-->>Service: transaction créée
+                Service-->>Router: transaction
+                Router-->>FE: 201 Created
+                FE->>FE: Ajout liste + recalcul totaux
+                FE-->>U: Tableau mis à jour
+            end
+            deactivate DB
+            deactivate Service
+        end
+        deactivate Router
+    end
+    deactivate FE

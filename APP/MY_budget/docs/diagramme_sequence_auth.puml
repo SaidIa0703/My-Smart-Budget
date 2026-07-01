@@ -1,0 +1,67 @@
+@startuml DIAGRAMME DE SEQUENCE AUTHENTIFICATIONS
+
+title DIAGRAMME DE SEQUENCE AUTHENTIFICATIONS
+
+skinparam sequenceArrowThickness 1.5
+skinparam participantBorderColor #888888
+skinparam participantBackgroundColor #F5F5F5
+skinparam actorBorderColor #333333
+
+actor Utilisateur
+participant "Frontend\n(Next.js)" as Frontend
+participant "Backend\nAuthController" as Controller
+participant "Backend\nAuthService" as Service
+database "PostgreSQL" as DB
+
+Utilisateur -> Frontend : Saisie email + mot de passe
+activate Frontend
+Frontend -> Controller : POST /auth/login\n(email, password)
+activate Controller
+deactivate Frontend
+Controller -> Service : validateCredentials(email, password)
+activate Service
+deactivate Controller
+Service -> DB : SELECT * FROM users WHERE email = ?
+activate DB
+
+alt utilisateur non trouvé
+    DB --> Service : utilisateur pas trouvé (vide)
+    deactivate DB
+    Service --> Controller : throw NotFoundException("User not found")
+    deactivate Service
+    activate Controller
+    Controller --> Frontend : 404 Not Found
+    deactivate Controller
+    activate Frontend
+    Frontend --> Utilisateur : Affiche message "Identifiant inconnu"
+    deactivate Frontend
+
+else utilisateur trouvé
+    DB --> Service : Résultat de la requête (user)
+    deactivate DB
+    Service -> Service : bcrypt.compare()
+
+    alt mot de passe incorrect
+        Service --> Controller : throw UnauthorizedException\n("invalid credentials")
+        deactivate Service
+        activate Controller
+        Controller --> Frontend : 401 Unauthorized
+        deactivate Controller
+        activate Frontend
+        Frontend --> Utilisateur : Affiche message\n"Identifiant ou mot de passe incorrect"
+        deactivate Frontend
+
+    else mot de passe correct
+        Service --> Controller : userId, role\n+ JWT Access & Refresh Tokens
+        deactivate Service
+        activate Controller
+        Controller --> Frontend : 200 OK\nSet-Cookie: accessToken (HTTPOnly)\nSet-Cookie: refreshToken (HTTPOnly)
+        deactivate Controller
+        activate Frontend
+        Frontend --> Utilisateur : Redirection /dashboard
+        deactivate Frontend
+
+    end
+end
+
+@enduml

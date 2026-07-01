@@ -1,0 +1,36 @@
+sequenceDiagram
+    actor U as Utilisateur
+    participant FE as Frontend (Next.js)
+    participant Controller as Backend AuthController
+    participant Service as Backend AuthService
+    participant DB as PostgreSQL
+
+    U->>+FE: Saisie email + mot de passe
+    FE->>+Controller: POST /auth/login (email, password)
+    Controller->>+Service: validateCredentials(email, password)
+    Service->>+DB: SELECT * FROM users WHERE email = ?
+
+    alt utilisateur non trouvé
+        DB-->>Service: utilisateur pas trouvé (vide)
+        Service-->>Controller: throw NotFoundException
+        Controller-->>FE: 404 Not Found
+        FE-->>U: Affiche "Identifiant inconnu"
+    else utilisateur trouvé
+        DB-->>Service: Résultat de la requête (user)
+        Service->>Service: bcrypt.compare()
+
+        alt mot de passe incorrect
+            Service-->>Controller: throw UnauthorizedException
+            Controller-->>FE: 401 Unauthorized
+            FE-->>U: Affiche "Identifiant ou mot de passe incorrect"
+        else mot de passe correct
+            Service-->>Controller: userId, role + JWT Access & Refresh Tokens
+            Controller-->>FE: 200 OK + Set-Cookie accessToken / refreshToken (HTTPOnly)
+            FE-->>U: Redirection /dashboard
+        end
+    end
+
+    deactivate DB
+    deactivate Service
+    deactivate Controller
+    deactivate FE

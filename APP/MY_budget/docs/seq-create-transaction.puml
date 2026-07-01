@@ -1,0 +1,95 @@
+@startuml seq-create-transaction
+
+title Séquence - Création d'une transaction (US-03)
+
+skinparam sequenceArrowThickness 1.5
+skinparam participantBorderColor #888888
+skinparam participantBackgroundColor #F5F5F5
+skinparam actorBorderColor #333333
+skinparam sequenceGroupBorderThickness 1.5
+skinparam sequenceGroupBorderColor #555555
+skinparam sequenceGroupHeaderFontStyle bold
+skinparam sequenceLifeLineBorderColor #888888
+skinparam sequenceLifeLineBorderThickness 1
+
+actor "Utilisateur" as U
+participant "Frontend\n(Next.js 14)" as FE
+participant "Backend\nTransactionsRouter" as Router
+participant "Backend\nTransactionsService" as Service
+database "PostgreSQL\n(transactions, budgets)" as DB
+
+== Saisie ==
+
+U -> FE : Clic "Ajouter une transaction"\n+ saisie des champs (montant, catégorie, date, label)
+activate FE
+
+alt [validation côté client échouée]
+
+    FE --> U : Affiche erreurs de formulaire\n(Zod — champs invalides ou manquants)
+    deactivate FE
+
+else [validation côté client OK]
+
+    FE -> FE : Validation Zod réussie
+
+    FE -> Router : POST /transactions\n{ date, amount, type, categoryId, label }\n+ accessToken (cookie HTTPOnly)
+    activate Router
+    deactivate FE
+
+    == Vérification du token ==
+
+    Router -> Router : Middleware authenticate\n→ jwt.verify(accessToken)
+
+    alt [token absent ou invalide]
+
+        Router --> FE : 401 Unauthorized\n{ message: "Non authentifié" }
+        deactivate Router
+        FE --> U : Redirection vers /login
+
+    else [token valide → userId extrait]
+
+        Router -> Service : createTransaction(dto, userId)
+        activate Service
+        deactivate Router
+
+        == Vérification de la catégorie ==
+
+        Service -> DB : SELECT * FROM budgets\nWHERE id = $1 AND user_id = $2
+        activate DB
+
+        alt [catégorie / budget inexistant]
+
+            DB --> Service : aucune ligne retournée
+            deactivate DB
+            Service --> Router : 404 { message: "Catégorie introuvable" }
+            deactivate Service
+            Router --> FE : 404 Not Found
+            FE --> U : Affiche message "Catégorie introuvable"
+
+        else [catégorie / budget valide]
+
+            DB --> Service : budget OK
+            deactivate DB
+
+            == Insertion ==
+
+            Service -> DB : INSERT INTO transactions\n(user_id, budget_id, name, category,\namount, date, created_at)\nRETURNING *
+            activate DB
+            DB --> Service : transaction créée (objet complet)
+            deactivate DB
+            Service --> Router : transaction
+            deactivate Service
+            Router --> FE : 201 Created\n{ transaction }
+
+            == Mise à jour UI ==
+
+            FE -> FE : Ajout à la liste des transactions\n+ recalcul des totaux et du dashboard
+            FE --> U : Tableau mis à jour
+
+        end
+
+    end
+
+end
+
+@enduml

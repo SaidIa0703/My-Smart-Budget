@@ -1,0 +1,28 @@
+sequenceDiagram
+    actor CJ as Cron Job
+    participant BAS as BudgetAlertsService
+    participant DB as PostgreSQL
+    participant NS as NotificationService
+    participant EP as Email/Push Provider
+    actor U as Utilisateur
+
+    CJ->>+BAS: planifie() toutes les X minutes
+    BAS->>+DB: SELECT budgets + consommation par utilisateur
+    DB-->>-BAS: liste des budgets + montants utilisés
+
+    loop pour chaque budget
+        BAS->>BAS: calcul pourcentage consommé (consommé / limite × 100)
+
+        alt seuil 70%, 90% ou 100% franchi
+            BAS->>+NS: createNotification(userId, budgetId, type)
+            NS->>+DB: INSERT INTO notifications (...)
+            DB-->>-NS: notification créée
+            NS->>+EP: sendAlert(user, notification)
+            EP-->>-NS: OK
+        else pas de seuil franchi
+            BAS->>BAS: aucune action
+        end
+        deactivate NS
+    end
+
+    BAS-->>-CJ: rapport d'exécution (nb alertes)

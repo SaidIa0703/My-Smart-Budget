@@ -1,29 +1,31 @@
-import { Schema, model } from 'mongoose';
+const { Schema, model } = require('mongoose');
 
-const reportSchema = new Schema({
+const monthlyReportSchema = new Schema({
   userId: {
-    type: String,
+    type: Number,
     required: true,
+    index: true,
   },
-  title: {
-    type: String,
-    required: true,
+  period: {
+    month: { type: Number, required: true, min: 1, max: 12 },
+    year:  { type: Number, required: true },
   },
-  description: String,
-  data: Schema.Types.Mixed,
-  type: {
-    type: String,
-    enum: ['monthly', 'yearly', 'custom'],
-    default: 'monthly',
+  metrics: {
+    totalExpenses:     { type: Number, default: 0 },
+    totalIncome:       { type: Number, default: 0 },
+    savingsRate:       { type: Number, default: 0 },
+    categoryBreakdown: [
+      {
+        categoryName: String,
+        amount:       Number,
+        percentage:   Number,
+      },
+    ],
   },
-  createdAt: {
-    type: Date,
-    default: Date.now,
-  },
-  updatedAt: {
+  generatedAt: {
     type: Date,
     default: Date.now,
   },
 });
 
-export default model('Report', reportSchema);
+module.exports = model('MonthlyReport', monthlyReportSchema);

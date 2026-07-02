@@ -3,15 +3,36 @@
   "version": "0.1.0",
   "private": true,
   "scripts": {
-    "dev": "next dev --turbopack",
-    "build": "next build --turbopack",
-    "start": "next start",
+    "dev": "node index.js",
+    "start": "node index.js",
+    "test": "jest --testPathPatterns=tests/ --coverage",
+    "test:unit": "jest --testPathPatterns=tests/unit/ --coverage",
+    "test:integration": "jest --testPathPatterns=tests/integration/",
     "lint": "eslint"
   },
+  "jest": {
+    "testEnvironment": "node",
+    "coverageDirectory": "coverage",
+    "coverageReporters": ["lcov", "text", "html"],
+    "collectCoverageFrom": [
+      "services/**/*.js",
+      "controllers/**/*.js",
+      "middleware/**/*.js",
+      "config/**/*.js"
+    ],
+    "testPathIgnorePatterns": ["/node_modules/"]
+  },
   "dependencies": {
+    "bcryptjs": "^3.0.3",
     "brew": "^0.0.8",
     "cors": "^2.8.6",
+    "express": "^5.2.1",
+    "express-mongo-sanitize": "^2.2.0",
+    "express-rate-limit": "^8.5.2",
+    "express-validator": "^7.3.2",
     "git": "^0.1.5",
+    "helmet": "^8.2.0",
+    "jsonwebtoken": "^9.0.3",
     "lucide-react": "^0.545.0",
     "mongoose": "^9.1.6",
     "next": "15.5.4",
@@ -20,18 +41,22 @@
     "react": "19.1.0",
     "react-dom": "19.1.0",
     "tailwind": "^4.0.0",
-    "uuid": "^13.0.0"
+    "uuid": "^13.0.0",
+    "xss-clean": "^0.1.4"
   },
   "devDependencies": {
     "@eslint/eslintrc": "^3",
     "@tailwindcss/postcss": "^4.1.18",
+    "@types/jest": "^30.0.0",
     "@types/node": "^20",
     "@types/react": "^19",
     "@types/react-dom": "^19",
     "autoprefixer": "^10.4.23",
     "eslint": "^9",
     "eslint-config-next": "15.5.4",
+    "jest": "^30.4.2",
     "postcss": "^8.5.6",
+    "supertest": "^7.2.2",
     "tailwindcss": "^4",
     "typescript": "^5"
   }

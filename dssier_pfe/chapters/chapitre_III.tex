@@ -26,8 +26,8 @@ Le diagramme ci-dessous synthétise les interactions entre l'utilisateur et le s
 
 \begin{figure}[H]
     \centering
-    \safefig{chapters/assets/images/cas-utilisation.png}{0.90\textwidth}{cas-utilisation.png}
-    \caption{Diagramme de Cas d'Utilisation global — My Smart Budget}
+    \safefig{chapters/assets/images/class-diagram-app-budget-v3.png}{0.90\textwidth}{class-diagram-app-budget-v3.png}
+    \caption{Diagramme de classes UML My Smart Budget}
     \label{fig:uml_global}
 \end{figure}
 
@@ -100,11 +100,11 @@ Bien que travaillant seul, je me suis astreint à des rituels stricts pour maint
     \item \textbf{Sprint Retrospective (30 min / 14j)} : Analyse du processus ("How to work better?").
 \end{itemize}
 
-\begin{tcolorbox}[colback=yellow!5!white,colframe=yellow!60!black,title=\textbf{Exemple concret : Sprint du 14/02/2025}]
+\begin{tcolorbox}[colback=yellow!5!white,colframe=yellow!60!black,title=\textbf{Exemple concret : Sprint du 14/02/2026}]
 \textbf{Lors de la Sprint Review :}
 J'ai présenté la fonctionnalité \textit{"Tableau de bord"}. Un retour utilisateur a souligné un temps de chargement trop élevé sur mobile.
 \begin{itemize}
-    \item[$\rightarrow$] \textbf{Action :} Création de l'issue \#38 \textit{"Optimize Dashboard Loading"} — mise en place de la pagination côté serveur et d'un index composé sur \texttt{user\_id + date}.
+    \item[$\rightarrow$] \textbf{Action :} Création de l'issue \#38 \textit{"Optimize Dashboard Loading"}  mise en place de la pagination côté serveur et d'un index composé sur \texttt{user\_id + date}.
 \end{itemize}
 
 \textbf{Lors de la Rétrospective :}
@@ -141,7 +141,7 @@ Ces métriques montrent que le projet avance à un rythme stable et que la quali
 
 \begin{tcolorbox}[colback=green!5!white,colframe=green!60!black,title=\textbf{Extrait réel du rapport de Sprint 3}]
 \begin{verbatim}
-## Sprint 3 (01/02/2025 - 14/02/2025)
+## Sprint 3 (01/02/2026 - 14/02/2026)
 - Velocity: 9 issues fermées (Cible: 8) [OK]
 - Lead Time: 2.4 jours/issue [OK]
 - CI Success (main): 12/12 builds [OK]
@@ -167,13 +167,13 @@ Le projet est jalonné par 4 étapes majeures (Milestones GitHub), avec des crit
 \hline
 \textbf{Jalon} & \textbf{Date Cible} & \textbf{Livrable Principal} \\
 \hline
-\textbf{POC} & 05/10/2024 & Backend Node.js + Connexion DB. Première route API. \\
+\textbf{POC} & 05/10/2025 & Backend Node.js + Connexion DB. Première route API. \\
 \hline
-\textbf{MVP (v1.0)} & 15/10/2024 & Auth JWT, CRUD complet, Dashboard v1. \\
+\textbf{MVP (v1.0)} & 15/10/2025 & Auth JWT, CRUD complet, Dashboard v1. \\
 \hline
-\textbf{Bêta (v1.1)} & 30/10/2024 & Alertes budgétaires, CI/CD complet. \\
+\textbf{Bêta (v1.1)} & 30/10/2025 & Alertes budgétaires, CI/CD complet. \\
 \hline
-\textbf{Finale (v2.0)} & 15/11/2024 & Export PDF, Optimisations Perf, Documentation finale. \\
+\textbf{Finale (v2.0)} & 15/11/2025 & Export PDF, Optimisations Perf, Documentation finale. \\
 \hline
 \end{tabular}
 \end{center}

@@ -45,7 +45,7 @@ Les interactions du système sont définies par trois acteurs principaux :
 \begin{figure}[H]
     \centering
     \safefig{chapters/assets/images/usage_global.png}{0.92\textwidth}{usage_global.png}
-    \caption{Diagramme de cas d'usage global — My Smart Budget}
+    \caption{Diagramme de cas d'usage global -- My Smart Budget}
     \label{fig:usage_global}
 \end{figure}
 
@@ -62,7 +62,7 @@ Ce diagramme structure les données manipulées par l'application et sert de ré
 \begin{figure}[H]
     \centering
     \safefig{chapters/assets/images/class-diagram-app-budget-v3.png}{0.95\textwidth}{class-diagram-app-budget-v3.png}
-    \caption{Diagramme de classes UML détaillé — My Smart Budget}
+    \caption{Diagramme de classes UML détaillé -- My Smart Budget}
     \label{fig:class-diagram}
 \end{figure}
 
@@ -102,7 +102,7 @@ Les séquences détaillent les interactions temporelles entre le Frontend, l'API
 \begin{figure}[H]
     \centering
     \safefig{chapters/assets/images/seq-auth-login.png}{0.92\textwidth}{seq-auth-login.png}
-    \caption{Diagramme de séquence — Flux de connexion utilisateur (Login)}
+    \caption{Diagramme de séquence -- Flux de connexion utilisateur (Login)}
     \label{fig:seq-auth}
 \end{figure}
 
@@ -122,7 +122,7 @@ Pour l'utilisateur, cela se traduit par une connexion fluide en moins de 2 secon
 \begin{figure}[H]
     \centering
     \safefig{chapters/assets/images/seq-create-transaction.png}{0.92\textwidth}{seq-create-transaction.png}
-    \caption{Diagramme de séquence — Flux de création d'une transaction}
+    \caption{Diagramme de séquence -- Flux de création d'une transaction}
     \label{fig:seq-transaction}
 \end{figure}
 
@@ -135,7 +135,7 @@ Pour l'utilisateur, cela signifie qu'une transaction mal saisie est rejetée imm
 \begin{figure}[H]
     \centering
     \safefig{chapters/assets/images/seq-budget-alert.png}{0.92\textwidth}{seq-budget-alert.png}
-    \caption{Diagramme de séquence — Flux automatique de déclenchement d'alertes}
+    \caption{Diagramme de séquence -- Flux automatique de déclenchement d'alertes}
     \label{fig:seq-alert}
 \end{figure}
 
@@ -157,11 +157,11 @@ La conception graphique de \textbf{My Smart Budget} a suivi une démarche rigour
 \hline
 \textbf{Étape} & \textbf{Livrable} & \textbf{Objectif} \\
 \hline
-\textbf{1 — Zoning} & Schéma de découpage en zones & Valider la hiérarchie de l'information et la disposition des blocs fonctionnels \\
+\textbf{1 -- Zoning} & Schéma de découpage en zones & Valider la hiérarchie de l'information et la disposition des blocs fonctionnels \\
 \hline
-\textbf{2 — Wireframe} & Maquette basse fidélité & Définir la structure précise, les interactions et les contenus sans couleurs ni styles \\
+\textbf{2 -- Wireframe} & Maquette basse fidélité & Définir la structure précise, les interactions et les contenus sans couleurs ni styles \\
 \hline
-\textbf{3 — Maquette HF} & Figma haute fidélité & Intégrer la charte graphique, les composants du Design System et les états interactifs \\
+\textbf{3 -- Maquette HF} & Figma haute fidélité & Intégrer la charte graphique, les composants du Design System et les états interactifs \\
 \hline
 \end{tabular}
 \end{center}
@@ -170,14 +170,14 @@ La conception graphique de \textbf{My Smart Budget} a suivi une démarche rigour
 \subsection{Page d'inscription (Register)}
 % ------------------------------------------------------------
 
-\subsubsection{Zoning — Structure fonctionnelle}
+\subsubsection{Zoning -- Structure fonctionnelle}
 
 Le zoning de la page d'inscription (identifiant \textbf{Z-01}) définit cinq zones fonctionnelles empilées verticalement, conformément à l'approche Mobile First :
 
 \begin{figure}[H]
     \centering
     \safefig{chapters/assets/images/zoning-register.png}{0.55\textwidth}{zoning-register.png}
-    \caption{Zoning Z-01 — Page d'inscription (Register)}
+    \caption{Zoning Z-01 -- Page d'inscription (Register)}
     \label{fig:zoning-register}
 \end{figure}
 
@@ -193,9 +193,9 @@ Le zoning de la page d'inscription (identifiant \textbf{Z-01}) définit cinq zon
 \hline
 \textbf{Formulaire} & Champs : Nom complet, Adresse e-mail, Mot de passe, Confirmation + case CGU \\
 \hline
-\textbf{CTA Create Account} & Bouton d'action principal — soumission du formulaire \\
+\textbf{CTA Create Account} & Bouton d'action principal -- soumission du formulaire \\
 \hline
-\textbf{CTA Google / Apple} & Connexion sociale — alternative rapide sans saisie de mot de passe \\
+\textbf{CTA Google / Apple} & Connexion sociale -- alternative rapide sans saisie de mot de passe \\
 \hline
 \end{tabular}
 \end{center}
@@ -205,7 +205,7 @@ Le zoning de la page d'inscription (identifiant \textbf{Z-01}) définit cinq zon
 \begin{figure}[H]
     \centering
     \safefig{chapters/assets/images/wireframe-register.png}{0.62\textwidth}{wireframe-register.png}
-    \caption{Maquette haute fidélité — Page d'inscription}
+    \caption{Maquette haute fidélité -- Page d'inscription}
     \label{fig:wireframe-register}
 \end{figure}
 
@@ -220,7 +220,7 @@ La maquette finale reprend fidèlement le zoning et y ajoute :
 
 
 % ------------------------------------------------------------
-\subsection{Structure générale des pages — Systèmes de grille}
+\subsection{Structure générale des pages -- Systèmes de grille}
 % ------------------------------------------------------------
 
 \subsubsection{Grille mobile (layout vertical)}
@@ -228,7 +228,7 @@ La maquette finale reprend fidèlement le zoning et y ajoute :
 \begin{figure}[H]
     \centering
     \safefig{chapters/assets/images/wireframe-mobile-layout.png}{0.35\textwidth}{wireframe-mobile-layout.png}
-    \caption{Schéma de grille mobile — Structure des pages principales}
+    \caption{Schéma de grille mobile -- Structure des pages principales}
     \label{fig:wireframe-mobile-layout}
 \end{figure}
 
@@ -251,7 +251,7 @@ Sur desktop, la grille adopte une structure à trois colonnes : navigation laté
     \begin{minipage}{0.48\textwidth}
         \centering
         \safefig{chapters/assets/images/zoning-desktop.png}{\textwidth}{zoning-desktop.png}
-        \caption{Zoning desktop — Structure multi-colonnes}
+        \caption{Zoning desktop -- Structure multi-colonnes}
         \label{fig:zoning-desktop}
     \end{minipage}\hfill
     \begin{minipage}{0.48\textwidth}
@@ -264,27 +264,27 @@ Sur desktop, la grille adopte une structure à trois colonnes : navigation laté
 
 Le tableau de bord desktop est structuré en deux zones principales :
 \begin{itemize}
-    \item \textbf{Navigation latérale} : Menu fixe avec quatre entrées — \textit{Overview}, \textit{Transactions}, \textit{Budgets}, \textit{Savings} — et un accès aux \textit{Settings} en bas.
+    \item \textbf{Navigation latérale} : Menu fixe avec quatre entrées -- \textit{Overview}, \textit{Transactions}, \textit{Budgets}, \textit{Savings}  et un accès aux \textit{Settings} en bas.
     \item \textbf{Zone centrale} : Deux rangées de modules graphiques (graphiques de synthèse + modules contextuels), suivies du tableau \textit{Recent Ledger} affichant les dernières transactions avec entité, catégorie, date et montant.
 \end{itemize}
 
-\subsubsection{Zoning — Dashboard Mobile}
+\subsubsection{Zoning -- Dashboard Mobile}
 
 \begin{figure}[H]
     \centering
     \safefig{chapters/assets/images/zoning-dashboard-mobile.png}{0.38\textwidth}{zoning-dashboard-mobile.png}
-    \caption{Zoning — Dashboard Mobile (structure des zones)}
+    \caption{Zoning -- Dashboard Mobile (structure des zones)}
     \label{fig:zoning-dashboard-mobile}
 \end{figure}
 
 Le zoning mobile empile les zones dans l'ordre de priorité : Header (Z-01), KPI solde total, modules Revenus/Dépenses côte-à-côte, activité récente, modules secondaires, Footer et Navbar.
 
-\subsubsection{Wireframe — Dashboard Mobile}
+\subsubsection{Wireframe -- Dashboard Mobile}
 
 \begin{figure}[H]
     \centering
     \safefig{chapters/assets/images/wireframe-dashboard-mobile.png}{0.42\textwidth}{wireframe-dashboard-mobile.png}
-    \caption{Wireframe — Dashboard Mobile (MSB)}
+    \caption{Wireframe -- Dashboard Mobile (MSB)}
     \label{fig:wireframe-dashboard-mobile}
 \end{figure}
 
@@ -296,7 +296,7 @@ Sur mobile, le dashboard condense l'information en une colonne scrollable :
 \end{itemize}
 
 % ------------------------------------------------------------
-\subsection{Wireframes existants — Transactions et Ajout}
+\subsection{Wireframes existants -- Transactions et Ajout}
 % ------------------------------------------------------------
 
 \begin{figure}[H]
@@ -304,13 +304,13 @@ Sur mobile, le dashboard condense l'information en une colonne scrollable :
     \begin{minipage}{0.48\textwidth}
         \centering
         \safefig{chapters/assets/images/wireframe-dashboard.png}{\textwidth}{wireframe-dashboard.png}
-        \caption{Wireframe basse fidélité — Dashboard (version initiale)}
+        \caption{Wireframe basse fidélité -- Dashboard (version initiale)}
         \label{fig:wireframe-dashboard}
     \end{minipage}\hfill
     \begin{minipage}{0.48\textwidth}
         \centering
         \safefig{chapters/assets/images/wireframe-transactions.png}{\textwidth}{wireframe-transactions.png}
-        \caption{Wireframe — Page Transactions}
+        \caption{Wireframe -- Page Transactions}
         \label{fig:wireframe-transactions}
     \end{minipage}
 \end{figure}
@@ -344,14 +344,14 @@ Ces wireframes basse fidélité ont constitué la première itération de concep
 
 \section{Conception de la Base de Données (PostgreSQL)}
 
-Le modèle de données a été conçu selon la méthode Merise (MCD/MLD/MPD) puis implémenté physiquement sous PostgreSQL 15.
+Le modèle de données a été conçu selon la méthode Merise (MCD/MLD/MPD) puis implémenté physiquement sous PostgreSQL 16.
 
 \subsection{Modèle Conceptuel (MCD)}
 
 \begin{figure}[H]
     \centering
     \safefig{chapters/assets/images/mcd-app-budget-v3.png}{0.95\textwidth}{mcd-app-budget-v3.png}
-    \caption{Modèle Conceptuel de Données (MCD) — entités et relations}
+    \caption{Modèle Conceptuel de Données (MCD) -- entités et relations}
     \label{fig:mcd}
 \end{figure}
 
@@ -362,18 +362,18 @@ Le MLD est dérivé du MCD par application des règles de passage Merise : chaqu
 \begin{figure}[H]
     \centering
     \safefig{chapters/assets/images/mld-app-budget.png}{0.95\textwidth}{mld-app-budget.png}
-    \caption{Modèle Logique de Données (MLD) — tables et clés étrangères}
+    \caption{Modèle Logique de Données (MLD) -- tables et clés étrangères}
     \label{fig:mld}
 \end{figure}
 
 \subsection{Modèle Physique (MPD)}
 
-Le MPD précise les types SQL, contraintes (\texttt{NOT NULL}, \texttt{UNIQUE}, \texttt{ON DELETE CASCADE}) et index de chaque table tels qu'implémentés sous PostgreSQL 15.
+Le MPD précise les types SQL, contraintes (\texttt{NOT NULL}, \texttt{UNIQUE}, \texttt{ON DELETE CASCADE}) et index de chaque table tels qu'implémentés sous PostgreSQL 16.
 
 \begin{figure}[H]
     \centering
     \safefig{chapters/assets/images/mpd-app-budget.png}{0.95\textwidth}{mpd-app-budget.png}
-    \caption{Modèle Physique de Données (MPD) — types SQL et contraintes}
+    \caption{Modèle Physique de Données (MPD) -- types SQL et contraintes}
     \label{fig:mpd}
 \end{figure}
 
@@ -409,7 +409,7 @@ L'application repose sur une séparation stricte des responsabilités.
 \begin{figure}[H]
     \centering
     \safefig{chapters/assets/images/arch-3tiers-app-budget-v3.png}{0.92\textwidth}{arch-3tiers-app-budget-v3.png}
-    \caption{Architecture 3-tiers : Next.js (Front) — Express (Back) — PostgreSQL (Data)}
+    \caption{Architecture 3-tiers : Next.js (Front) -- Express (Back) -- PostgreSQL (Data)}
     \label{fig:arch-3tiers}
 \end{figure}
 

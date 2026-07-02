@@ -31,8 +31,9 @@
 \usepackage[table]{xcolor}
 \usepackage{adjustbox}   % tableaux qui dépassent
 \usepackage{microtype}   % meilleure justification, réduit les pages
+\usepackage[labelsep=space]{caption}
 
-% Configuration de la page — marges réduites
+% Configuration de la page  marges réduites
 \geometry{
     left=2cm,
     right=2cm,
@@ -74,7 +75,7 @@
 \renewcommand{\headrulewidth}{0.4pt}
 \renewcommand{\footrulewidth}{0.4pt}
 
-% Titres — espacements très compacts
+% Titres  espacements très compacts
 \titleformat{\chapter}[display]
     {\normalfont\Large\bfseries\color{colintBlack}}
     {\chaptertitlename\ \thechapter}{3pt}{\large\color{colintDark}}
@@ -128,7 +129,7 @@
     \end{adjustbox}%
 }
 
-% Environnements tcolorbox — plus compacts
+% Environnements tcolorbox  plus compacts
 \tcbset{
     before skip=3pt,
     after skip=3pt,
@@ -179,7 +180,7 @@
     title=Focus GitHub,
 }
 
-% Code — plus petit pour réduire les pages
+% Code  plus petit pour réduire les pages
 \lstset{
     basicstyle=\fontsize{7}{8.5}\ttfamily,
     breaklines=true,
@@ -240,7 +241,7 @@
     morestring=[b]',morestring=[b]"
 }
 
-% Table des matières — compacte
+% Table des matières  compacte
 \setlength{\cftbeforechapskip}{2pt}
 \setcounter{tocdepth}{1}  % 0=chapter, 1=section, 2=subsection
 \setlength{\cftbeforesecskip}{0pt}

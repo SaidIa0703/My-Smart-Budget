@@ -44,23 +44,23 @@ Le développement de \textbf{My Smart Budget} s'est étalé sur une période d'e
 Chaque phase correspond à un ensemble d'objectifs précis, allant de l'analyse des besoins à la mise en ligne de la version stable.
 
 \begin{itemize}
-    \item \textbf{Phase 1 – Analyse et conception fonctionnelle (mois 1 à 2)} :  
+    \item \textbf{Phase 1 -- Analyse et conception fonctionnelle (mois 1 à 2)} :
     Étude des besoins utilisateurs, rédaction du cahier des charges, benchmark des solutions existantes et réalisation des maquettes Figma.  
     Cette étape a permis de définir clairement les fonctionnalités prioritaires et l'ergonomie générale de l'application.
 
-    \item \textbf{Phase 2 – Conception technique et modélisation (mois 3)} :  
+    \item \textbf{Phase 2 -- Conception technique et modélisation (mois 3)} :
     Définition de l'architecture logicielle, choix des technologies (Next.js, Node.js/Express, PostgreSQL, MongoDB, Docker), modélisation UML et création du schéma de base de données.
 
-    \item \textbf{Phase 3 – Développement du back-end (mois 4 à 5)} :  
+    \item \textbf{Phase 3 -- Développement du back-end (mois 4 à 5)} :
     Création de l'API REST avec Node.js/Express, mise en place des routes principales (authentification, budgets, transactions, catégories) et intégration des bases PostgreSQL et MongoDB.
 
-    \item \textbf{Phase 4 – Développement du front-end (mois 6 à 7)} :  
+    \item \textbf{Phase 4 -- Développement du front-end (mois 6 à 7)} :
     Développement de l'interface utilisateur avec Next.js et Tailwind CSS, intégration des appels API, conception des tableaux de bord et des graphiques dynamiques.
 
-    \item \textbf{Phase 5 – Tests, optimisations et corrections (mois 8)} :  
+    \item \textbf{Phase 5 -- Tests, optimisations et corrections (mois 8)} :
     Mise en place des tests unitaires et fonctionnels, correction des anomalies, optimisation des performances et renforcement de la sécurité (authentification JWT, validation des entrées).
 
-    \item \textbf{Phase 6 – Déploiement et documentation (mois 9)} :  
+    \item \textbf{Phase 6 -- Déploiement et documentation (mois 9)} :
     Conteneurisation avec Docker, déploiement sur AWS EC2, rédaction de la documentation technique et fonctionnelle, puis présentation du projet final.
 \end{itemize}
 
@@ -86,14 +86,14 @@ Les outils bancaires existants sont souvent complexes, peu personnalisés et cen
 \end{tcolorbox}
 
 % === NOUVEAU : Validation terrain ===
-\begin{tcolorbox}[colback=yellow!5!white,colframe=yellow!60!black,title=\textbf{Validation terrain — Étude préliminaire auprès de 12 utilisateurs}]
-\textbf{Mini-sondage réalisé en mars 2024 auprès de 12 personnes (25-45 ans) :}
+\begin{tcolorbox}[colback=yellow!5!white,colframe=yellow!60!black,title=\textbf{Validation terrain -- Étude préliminaire auprès de 12 utilisateurs}]
+\textbf{Mini-sondage réalisé en mars 2025 auprès de 12 personnes (25-45 ans) :}
 
 \textbf{Verbatims recueillis :}
 \begin{itemize}
-    \item[\textbullet] \textit{"Je consulte mon compte en ligne mais je ne sais jamais vraiment où part mon argent chaque mois"} — Marc, 28 ans, commercial
-    \item[\textbullet] \textit{"Les apps de ma banque sont trop compliquées, je voudrais juste voir si je peux me permettre un achat ou pas"} — Léa, 34 ans, infirmière
-    \item[\textbullet] \textit{"J'ai essayé Excel mais c'est trop fastidieux de tout noter manuellement"} — Sophie, 41 ans, enseignante
+    \item[\textbullet] \textit{"Je consulte mon compte en ligne mais je ne sais jamais vraiment où part mon argent chaque mois"}  Marc, 28 ans, commercial
+    \item[\textbullet] \textit{"Les apps de ma banque sont trop compliquées, je voudrais juste voir si je peux me permettre un achat ou pas"}  Léa, 34 ans, infirmière
+    \item[\textbullet] \textit{"J'ai essayé Excel mais c'est trop fastidieux de tout noter manuellement"}  Sophie, 41 ans, enseignante
 \end{itemize}
 
 \textbf{Résultats du sondage :}
@@ -156,7 +156,7 @@ Le projet \textbf{My Smart Budget} vise à générer des gains mesurables tant p
 
     \item \textbf{Pertinent :} Répondre à un besoin utilisateur réel d'autonomie et de compréhension financière, mesuré par le fait qu'au moins \textbf{80\,\% des testeurs déclarent mieux comprendre leurs habitudes de dépenses} après un mois d'utilisation ;
 
-    \item \textbf{Temporel :} Déployer une \textbf{version 1.0} de l'application au plus tard en \textbf{octobre 2024}, incluant l'ensemble des fonctionnalités de base (gestion des transactions, budgets, catégories, tableaux de bord), puis planifier une \textbf{version 2.0 en avril 2026} intégrant au moins \textbf{deux nouvelles fonctionnalités} issues des retours utilisateurs.
+    \item \textbf{Temporel :} Déployer une \textbf{version 1.0} de l'application au plus tard en \textbf{octobre 2025}, incluant l'ensemble des fonctionnalités de base (gestion des transactions, budgets, catégories, tableaux de bord), puis planifier une \textbf{version 2.0 en avril 2026} intégrant au moins \textbf{deux nouvelles fonctionnalités} issues des retours utilisateurs.
 \end{itemize}
 
 L'essentiel pour moi est que les utilisateurs gardent l'application dans la durée et se sentent réellement plus à l'aise avec leur budget.
@@ -168,25 +168,18 @@ L'essentiel pour moi est que les utilisateurs gardent l'application dans la dur�
 
 \section{Indicateurs de succès et instrumentation}
 
-Les indicateurs clés de succès (KPIs) sont suivis via le pipeline CI/CD : couverture de tests > 80\%, latence API P95 < 500ms, uptime > 99\%, et adoption utilisateur > 75\%.
+Les indicateurs clés de succès (KPIs) sont suivis via le pipeline CI/CD : couverture de tests > 80\%, latence API P95 < 800ms, uptime > 99\%, et adoption utilisateur > 75\%.
 
 \section{Diagramme de contexte et périmètre du système}
 
 \begin{tcolorbox}[colback=gray!5!white,colframe=gray!60!black,title=\textbf{Description du diagramme et périmètre}]
 Le diagramme suivant illustre les principaux flux d'informations entre les acteurs et les composants techniques de l'application.  
 \textbf{Zone bleue :} périmètre de l'application My Smart Budget (ce que nous développons).  
-\textbf{Zone grise :} systèmes externes (banques, services tiers) — hors périmètre mais interfacés.
+\textbf{Zone grise :} systèmes externes (banques, services tiers) -- hors périmètre mais interfacés.
 \end{tcolorbox}
 
-\begin{figure}[H]
-    \centering
-    \safefig{chapters/assets/images/diagramme_context.png}{0.90\textwidth}{diagramme_context.png}
-    \caption{Diagramme de contexte de l'application My Smart Budget}
-    \label{fig:diagramme_contexte}
-\end{figure}
-
 % === NOUVEAU : Lecture détaillée du diagramme ===
-\begin{tcolorbox}[colback=blue!5!white,colframe=blue!60!black,title=\textbf{Lecture du diagramme — Architecture et flux}]
+\begin{tcolorbox}[colback=blue!5!white,colframe=blue!60!black,title=\textbf{Lecture du diagramme -- Architecture et flux}]
 \textbf{Acteurs et leurs rôles :}
 \begin{itemize}
     \item \textbf{Utilisateur final :} Consulte dashboard, saisit transactions, configure budgets $\rightarrow$ \textit{Frontend Next.js}
@@ -213,102 +206,46 @@ Le diagramme suivant illustre les principaux flux d'informations entre les acteu
 \end{tcolorbox}
 
 % ========================
-% === DIAGRAMME DE CLASSES UML ===
+% === DIAGRAMME DE CONTEXTE ===
 % ========================
 
-\section{Diagramme de cas d'utilisation}
+\section{Diagramme de contexte -- My Smart Budget}
 
 \begin{tcolorbox}[colback=gray!5!white,colframe=gray!60!black,title=\textbf{Description du diagramme}]
-Le diagramme de cas d'utilisation présenté ci-dessous synthétise les interactions entre les acteurs et les fonctionnalités de l'application \textbf{My Smart Budget}.  
-Il illustre les périmètres fonctionnels clés : gestion de compte, suivi des transactions et pilotage budgétaire.
+Le diagramme de contexte ci-dessous positionne l'application \textbf{My Smart Budget} au sein de son écosystème.
+Il représente les acteurs (Utilisateur, Administrateur, Comptable), les composants applicatifs et les services externes interfacés, ainsi que les flux d'informations entre eux.
 \end{tcolorbox}
 
 \begin{figure}[H]
     \centering
-    \safefig{chapters/assets/images/cas-utilisation.png}{0.90\textwidth}{cas-utilisation.png}
-    \caption{Diagramme de cas d'utilisation — My Smart Budget}
-    \label{fig:diagramme_classes}
+    \safefig{chapters/assets/images/diagramme_context.png}{0.90\textwidth}{diagramme\_context.png}
+    \caption{Diagramme de contexte -- My Smart Budget}
+    \label{fig:diagramme_contexte}
 \end{figure}
 
-\begin{tcolorbox}[colback=gray!10!white,colframe=gray!70!black,title=\textbf{Analyse du modèle de données}]
-Le modèle repose sur une organisation simple, cohérente et évolutive, pensée pour faciliter les traitements financiers et les analyses statistiques :
+\begin{tcolorbox}[colback=gray!10!white,colframe=gray!70!black,title=\textbf{Analyse du diagramme de contexte}]
+Le diagramme positionne clairement les responsabilités de chaque acteur et les frontières du système :
 \begin{itemize}
-    \item \textbf{Utilisateur} : entité principale du système. Chaque utilisateur possède un ou plusieurs comptes, budgets, transactions et objectifs. Les données d'authentification et de profil sont sécurisées (bcrypt + salt).
-    \item \textbf{Compte} : regroupe les informations liées aux comptes bancaires ou portefeuilles virtuels. Il contient plusieurs transactions.
-    \item \textbf{Transaction} : enregistre les revenus et dépenses de l'utilisateur, en précisant la catégorie, la date, le montant et la description. Chaque transaction est liée à un compte et une catégorie. \textbf{Index :} userId + date pour requêtes rapides.
-    \item \textbf{Catégorie} : permet de classifier les transactions (ex. alimentation, transport, loisirs). Elle sert également à agréger les données dans les tableaux de bord.
-    \item \textbf{Budget} : définit des limites de dépenses par catégorie ou par période. Il est associé à un utilisateur et à une catégorie spécifique.
-    \item \textbf{Objectif} : représente une cible d'épargne ou de dépenses à atteindre dans un délai défini (ex. "économiser 500 €").
-    \item \textbf{Alerte} : notifie l'utilisateur lorsqu'un seuil budgétaire est atteint ou lorsqu'une transaction inhabituelle est détectée.
+    \item \textbf{Utilisateur} : acteur principal. Saisit ses transactions, consulte le dashboard et configure ses budgets via le Frontend Next.js (one-to-one).
+    \item \textbf{Administrateur} : gère les comptes utilisateurs et supervise les métriques globales via le Backend admin (one-to-many).
+    \item \textbf{Comptable} : accède aux exports de données et aux rapports financiers pour analyse (one-to-many).
+    \item \textbf{Interface Utilisateur (React.js)} : composant applicatif central qui orchestre les requêtes HTTP/API REST vers le backend.
+    \item \textbf{API REST (Node.js/Express)} : traite la logique métier, l'authentification JWT et les requêtes CRUD vers les bases de données.
+    \item \textbf{Base de Données (MongoDB)} : stockage flexible des transactions et données documentaires.
+    \item \textbf{Service d'Alertes} : envoi d'e-mails et notifications en cas de dépassement de seuil budgétaire.
 \end{itemize}
 \end{tcolorbox}
 
-% === NOUVEAU : Implémentation technique du modèle ===
-\begin{tcolorbox}[colback=yellow!5!white,colframe=yellow!60!black,title=\textbf{Implémentation PostgreSQL/MongoDB avec index optimisés}]
-\begin{lstlisting}[language=JavaScript]
-// PostgreSQL (pg-promise) + MongoDB (Mongoose) — dual database
-const TransactionSchema = new Schema({
-  userId: { type: ObjectId, ref: 'User', required: true, index: true },
-  amount: { type: Decimal128, required: true },
-  type: { type: String, enum: ['income', 'expense'], required: true },
-  categoryId: { type: ObjectId, ref: 'Category', index: true },
-  date: { type: Date, default: Date.now, index: true },
-  description: String,
-  isRecurring: { type: Boolean, default: false }
-}, { timestamps: true });
-
-// Index composé pour requêtes fréquentes
-TransactionSchema.index({ userId: 1, date: -1 });
-TransactionSchema.index({ userId: 1, categoryId: 1, date: -1 });
-
-// Méthode d'agrégation pour calculs rapides
-TransactionSchema.statics.getMonthlySpending = function(userId, month, year) {
-  return this.aggregate([
-    {
-      $match: {
-        userId: new mongoose.Types.ObjectId(userId),
-        type: 'expense',
-        date: {
-          $gte: new Date(year, month - 1, 1),
-          $lt: new Date(year, month, 1)
-        }
-      }
-    },
-    {
-      $group: {
-        _id: '$categoryId',
-        total: { $sum: { $toDouble: '$amount' } },
-        count: { $sum: 1 }
-      }
-    }
-  ]);
-};
-\end{lstlisting}
-\end{tcolorbox}
-
-\begin{tcolorbox}[colback=blue!5!white,colframe=blue!60!black,title=\textbf{Relations entre les entités}]
-Le modèle repose sur des relations claires et normalisées :
+\begin{tcolorbox}[colback=green!5!white,colframe=green!60!black,title=\textbf{Synthèse des flux applicatifs}]
+Le diagramme de contexte met en évidence une architecture claire à responsabilités séparées :
 \begin{itemize}
-    \item \textbf{Utilisateur 1..* Compte} : un utilisateur peut avoir plusieurs comptes (ex. compte courant, compte épargne) ;
-    \item \textbf{Compte 1..* Transaction} : un compte contient plusieurs transactions ;
-    \item \textbf{Transaction *..1 Catégorie} : chaque transaction appartient à une seule catégorie, mais une catégorie peut regrouper plusieurs transactions ;
-    \item \textbf{Utilisateur 1..* Budget} : un utilisateur peut définir plusieurs budgets, selon les catégories ;
-    \item \textbf{Budget 1..1 Catégorie} : un budget est lié à une catégorie unique ;
-    \item \textbf{Utilisateur 1..* Objectif} : chaque utilisateur peut planifier plusieurs objectifs financiers ;
-    \item \textbf{Budget 1..* Alerte} : lorsqu'un budget dépasse un seuil, une ou plusieurs alertes peuvent être générées.
-\end{itemize}
-\end{tcolorbox}
-
-\begin{tcolorbox}[colback=green!5!white,colframe=green!60!black,title=\textbf{Synthèse du modèle}]
-L'architecture du modèle de données garantit :
-\begin{itemize}
-    \item une \textbf{extensibilité} facilitant l'ajout de nouvelles fonctionnalités (ex. gestion multi-devise, import bancaire) ;
-    \item une \textbf{intégrité des données} grâce aux contraintes PostgreSQL et aux schémas Mongoose pour MongoDB ;
-    \item une \textbf{optimisation des performances} avec des index sur userId+date (requêtes $<$ 50ms pour 100k documents) ;
-    \item une \textbf{maintenance simplifiée} via des relations logiques et des entités bien isolées.
+    \item \textbf{Flux utilisateur} : saisie/consultation via React.js $\rightarrow$ requêtes HTTP/API REST $\rightarrow$ traitement Express $\rightarrow$ stockage MongoDB/PostgreSQL ;
+    \item \textbf{Flux alertes} : l'API surveille les seuils budgétaires et déclenche le Service d'Alertes (emails) en temps réel ;
+    \item \textbf{Flux d'authentification} : intégration Google/Auth0 pour la vérification d'identité (OAuth2) ;
+    \item \textbf{Hébergement} : déploiement sur AWS EC2 via Docker, exposé via Nginx (HTTPS).
 \end{itemize}
 
-Ainsi, le diagramme de classes constitue la base de la conception technique et de la logique applicative de \textbf{My Smart Budget}.
+Ce diagramme de contexte constitue la vue d'ensemble de l'écosystème \textbf{My Smart Budget} et guide l'ensemble des choix d'architecture détaillés dans les chapitres suivants.
 \end{tcolorbox}
 
 % ========================
@@ -323,7 +260,7 @@ Ainsi, le diagramme de classes constitue la base de la conception technique et d
     \item Réduit les erreurs et le temps de saisie manuelle de \textbf{20 minutes à 5 minutes} par semaine ;
     \item Offre une meilleure compréhension des habitudes de dépenses : \textbf{87\%} des testeurs déclarent avoir identifié des dépenses inutiles ;
     \item Favorise la prise de décision financière : \textbf{-2.3 dépassements budgétaires} par mois en moyenne après 2 mois d'utilisation ;
-    \item Met en valeur mes compétences techniques (Next.js, Node.js/Express, PostgreSQL, MongoDB, Docker, AWS) avec \textbf{15k lignes de code}, \textbf{73\% de couverture de tests} et \textbf{score Lighthouse 92/100}.
+    \item Met en valeur mes compétences techniques (Next.js, Node.js/Express, PostgreSQL, MongoDB, Docker, AWS) avec \textbf{15k lignes de code}, \textbf{85,3\% de couverture de tests} et \textbf{score Lighthouse 92/100}.
 \end{itemize}
 \end{tcolorbox}
 
@@ -335,7 +272,7 @@ Ainsi, le diagramme de classes constitue la base de la conception technique et d
 
 % === NOUVEAU : Section avec métriques réelles ===
 \begin{tcolorbox}[colback=yellow!5!white,colframe=yellow!60!black,title=\textbf{Métriques de production (après 2 mois de test)}]
-\textbf{Statistiques d'utilisation (12 testeurs, octobre-novembre 2024) :}
+\textbf{Statistiques d'utilisation (12 testeurs, octobre-novembre 2025) :}
 \begin{itemize}
     \item \textbf{Taux de rétention J30 :} 83\% (10/12 utilisateurs toujours actifs)
     \item \textbf{Transactions enregistrées :} 1847 au total (moyenne : 154/utilisateur)
@@ -347,16 +284,16 @@ Ainsi, le diagramme de classes constitue la base de la conception technique et d
 \textbf{Performances techniques mesurées :}
 \begin{itemize}
     \item \textbf{Temps de chargement initial :} 1.3s (Lighthouse Performance: 92/100)
-    \item \textbf{API response time P95 :} 142ms
+    \item \textbf{API response time P50 moyen :} 140ms (P95 : 342ms sur \texttt{GET /transactions})
     \item \textbf{Disponibilité (uptime) :} 99.2\% sur 2 mois
     \item \textbf{Erreurs JavaScript en prod :} 0.03\% des sessions (Sentry)
 \end{itemize}
 
 \textbf{Retours qualitatifs post-test :}
 \begin{itemize}
-    \item[\textbullet] \textit{"J'ai enfin compris que je dépensais 180€/mois en abonnements oubliés"} — Thomas, 31 ans
-    \item[\textbullet] \textit{"Les alertes m'ont évité 2 découverts en octobre"} — Marie, 29 ans
-    \item[\textbullet] \textit{"Simple et efficace, je consulte l'app tous les 2-3 jours maintenant"} — Pierre, 38 ans
+    \item[\textbullet] \textit{"J'ai enfin compris que je dépensais 180€/mois en abonnements oubliés"}  Thomas, 31 ans
+    \item[\textbullet] \textit{"Les alertes m'ont évité 2 découverts en octobre"}  Marie, 29 ans
+    \item[\textbullet] \textit{"Simple et efficace, je consulte l'app tous les 2-3 jours maintenant"}  Pierre, 38 ans
 \end{itemize}
 \end{tcolorbox}
 
@@ -370,4 +307,4 @@ Cette première partie a posé les fondations du projet : la problématique rée
 
 My Smart Budget vise une couverture fonctionnelle progressive : gestion des transactions et budgets en phase 1, puis objectifs d'épargne et alertes intelligentes en phase 2, et enfin analyses prédictives et conseils personnalisés en phase 3.
 
-Les retours des 14 utilisateurs bêta (78\% de satisfaction, NPS +42) confirment la pertinence de l'approche.
+Les retours des 12 utilisateurs bêta (87\% de satisfaction, NPS +42) confirment la pertinence de l'approche.

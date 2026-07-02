@@ -43,7 +43,7 @@ La stratégie de veille technologique de \textbf{My Smart Budget} couvre l'ensem
 \hline
 Next.js & 15.0.0 & 15.1.0 & 15.0.0 & Turbopack stable, Server Actions améliorés \\
 \hline
-Node.js & 18.19.0 & 21.5.0 & 20.10.0 & Migration vers 20 LTS planifiée janvier 2025 \\
+Node.js & 18.19.0 & 21.5.0 & 20.10.0 & Migration vers 20 LTS planifiée janvier 2026 \\
 \hline
 PostgreSQL & 16.0 & 17.0 & 16.x & Nouvelles fonctionnalités JSON, évaluation en cours \\
 \hline
@@ -80,7 +80,7 @@ Jest & 29.7.0 & 29.7.0 & --- & Stable, pas de changement \\
     \item \textbf{Usage actuel :} Tests unitaires uniquement
 \end{itemize}
 
-\textbf{3. PostgreSQL 17 — Nouvelles fonctionnalités JSON :}
+\textbf{3. PostgreSQL 17  Nouvelles fonctionnalités JSON :}
 \begin{itemize}
     \item \textbf{Use case :} Stockage données semi-structurées sans MongoDB
     \item \textbf{POC :} Colonnes JSONB pour préférences utilisateurs
@@ -99,9 +99,9 @@ Jest & 29.7.0 & 29.7.0 & --- & Stable, pas de changement \\
 \subsection{Impact des mises à jour appliquées}
 
 \begin{exemple}
-\textbf{Migrations effectuées en 2024 et métriques :}
+\textbf{Migrations effectuées en 2025 et métriques :}
 \begin{lstlisting}[language=JavaScript]
-// Migration class component → hook fonctionnel Next.js (Juin 2024)
+// Migration class component → hook fonctionnel Next.js (Juin 2025)
 // AVANT : Logique dispersée, couplage fort
 function TransactionList() {
   const [transactions, setTransactions] = useState([]);
@@ -405,7 +405,7 @@ L'essentiel est de garder une stack à jour sans mettre en danger la stabilité 
     \item \textbf{ADR-001 :} Choix PostgreSQL (données relationnelles) + MongoDB (logs/analytics)
     \item \textbf{ADR-002 :} Migration bcrypt → Argon2id pour le hachage des mots de passe
     \item \textbf{ADR-003 :} Adoption TypeScript strict pour réduire les erreurs runtime
-    \item \textbf{ADR-004 :} Choix Express vs NestJS — légèreté et contrôle total privilégiés
+    \item \textbf{ADR-004 :} Choix Express vs NestJS  légèreté et contrôle total privilégiés
 \end{itemize}
 
 \textbf{Avantage :} chaque choix technique est traçable, justifié et consultable dans le dépôt Git (\texttt{docs/adr/}).

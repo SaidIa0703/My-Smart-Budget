@@ -235,14 +235,38 @@ const MySmartBudget = () => {
     if (!userData) { window.location.href = '/login'; return; }
     const u = JSON.parse(userData);
     setUser(u);
-    const done = localStorage.getItem('questionnaire_done');
-    if (done) {
-      const saved = localStorage.getItem('questionnaire_answers');
-      if (saved) setQuestionnaireAnswers(JSON.parse(saved));
-      setScreen('dashboard');
-    } else {
-      setScreen('questionnaire');
-    }
+
+    // Vérifier le profil en base de données en priorité
+    // Ainsi le questionnaire ne s'affiche plus après chaque déconnexion
+    fetch(`${API}/profile/${u.id}`, { credentials: 'include' })
+      .then(r => r.json())
+      .then(data => {
+        if (data.exists && data.profile) {
+          localStorage.setItem('questionnaire_done', 'true');
+          localStorage.setItem('questionnaire_answers', JSON.stringify(data.profile));
+          setQuestionnaireAnswers(data.profile);
+          setScreen('dashboard');
+        } else {
+          const done = localStorage.getItem('questionnaire_done');
+          if (done) {
+            const saved = localStorage.getItem('questionnaire_answers');
+            if (saved) setQuestionnaireAnswers(JSON.parse(saved));
+            setScreen('dashboard');
+          } else {
+            setScreen('questionnaire');
+          }
+        }
+      })
+      .catch(() => {
+        const done = localStorage.getItem('questionnaire_done');
+        if (done) {
+          const saved = localStorage.getItem('questionnaire_answers');
+          if (saved) setQuestionnaireAnswers(JSON.parse(saved));
+          setScreen('dashboard');
+        } else {
+          setScreen('questionnaire');
+        }
+      });
   }, []);
 
   useEffect(() => {

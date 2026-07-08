@@ -20,7 +20,7 @@ jobs:
       - name: Install dependencies and run tests with coverage
         working-directory: APP/MY_budget/backend
         run: |
-          npm ci
+          npm install
           npm run test:coverage
       - name: SonarQube Scan
         uses: SonarSource/sonarqube-scan-action@v6

@@ -1,21 +1,34 @@
 const express = require('express');
 const cors = require('cors');
 const cookieParser = require('cookie-parser');
+const helmet = require('helmet');
+const rateLimit = require('express-rate-limit');
 const { db, connectMongo, testPostgres } = require('./db');
 const authRoutes = require('./routes/auth');
 const profileRoutes = require('./routes/profile');
 const transactionsRoutes = require('./routes/transactions');
 const objectifsRoutes = require('./routes/objectifs');
 const reportsRoutes = require('./routes/reports');
+const authenticate = require('./middleware/authenticate');
 const app = express();
 
+const globalLimiter = rateLimit({
+  windowMs: 15 * 60 * 1000,
+  max: 100,
+  standardHeaders: true,
+  legacyHeaders: false,
+  message: { message: 'Trop de requêtes, réessayez dans 15 minutes' },
+});
+
 // Middleware
+app.use(helmet());
 app.use(cors({
   origin: process.env.FRONTEND_URL || 'http://localhost:3000',
   credentials: true,
 }));
 app.use(cookieParser());
-app.use(express.json());
+app.use(express.json({ limit: '10kb' }));
+app.use(globalLimiter);
 app.use('/api/profile', profileRoutes);
 app.use('/api/transactions', transactionsRoutes);
 app.use('/api/auth', authRoutes);
@@ -90,9 +103,12 @@ app.post('/api/budgets', async (req, res) => {
 });
 
 // PUT modifier un budget
-app.put('/api/budgets/:id', async (req, res) => {
-  const { category, limit } = req.body;
+app.put('/api/budgets/:id', authenticate, async (req, res) => {
   try {
+    const existing = await db.oneOrNone('SELECT user_id FROM budgets WHERE id = $1', [req.params.id]);
+    if (!existing) return res.status(404).json({ error: 'Budget introuvable' });
+    if (existing.user_id !== req.user.userId) return res.status(403).json({ error: 'Accès interdit' });
+    const { category, limit } = req.body;
     const budget = await db.one(
       'UPDATE budgets SET category=$1, "limit"=$2, updated_at=NOW() WHERE id=$3 RETURNING *',
       [category, limit, req.params.id]
@@ -104,8 +120,11 @@ app.put('/api/budgets/:id', async (req, res) => {
 });
 
 // DELETE un budget
-app.delete('/api/budgets/:id', async (req, res) => {
+app.delete('/api/budgets/:id', authenticate, async (req, res) => {
   try {
+    const existing = await db.oneOrNone('SELECT user_id FROM budgets WHERE id = $1', [req.params.id]);
+    if (!existing) return res.status(404).json({ error: 'Budget introuvable' });
+    if (existing.user_id !== req.user.userId) return res.status(403).json({ error: 'Accès interdit' });
     await db.none('DELETE FROM budgets WHERE id = $1', [req.params.id]);
     res.json({ message: 'Budget supprimé' });
   } catch (err) {

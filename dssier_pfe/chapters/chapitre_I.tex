@@ -40,7 +40,7 @@ J'ai choisi de travailler sur la gestion de budget car c'est un sujet qui me con
 \end{tcolorbox}
 
 \begin{tcolorbox}[colback=green!5!white,colframe=green!60!black,title=\textbf{Durée et planification du projet}]
-Le développement de \textbf{My Smart Budget} s'est étalé sur une période d'environ \textbf{neuf mois}, en suivant une organisation progressive et adaptée à un travail individuel.  
+La réalisation du projet \textbf{My Smart Budget} s'est étalée sur une période d'environ \textbf{neuf mois} (dont six mois de développement actif), en suivant une organisation progressive et adaptée à un travail individuel.
 Chaque phase correspond à un ensemble d'objectifs précis, allant de l'analyse des besoins à la mise en ligne de la version stable.
 
 \begin{itemize}
@@ -144,15 +144,16 @@ Le projet \textbf{My Smart Budget} vise à générer des gains mesurables tant p
 % === OBJECTIFS SMART AVEC MESURES ===
 % ========================
 
+
 \section{Objectifs SMART et leur mesure}
 
 \begin{tcolorbox}[colback=green!5!white,colframe=green!60!black,title=\textbf{Objectifs SMART du projet avec indicateurs de mesure}]
 \begin{itemize}
     \item \textbf{Spécifique :} Fournir une application web permettant de suivre et d'analyser les dépenses personnelles en temps réel via des tableaux de bord et des alertes automatiques, avec au minimum \textbf{3 types de graphiques} (évolution mensuelle, répartition par catégorie, suivi des objectifs) et \textbf{2 types d'alertes} (dépassement de budget, objectif atteint) ;
 
-    \item \textbf{Mesurable :} Atteindre un \textbf{taux d'adoption de 70\,\%} sur un panel de 20 utilisateurs internes et réduire de \textbf{25\,\%} les dépassements budgétaires mensuels après deux mois d'utilisation ;
+    \item \textbf{Mesurable :} Atteindre un \textbf{taux d'adoption de 70\,\%} sur un panel de 12 utilisateurs et réduire de \textbf{25\,\%} les dépassements budgétaires mensuels après deux mois d'utilisation ;
 
-    \item \textbf{Atteignable :} Développement réalisé par une personne en environ \textbf{neuf mois}, en suivant des sprints de deux semaines, avec pour objectif de livrer \textbf{100\,\% des fonctionnalités prioritaires} identifiées dans le cahier des charges et d'atteindre un \textbf{taux de couverture de tests d'au moins 70\,\%} sur les fonctionnalités critiques ;
+    \item \textbf{Atteignable :} Développement réalisé par une personne en environ \textbf{neuf mois}, en suivant des sprints de deux semaines, avec pour objectif de livrer \textbf{100\,\% des fonctionnalités prioritaires} identifiées dans le cahier des charges et d'atteindre un \textbf{taux de couverture de tests d'au moins 80\,\%} sur les fonctionnalités critiques ;
 
     \item \textbf{Pertinent :} Répondre à un besoin utilisateur réel d'autonomie et de compréhension financière, mesuré par le fait qu'au moins \textbf{80\,\% des testeurs déclarent mieux comprendre leurs habitudes de dépenses} après un mois d'utilisation ;
 
@@ -209,13 +210,6 @@ Le diagramme suivant illustre les principaux flux d'informations entre les acteu
 % === DIAGRAMME DE CONTEXTE ===
 % ========================
 
-\section{Diagramme de contexte -- My Smart Budget}
-
-\begin{tcolorbox}[colback=gray!5!white,colframe=gray!60!black,title=\textbf{Description du diagramme}]
-Le diagramme de contexte ci-dessous positionne l'application \textbf{My Smart Budget} au sein de son écosystème.
-Il représente les acteurs (Utilisateur, Administrateur, Comptable), les composants applicatifs et les services externes interfacés, ainsi que les flux d'informations entre eux.
-\end{tcolorbox}
-
 \begin{figure}[H]
     \centering
     \safefig{chapters/assets/images/diagramme_context.png}{0.90\textwidth}{diagramme\_context.png}
@@ -229,9 +223,9 @@ Le diagramme positionne clairement les responsabilités de chaque acteur et les 
     \item \textbf{Utilisateur} : acteur principal. Saisit ses transactions, consulte le dashboard et configure ses budgets via le Frontend Next.js (one-to-one).
     \item \textbf{Administrateur} : gère les comptes utilisateurs et supervise les métriques globales via le Backend admin (one-to-many).
     \item \textbf{Comptable} : accède aux exports de données et aux rapports financiers pour analyse (one-to-many).
-    \item \textbf{Interface Utilisateur (React.js)} : composant applicatif central qui orchestre les requêtes HTTP/API REST vers le backend.
+    \item \textbf{Interface Utilisateur (Next.js)} : composant applicatif central qui orchestre les requêtes HTTP/API REST vers le backend.
     \item \textbf{API REST (Node.js/Express)} : traite la logique métier, l'authentification JWT et les requêtes CRUD vers les bases de données.
-    \item \textbf{Base de Données (MongoDB)} : stockage flexible des transactions et données documentaires.
+    \item \textbf{Base de Données (PostgreSQL 16)} : stockage des transactions, budgets et utilisateurs (données relationnelles, ACID).
     \item \textbf{Service d'Alertes} : envoi d'e-mails et notifications en cas de dépassement de seuil budgétaire.
 \end{itemize}
 \end{tcolorbox}
@@ -239,9 +233,9 @@ Le diagramme positionne clairement les responsabilités de chaque acteur et les 
 \begin{tcolorbox}[colback=green!5!white,colframe=green!60!black,title=\textbf{Synthèse des flux applicatifs}]
 Le diagramme de contexte met en évidence une architecture claire à responsabilités séparées :
 \begin{itemize}
-    \item \textbf{Flux utilisateur} : saisie/consultation via React.js $\rightarrow$ requêtes HTTP/API REST $\rightarrow$ traitement Express $\rightarrow$ stockage MongoDB/PostgreSQL ;
+    \item \textbf{Flux utilisateur} : saisie/consultation via Next.js $\rightarrow$ requêtes HTTP/API REST $\rightarrow$ traitement Express $\rightarrow$ stockage MongoDB/PostgreSQL ;
     \item \textbf{Flux alertes} : l'API surveille les seuils budgétaires et déclenche le Service d'Alertes (emails) en temps réel ;
-    \item \textbf{Flux d'authentification} : intégration Google/Auth0 pour la vérification d'identité (OAuth2) ;
+    \item \textbf{Flux d'authentification} : JWT (access token 24h) avec vérification bcrypt du mot de passe haché ;
     \item \textbf{Hébergement} : déploiement sur AWS EC2 via Docker, exposé via Nginx (HTTPS).
 \end{itemize}
 
@@ -257,7 +251,7 @@ Ce diagramme de contexte constitue la vue d'ensemble de l'écosystème \textbf{M
 \begin{tcolorbox}[colback=green!5!white,colframe=green!60!black,title=\textbf{Apports mesurables du projet My Smart Budget}]
 \begin{itemize}
     \item Simplifie la gestion financière personnelle grâce à l'automatisation et à la visualisation claire des données (\textbf{gain de temps : 35\%}) ;
-    \item Réduit les erreurs et le temps de saisie manuelle de \textbf{20 minutes à 5 minutes} par semaine ;
+    \item Réduit le temps de gestion budgétaire mensuelle de \textbf{plus de 30 minutes à moins de 15 minutes} par mois ;
     \item Offre une meilleure compréhension des habitudes de dépenses : \textbf{87\%} des testeurs déclarent avoir identifié des dépenses inutiles ;
     \item Favorise la prise de décision financière : \textbf{-2.3 dépassements budgétaires} par mois en moyenne après 2 mois d'utilisation ;
     \item Met en valeur mes compétences techniques (Next.js, Node.js/Express, PostgreSQL, MongoDB, Docker, AWS) avec \textbf{15k lignes de code}, \textbf{85,3\% de couverture de tests} et \textbf{score Lighthouse 92/100}.

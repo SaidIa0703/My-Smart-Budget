@@ -1,11 +1,22 @@
 const express = require('express');
 const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
+const rateLimit = require('express-rate-limit');
 const { db } = require('../db');
 
 const router = express.Router();
 const JWT_SECRET = process.env.JWT_SECRET || 'your-secret-key-change-in-prod';
 const REFRESH_SECRET = process.env.REFRESH_SECRET || 'your-refresh-secret-change-in-prod';
+
+const authLimiter = rateLimit({
+  windowMs: 15 * 60 * 1000,
+  max: 20,
+  standardHeaders: true,
+  legacyHeaders: false,
+  message: { message: 'Trop de tentatives, réessayez dans 15 minutes' },
+});
+
+const PASSWORD_REGEX = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d).{8,}$/;
 
 const COOKIE_OPTS = {
   httpOnly: true,
@@ -25,7 +36,7 @@ const authenticate = (req, res, next) => {
 };
 
 // REGISTER
-router.post('/register', async (req, res) => {
+router.post('/register', authLimiter, async (req, res) => {
   try {
     const { email, password, name } = req.body;
 
@@ -33,8 +44,8 @@ router.post('/register', async (req, res) => {
       return res.status(400).json({ message: 'Tous les champs sont requis' });
     }
 
-    if (password.length < 6) {
-      return res.status(400).json({ message: 'Minimum 6 caractères' });
+    if (!PASSWORD_REGEX.test(password)) {
+      return res.status(400).json({ message: 'Le mot de passe doit contenir au moins 8 caractères, une majuscule, une minuscule et un chiffre' });
     }
 
     const existingUser = await db.oneOrNone(
@@ -83,7 +94,7 @@ router.post('/register', async (req, res) => {
 });
 
 // LOGIN
-router.post('/login', async (req, res) => {
+router.post('/login', authLimiter, async (req, res) => {
   try {
     const { email, password } = req.body;
 

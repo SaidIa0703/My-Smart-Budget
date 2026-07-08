@@ -43,15 +43,15 @@ Le projet repose sur une architecture \textbf{3-tiers évolutive} : Front-end (N
 \hline
 \textbf{Critère} & \textbf{Métrique} & \textbf{Objectif} & \textbf{Justification} \\
 \hline
-\textbf{Performance} & Time-to-interactive & $< 2$s (P95) & UX Fluide \\
+\textbf{Performance} & Time-to-interactive & $< 800$ms (P95) & UX Fluide \\
 \hline
-\textbf{Sécurité} & Auth (JWT + Bcrypt) & Cost $\geq 12$ & Protection RGPD \\
+\textbf{Sécurité} & Auth (JWT + Bcrypt) & Cost $= 10$ & Protection RGPD \\
 \hline
-\textbf{Qualité} & Couverture de tests & $\geq 60\,\%$ & Maintenabilité \\
+\textbf{Qualité} & Couverture de tests & $\geq 80\,\%$ & Maintenabilité \\
 \hline
 \textbf{Scalabilité} & Architecture Stateless & 200 users simultanés & Infrastructure EC2 t3.micro \\
 \hline
-\textbf{Fiabilité} & Disponibilité (SLA) & $99.5\,\%$ & Accès continu \\
+\textbf{Fiabilité} & Disponibilité (SLA) & $99\,\%$ & Accès continu \\
 \hline
 \end{tabular}
 \end{center}
@@ -253,7 +253,7 @@ Le projet suit une feuille de route claire pour les évolutions futures :
 \begin{itemize}
     \item \textbf{v1.0 (Actuelle) :} MVP stable, déploiement Production.
     \item \textbf{v1.1 (Février 2026) :} Optimisation mobile, mode sombre, notifications Push.
-    \item \textbf{v2.0 (Avril 2026) :} POC d'agrégation bancaire automatique et notifications Push.
+    \item \textbf{v2.0 (Avril 2026) :} POC d'agrégation bancaire automatique (DSP2/Plaid) et catégorisation ML.
 \end{itemize}
 
 La validation de ces jalons confirme la capacité du projet à évoluer d'un prototype académique vers une solution exploitable par le grand public.

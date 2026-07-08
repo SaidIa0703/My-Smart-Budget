@@ -1,87 +1,10 @@
-\chapter{Conception, Modélisation et Gestion de Projet}
+\chapter{Gestion de Projet et Méthodologie Agile}
 
 \section{Introduction}
 
-Après la phase de cadrage et de définition des besoins, la conception du projet \textbf{My Smart Budget} a constitué une étape charnière avant le lancement des développements. Cette phase a permis de structurer l'architecture logicielle, de modéliser les données et de définir les processus de collaboration.
+La réussite d'un projet technique ne repose pas uniquement sur le code : elle dépend d'une organisation rigoureuse et d'une méthode de travail structurée. Pour \textbf{My Smart Budget}, j'ai adopté une démarche Agile adaptée au contexte d'un projet individuel, en m'appuyant sur des outils concrets de suivi et de pilotage.
 
-L'objectif n'était pas seulement de produire une documentation théorique, mais de bâtir les fondations d'une application \textbf{robuste, évolutive et maintenable}. Pour ce faire, j'ai combiné une approche de modélisation standardisée (UML) avec une méthodologie de gestion de projet Agile (Scrum/Kanban) rigoureuse.
-
-Concrètement, cette phase m'a évité beaucoup d'allers-retours et de refactorisations pendant le développement.
-
-\section{Conception technique et Modélisation UML}
-
-\subsection{Objectifs de la modélisation}
-
-L'utilisation du langage UML (Unified Modeling Language) répond à quatre besoins précis :
-\begin{itemize}
-    \item \textbf{Structurer} les données et les flux avant l'implémentation.
-    \item \textbf{Anticiper} les dépendances complexes entre les modules.
-    \item \textbf{Aligner} le code sur les besoins métier (Domain Driven Design).
-    \item \textbf{Faciliter} la maintenance future grâce à une documentation visuelle.
-\end{itemize}
-
-\subsection{Diagramme de Cas d'Utilisation Global}
-
-Le diagramme ci-dessous synthétise les interactions entre l'utilisateur et le système. Il met en évidence les périmètres fonctionnels clés : gestion de compte, opérations financières et pilotage budgétaire.
-
-\begin{figure}[H]
-    \centering
-    \safefig{chapters/assets/images/class-diagram-app-budget-v3.png}{0.90\textwidth}{class-diagram-app-budget-v3.png}
-    \caption{Diagramme de classes UML My Smart Budget}
-    \label{fig:uml_global}
-\end{figure}
-
-\subsection{Modèle Conceptuel de Données (Détail des Entités)}
-
-La structure des données repose sur trois modules interconnectés :
-
-\begin{description}
-    \item[1. Module Utilisateur] \hfill \\
-    Gère l'identité et les préférences.
-    \begin{itemize}
-        \item \textbf{User :} Email unique, mot de passe haché (Bcrypt), date d'inscription.
-        \item \textbf{Profile :} Préférences (Devise, Langue), seuils d'alerte personnalisés.
-        \item \textbf{Session :} Token JWT (Access + Refresh), expiration, IP.
-    \end{itemize}
-    
-    \item[2. Module Gestion Financière] \hfill \\
-    Cœur du système transactionnel.
-    \begin{itemize}
-        \item \textbf{Transaction :} Montant, date, type (Débit/Crédit), commentaire.
-        \item \textbf{Category :} Tag de classification (ex: Alimentation, Loyer) avec icône et couleur.
-        \item \textbf{Budget :} Enveloppe limite définie sur une période et une catégorie.
-    \end{itemize}
-
-    \item[3. Module Suivi et Alertes] \hfill \\
-    Logique proactive.
-    \begin{itemize}
-        \item \textbf{Alert :} Notification générée automatiquement aux seuils (70\%, 90\%, 100\%).
-        \item \textbf{Report :} Agrégat de données pour exports PDF/CSV.
-    \end{itemize}
-\end{description}
-
-En utilisant UML, j'ai pu voir rapidement si j'avais oublié un cas d'usage important avant d'écrire une ligne de code.
-
-\section{Architecture Technique}
-
-Le projet implémente le pattern architectural \textbf{MVC (Modèle-Vue-Contrôleur)} adapté au web moderne (API RESTful), garantissant une séparation stricte des responsabilités.
-
-\begin{figure}[H]
-    \centering
-    \safefig{chapters/assets/images/diagramme-packages.png}{0.90\textwidth}{diagramme-packages.png}
-    \caption{Architecture technique : Stack Next.js/Express/PostgreSQL+MongoDB et déploiement Docker}
-    \label{fig:architecture_tech}
-\end{figure}
-
-\begin{tcolorbox}[colback=blue!5!white,colframe=blue!60!black,title=\textbf{Transition Conception \textrightarrow{} Développement}]
-La modélisation a servi de guide direct pour l'implémentation :
-\begin{itemize}
-    \item Les \textbf{entités relationnelles} (User, Transaction, Budget) sont devenues des \textbf{tables PostgreSQL} (via pg-promise).
-    \item Les \textbf{données non-structurées} (logs, préférences) sont stockées via des \textbf{schémas Mongoose} (MongoDB).
-    \item Les \textbf{Cas d'utilisation} ont défini les routes de l'\textbf{API REST Express}.
-    \item Les \textbf{Relations} (1..n) ont dicté les jointures SQL côté PostgreSQL et les références \texttt{ObjectId} côté MongoDB.
-\end{itemize}
-\end{tcolorbox}
+Ce chapitre présente la méthodologie choisie, les rituels appliqués, les métriques de suivi et la planification du projet. La conception fonctionnelle et technique (UML, base de données, architecture) est traitée dans le chapitre suivant.
 
 \section{Méthodologie Agile et Conduite de Projet}
 
@@ -132,7 +55,7 @@ Stabilité & $< 5\%$ de bugs post-merge & Sprint Review \\
 \hline
 Lead Time & $< 3$ jours / fonctionnalité & Hebdo \\
 \hline
-Code Coverage & $> 70\%$ (Backend Jest) & Sprint Review \\
+Code Coverage & $> 80\%$ (Backend Jest) & Sprint Review \\
 \hline
 \end{tabular}
 \end{center}
@@ -167,13 +90,13 @@ Le projet est jalonné par 4 étapes majeures (Milestones GitHub), avec des crit
 \hline
 \textbf{Jalon} & \textbf{Date Cible} & \textbf{Livrable Principal} \\
 \hline
-\textbf{POC} & 05/10/2025 & Backend Node.js + Connexion DB. Première route API. \\
+\textbf{POC} & 01/07/2025 & Backend Node.js + Connexion DB. Première route API. \\
 \hline
 \textbf{MVP (v1.0)} & 15/10/2025 & Auth JWT, CRUD complet, Dashboard v1. \\
 \hline
-\textbf{Bêta (v1.1)} & 30/10/2025 & Alertes budgétaires, CI/CD complet. \\
+\textbf{Bêta (v1.1)} & 15/02/2026 & Alertes budgétaires, CI/CD complet, optimisations mobile. \\
 \hline
-\textbf{Finale (v2.0)} & 15/11/2025 & Export PDF, Optimisations Perf, Documentation finale. \\
+\textbf{Finale (v2.0)} & Avril 2026 & Agrégation bancaire POC, catégorisation ML, documentation finale. \\
 \hline
 \end{tabular}
 \end{center}
@@ -202,11 +125,11 @@ Les estimations reposent sur une complexité relative (Story Points), où \textb
 
 \section{Conclusion du chapitre}
 
-Cette phase de conception et d'organisation a permis de :
+La méthodologie Agile appliquée tout au long du projet a permis de :
 \begin{itemize}
-    \item \textbf{Sécuriser le développement} grâce à une architecture validée (UML/MVC).
-    \item \textbf{Garantir la qualité} par l'application rigoureuse des processus Agiles.
-    \item \textbf{Prouver le professionnalisme} via une traçabilité complète sur GitHub.
+    \item \textbf{Maintenir un rythme régulier} grâce aux sprints de 2 semaines et aux rituels quotidiens.
+    \item \textbf{Garantir la qualité} via des métriques de suivi objectives (vélocité, coverage, CI/CD).
+    \item \textbf{Prouver la traçabilité} par un historique complet sur GitHub (issues, PRs, milestones).
 \end{itemize}
 
-Les fondations étant posées, le chapitre suivant détaillera la réalisation technique et le développement de l'application.
+Cette organisation a directement servi la phase de conception détaillée présentée dans le chapitre suivant.

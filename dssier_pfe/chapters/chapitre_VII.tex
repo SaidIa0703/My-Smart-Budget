@@ -76,7 +76,7 @@ describe('BudgetCalculatorService', () => {
         id: budgetId,
         user_id: userId,
         monthlyLimit: 500,
-        categoryId: 'cat789',
+        categoryId: 789,
         startDate: new Date('2024-01-01')
       };
       
@@ -116,7 +116,7 @@ describe('Transactions API Integration Tests', () => {
     testUser = await db.one(
       `INSERT INTO users(email, password_hash, first_name, last_name)
        VALUES($1,$2,$3,$4) RETURNING *`,
-      ['test@mysmartbudget.com', await bcrypt.hash('Test123!@#', 12),
+      ['test@mysmartbudget.com', await bcrypt.hash('Test123!@#', 10),
        'Test', 'User']
     );
     
@@ -280,7 +280,7 @@ describe('Budget Creation Flow', () => {
 
 \subsection{Métriques de couverture de tests}
 
-\begin{tcolorbox}[colback=green!5!white,colframe=green!60!black,title=\textbf{Couverture de code actuelle (Décembre 2025)}]
+\begin{tcolorbox}[colback=green!5!white,colframe=green!60!black,title=\textbf{Couverture de code actuelle (Février 2026)}]
 \begin{center}
 \begin{tabular}{|l|c|c|c|c|c|}
 \hline
@@ -450,7 +450,7 @@ sonar.issue.ignore.multicriteria.e2.resourceKey=**/*.jsx
 
 \subsection{Métriques de qualité actuelles}
 
-\begin{tcolorbox}[colback=green!5!white,colframe=green!60!black,title=\textbf{Dashboard SonarQube - My Smart Budget (15 décembre 2025)}]
+\begin{tcolorbox}[colback=green!5!white,colframe=green!60!black,title=\textbf{Dashboard SonarQube - My Smart Budget (15 février 2026)}]
 \begin{center}
 \begin{figure}[H]
     \centering
@@ -595,7 +595,7 @@ const isWithinDateRange = (date, start, end) => {
 \begin{itemize}
     \item ✅ \textbf{Couverture de tests élevée :} 85.3\% (objectif 80\% dépassé)
     \item ✅ \textbf{0 bugs critiques} en production depuis 3 mois
-    \item ✅ \textbf{Pipeline CI/CD robuste :} 94.3\% de succès
+    \item ✅ \textbf{Pipeline CI/CD robuste :} 92.9\% de succès
     \item ✅ \textbf{Performance optimisée :} P95 < 800ms sur tous les endpoints critiques
     \item ✅ \textbf{Qualité A} sur toutes les métriques SonarQube
     \item ✅ \textbf{Lighthouse > 90} sur Performance et Accessibilité

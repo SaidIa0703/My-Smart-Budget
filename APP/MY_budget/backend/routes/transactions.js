@@ -1,5 +1,6 @@
 const express = require('express');
 const {db} = require('../db');
+const authenticate = require('../middleware/authenticate');
 
 const router = express.Router();
 
@@ -87,9 +88,12 @@ router.get('/:userId', async (req, res) =>{
 });
 
 // modifier une transaction
-router.put('/:id', async (req, res) => {
+router.put('/:id', authenticate, async (req, res) => {
     try {
         const { id } = req.params;
+        const existing = await db.oneOrNone('SELECT user_id FROM transactions WHERE id = $1', [id]);
+        if (!existing) return res.status(404).json({ message: 'Transaction introuvable' });
+        if (existing.user_id !== req.user.userId) return res.status(403).json({ message: 'Accès interdit' });
         const { name, category, amount, date } = req.body;
         const transaction = await db.one(
             'UPDATE transactions SET name=$1, category=$2, amount=$3, date=$4 WHERE id=$5 RETURNING *',
@@ -103,14 +107,17 @@ router.put('/:id', async (req, res) => {
 });
 
 //suprimer une transactions
-router.delete('/:id', async (req, res) => {
+router.delete('/:id', authenticate, async (req, res) => {
     try{
-        const {id} = req.params;
-        await db.one('DELETE FROM transactions WHERE id = $1', [id]);
-        res.json({message : 'Transaction supprimée'});
+        const { id } = req.params;
+        const existing = await db.oneOrNone('SELECT user_id FROM transactions WHERE id = $1', [id]);
+        if (!existing) return res.status(404).json({ message: 'Transaction introuvable' });
+        if (existing.user_id !== req.user.userId) return res.status(403).json({ message: 'Accès interdit' });
+        await db.none('DELETE FROM transactions WHERE id = $1', [id]);
+        res.json({ message: 'Transaction supprimée' });
     }catch(error){
         console.error('Error', error);
-        res.status(500).json({message : 'Transaction supprimée'});
+        res.status(500).json({ message: 'Erreur serveur' });
     }
 });
 

@@ -2,7 +2,7 @@
 
 \section{Veille technologique stack}
 
-La stratégie de veille technologique de \textbf{My Smart Budget} couvre l'ensemble de la stack Next.js/Express/PostgreSQL+MongoDB ainsi que l'écosystème DevOps et la sécurité. Cette veille proactive permet d'anticiper les évolutions, d'identifier les opportunités d'amélioration et de maintenir la sécurité de l'application. Par exemple, c'est en faisant cette veille que j'ai décidé de migrer vers Argon2 pour le hachage des mots de passe et de renforcer la politique CSP.
+La stratégie de veille technologique de \textbf{My Smart Budget} couvre l'ensemble de la stack Next.js/Express/PostgreSQL+MongoDB ainsi que l'écosystème DevOps et la sécurité. Cette veille proactive permet d'anticiper les évolutions, d'identifier les opportunités d'amélioration et de maintenir la sécurité de l'application. Par exemple, c'est en faisant cette veille que j'ai identifié Argon2id comme successeur recommandé à bcrypt (migration planifiée en v2.0) et que j'ai renforcé la politique CSP.
 
 \subsection{Sources et méthodologie de veille}
 
@@ -43,7 +43,7 @@ La stratégie de veille technologique de \textbf{My Smart Budget} couvre l'ensem
 \hline
 Next.js & 15.0.0 & 15.1.0 & 15.0.0 & Turbopack stable, Server Actions améliorés \\
 \hline
-Node.js & 18.19.0 & 21.5.0 & 20.10.0 & Migration vers 20 LTS planifiée janvier 2026 \\
+Node.js & 18.19.0 & 21.5.0 & 20.10.0 & Migration vers 20 LTS planifiée Q1 2026 (Dockerfile actuel : node:18-alpine) \\
 \hline
 PostgreSQL & 16.0 & 17.0 & 16.x & Nouvelles fonctionnalités JSON, évaluation en cours \\
 \hline
@@ -51,7 +51,7 @@ Express & 4.18.2 & 4.18.3 & --- & Patch sécurité appliqué immédiatement \\
 \hline
 pg-promise & 11.5.4 & 11.6.0 & 11.5.x & Amélioration gestion transactions, stable \\
 \hline
-Docker & 24.0.7 & 25.0.0 & 24.0.x & BuildKit par défaut, test en staging \\
+Docker & 24.0.7 & 25.0.0 & 24.0.x & BuildKit par défaut, testé en local avant prod \\
 \hline
 Cypress & 13.6.2 & 13.6.3 & --- & Bug fixes mineurs, update OK \\
 \hline
@@ -92,7 +92,7 @@ Jest & 29.7.0 & 29.7.0 & --- & Stable, pas de changement \\
 \begin{itemize}
     \item \textbf{Contexte :} Veille sur vulnérabilités bcrypt face aux GPU modernes
     \item \textbf{Résultats :} Argon2id résiste mieux aux attaques par force brute
-    \item \textbf{Décision :} Migration implémentée (voir section sécurité)
+    \item \textbf{Décision :} POC réalisé, migration planifiée en v2.0 (bcrypt actuellement en production)
 \end{itemize}
 \end{tcolorbox}
 
@@ -101,7 +101,7 @@ Jest & 29.7.0 & 29.7.0 & --- & Stable, pas de changement \\
 \begin{exemple}
 \textbf{Migrations effectuées en 2025 et métriques :}
 \begin{lstlisting}[language=JavaScript]
-// Migration class component → hook fonctionnel Next.js (Juin 2025)
+// Migration class component -> hook fonctionnel Next.js (Juin 2025)
 // AVANT : Logique dispersée, couplage fort
 function TransactionList() {
   const [transactions, setTransactions] = useState([]);
@@ -178,16 +178,16 @@ CVE-2024-45590 & 5.3 & body-parser & Prototype pollution & ✅ Patché 1.20.3 \\
 \subsection{Automatisation de la sécurité}
 
 \begin{exemple}
-\textbf{Pipeline de sécurité automatisé :}
+\textbf{Pipeline de sécurité (objectif v2.0 -- actuellement intégré dans sonarcloud.yml) :}
 \begin{lstlisting}[language=yaml]
-# .github/workflows/security.yml
+# .github/workflows/security.yml  (planifie v2.0)
 name: Security Scanning Pipeline
 
 on:
   schedule:
-    - cron: '0 0 * * *'  # Quotidien à minuit
+    - cron: '0 0 * * *'  # Quotidien a minuit
   push:
-    branches: [main, develop]
+    branches: [main]
   pull_request:
 
 jobs:
@@ -261,21 +261,11 @@ MTTR incident & N/A & < 1h & ✅ \\
 \begin{exemple}
 \textbf{Améliorations concrètes implémentées :}
 \begin{lstlisting}[language=JavaScript]
-// 1. Migration Argon2 suite à veille crypto (Octobre 2025)
-// AVANT : bcrypt (vulnérable aux attaques GPU)
-const bcrypt = require('bcrypt');
+// 1. Bcrypt en production (Cost 10) -- migration Argon2id planifiée v2.0
+const bcrypt = require('bcryptjs');
 const hashedPassword = await bcrypt.hash(password, 10);
-
-// APRÈS : Argon2id (résistant GPU/ASIC, winner PHC)
-const argon2 = require('argon2');
-const hashedPassword = await argon2.hash(password, {
-  type: argon2.argon2id,
-  memoryCost: 2 ** 16,  // 64 MB
-  timeCost: 3,          // 3 iterations
-  parallelism: 1,
-  saltLength: 32
-});
-// Résultat : +400% résistance brute force
+// Veille : Argon2id identifié comme successor recommandé (OWASP)
+// Action : POC réalisé, migration planifiée pour v2.0
 
 // 2. Content Security Policy renforcée (Novembre 2025)
 // AVANT : CSP basique
@@ -300,39 +290,32 @@ app.use(helmet.contentSecurityPolicy({
 \end{lstlisting}
 \end{exemple}
 
-\subsection{Roadmap technologique 2025}
+\subsection{Roadmap technologique 2025--2026}
 
 \begin{tcolorbox}[colback=blue!5!white,colframe=blue!60!black,title=\textbf{Plan de migration et évolutions planifiées}]
-\textbf{Q1 2025 - Modernisation Core :}
+\textbf{Q1--Q2 2025 - Modernisation Core (appliqué) :}
 \begin{itemize}
-    \item ✅ Node.js 20 LTS (janvier) : +15\% perf, native test runner
-    \item ✅ Next.js 15 GA (octobre) : Turbopack stable, Server Actions
-    \item ✅ PostgreSQL 16 (septembre) : Meilleures performances parallélisme
+    \item 📋 Node.js 20 LTS : migration planifiée Q1 2026 (actuellement 18.19.0)
+    \item ✅ Next.js 15 GA : Turbopack stable, Server Actions
+    \item ✅ PostgreSQL 16 : Meilleures performances parallélisme
     \item ✅ TypeScript 5.4 : Nouveaux types, performances accrues
-\end{itemize}
-
-\textbf{Q2 2025 - Performance  \& Scaling :}
-\begin{itemize}
-    \item ✅ Express 5.x : Meilleure gestion async/await native
-    \item ✅ Edge Functions : Auth et API critiques
-    \item ✅ Database sharding : Préparation 10k+ users
-    \item ✅ WebAssembly : Calculs financiers complexes
-\end{itemize}
-
-\textbf{Q3 2025 - Intelligence  \& Automation :}
-\begin{itemize}
-    \item ✅ Vector Search : Recherche sémantique transactions
-    \item ✅ ML Pipeline : Catégorisation automatique
-    \item ✅ Predictive Analytics : Prévisions budgétaires
     \item ✅ GitHub Copilot : Intégration développement
 \end{itemize}
 
-\textbf{Q4 2025 - Next Generation :}
+\textbf{Q3--Q4 2025 - Sécurité \& Performance (appliqué) :}
 \begin{itemize}
-    \item ✅ Bun runtime : Tests puis migration progressive
-    \item ✅ Rust services : Modules critiques performance
-    \item ✅ Blockchain : Audit trail immutable (POC)
-    \item ✅ Quantum-ready crypto : Préparation post-quantum
+    \item ✅ Renforcement CSP stricte avec nonces : score A+ Mozilla Observatory
+    \item ✅ Index composites PostgreSQL : -56\% temps requête dashboard
+    \item ✅ Compression gzip Nginx : -70\% taille payload
+    \item 🔬 Bun runtime : benchmarks réalisés (+67\% tests), adoption planifiée 2026
+\end{itemize}
+
+\textbf{2026 - Évolutions planifiées :}
+\begin{itemize}
+    \item 📋 Migration Node.js 22 LTS (Q1 2026)
+    \item 📋 React Server Components : migration progressive Dashboard (Q2 2026)
+    \item 📋 POC catégorisation automatique ML (Q3 2026)
+    \item 📋 Évaluation PostgreSQL 17 JSON vs MongoDB pour données semi-structurées
 \end{itemize}
 \end{tcolorbox}
 
@@ -345,7 +328,7 @@ app.use(helmet.contentSecurityPolicy({
 \hline
 \textbf{Action issue de la veille} & \textbf{Résultat mesuré} & \textbf{Source de la veille} \\
 \hline
-Migration bcrypt → Argon2id & Résistance accrue GPU/ASIC & OWASP Password Storage \\
+Veille Argon2id vs bcrypt & POC réalisé, migration planifiée v2.0 & OWASP Password Storage \\
 \hline
 CSP stricte avec nonces & Score A+ Mozilla Observatory & MDN Security Headers \\
 \hline
@@ -391,9 +374,9 @@ L'essentiel est de garder une stack à jour sans mettre en danger la stabilité 
 │   └── Rollback Procedures
 └── 📝 ADR (Architecture Decision Records)
     ├── ADR-001: Choix PostgreSQL + MongoDB (dual DB)
-    ├── ADR-002: Migration bcrypt → Argon2id
+    ├── ADR-002: Choix bcrypt (Cost 10) -- evaluation Argon2id planifiee v2.0
     ├── ADR-003: Adoption TypeScript
-    └── ADR-004: Strategy Microservices
+    └── ADR-004: Choix Express vs NestJS -- légèreté et contrôle total
 \end{verbatim}
 \end{exemple}
 
@@ -403,7 +386,7 @@ L'essentiel est de garder une stack à jour sans mettre en danger la stabilité 
 \textbf{Architecture Decision Records (ADR) rédigés :}
 \begin{itemize}
     \item \textbf{ADR-001 :} Choix PostgreSQL (données relationnelles) + MongoDB (logs/analytics)
-    \item \textbf{ADR-002 :} Migration bcrypt → Argon2id pour le hachage des mots de passe
+    \item \textbf{ADR-002 :} Choix bcrypt (Cost 10) pour le hachage -- évaluation Argon2id en cours (v2.0)
     \item \textbf{ADR-003 :} Adoption TypeScript strict pour réduire les erreurs runtime
     \item \textbf{ADR-004 :} Choix Express vs NestJS  légèreté et contrôle total privilégiés
 \end{itemize}
@@ -417,9 +400,8 @@ L'essentiel est de garder une stack à jour sans mettre en danger la stabilité 
 \textbf{Réussites majeures :}
 \begin{itemize}
     \item ✅ \textbf{0 vulnérabilité critique} en production toute l'année
-    \item ✅ \textbf{-58\% bundle size} grâce aux optimisations
-    \item ✅ \textbf{0 vulnérabilité} : stack maintenue à jour grâce à la veille
-    \item ✅ \textbf{100\% migrations} réussies sans incident
+    \item ✅ \textbf{-58\% bundle size} grâce aux optimisations Next.js
+    \item ✅ \textbf{100\% mises à jour} appliquées sans incident de régression
     \item ✅ \textbf{A+ Security score} sur tous les audits
 \end{itemize}
 
@@ -432,13 +414,13 @@ L'essentiel est de garder une stack à jour sans mettre en danger la stabilité 
     \item La documentation est un investissement rentable
 \end{itemize}
 
-\textbf{Objectifs 2025 :}
+\textbf{Objectifs 2026 :}
 \begin{itemize}
     \item Maintenir 0 vulnérabilité critique
-    \item Réduire le Time to Market de 50\%
-    \item Atteindre 95\% de couverture de tests
-    \item Migrer vers l'edge computing
-    \item Intégrer l'IA dans le workflow
+    \item Atteindre 90\% de couverture de tests (actuellement 85,3\%)
+    \item Réduire le Time to Market de 20\% via optimisation pipeline CI/CD
+    \item Déployer le POC de catégorisation automatique (ML)
+    \item Migrer vers Node.js 22 LTS
 \end{itemize}
 \end{tcolorbox}
 

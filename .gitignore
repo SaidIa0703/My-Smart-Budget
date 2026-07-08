@@ -62,3 +62,6 @@ Thumbs.db
 !fonts/*.ttf
 node_modules/
 package-lock.json
+
+# Claude Code
+.claude/

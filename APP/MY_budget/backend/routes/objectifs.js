@@ -1,5 +1,6 @@
 const express = require('express');
 const { db } = require('../db');
+const authenticate = require('../middleware/authenticate');
 const router = express.Router();
 
 router.get('/:userId', async (req, res) => {
@@ -24,9 +25,12 @@ router.post('/', async (req, res) => {
   }
 });
 
-router.put('/:id', async (req, res) => {
-  const { name, icon, target, current_amount, deadline } = req.body;
+router.put('/:id', authenticate, async (req, res) => {
   try {
+    const existing = await db.oneOrNone('SELECT user_id FROM objectifs WHERE id = $1', [req.params.id]);
+    if (!existing) return res.status(404).json({ message: 'Objectif introuvable' });
+    if (existing.user_id !== req.user.userId) return res.status(403).json({ message: 'Accès interdit' });
+    const { name, icon, target, current_amount, deadline } = req.body;
     const obj = await db.one(
       'UPDATE objectifs SET name=$1, icon=$2, target=$3, current_amount=$4, deadline=$5, updated_at=NOW() WHERE id=$6 RETURNING *',
       [name, icon, target, current_amount, deadline || null, req.params.id]
@@ -37,8 +41,11 @@ router.put('/:id', async (req, res) => {
   }
 });
 
-router.delete('/:id', async (req, res) => {
+router.delete('/:id', authenticate, async (req, res) => {
   try {
+    const existing = await db.oneOrNone('SELECT user_id FROM objectifs WHERE id = $1', [req.params.id]);
+    if (!existing) return res.status(404).json({ message: 'Objectif introuvable' });
+    if (existing.user_id !== req.user.userId) return res.status(403).json({ message: 'Accès interdit' });
     await db.none('DELETE FROM objectifs WHERE id = $1', [req.params.id]);
     res.json({ message: 'Objectif supprimé' });
   } catch (err) {

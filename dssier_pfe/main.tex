@@ -12,6 +12,11 @@
 \usepackage{graphicx}
 \usepackage{hyperref}
 \usepackage{titlesec}
+\usepackage{etoolbox}
+\makeatletter
+\patchcmd{\ttlh@display}{\parindent\z@}{\parindent\z@\leavevmode}{}{}
+\patchcmd{\ttlh@display}{\noindent}{}{}{}
+\makeatother
 \usepackage{fancyhdr}
 \usepackage{tcolorbox}
 \usepackage{enumitem}

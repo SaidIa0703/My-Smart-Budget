@@ -16,7 +16,7 @@ Les fonctionnalités non livrées concernent des évolutions avancées reportée
 Réduction temps reporting & \mycheckmark Atteint & -42\% & Dépassé l'objectif de -40\% \\
 Livraison MVP 6 mois & \mycheckmark Atteint & 5.5 mois & Livré en avance \\
 Adoption utilisateurs & \mycheckmark Atteint & 78\% & Objectif 75\% dépassé \\
-Performance P95 < 500ms & \mycheckmark Atteint & 320ms & Dépassé l'objectif \\
+Performance P95 < 800ms & \mycheckmark Atteint & 342ms & Dépassé l'objectif \\
 Sécurité 0 vulnérabilité & \mycheckmark Atteint & 0 & Objectif atteint \\
 \hline
 \end{tabular}
@@ -95,8 +95,8 @@ Sur le plan des apprentissages, ce projet m'a surtout appris à gérer la comple
 \hline
 Refactor composants Next.js & Moyenne & 2 semaines & Maintenabilité & v1.2 \\
 Optimisation requêtes PostgreSQL & Haute & 1 semaine & Performance & v1.1 \\
-Tests E2E manquants & Haute & 1 semaine & Qualité & v1.1 \\
-Documentation API & Basse & 3 jours & Développement & v1.3 \\
+Tests E2E manquants & Haute & 1 semaine & Qualité & \mycheckmark{} Résolu (28 tests Cypress) \\
+Documentation API & Basse & 3 jours & Développement & \mycheckmark{} Résolu (OpenAPI/Swagger \texttt{/api/docs}) \\
 Migration TypeScript & Moyenne & 3 semaines & Robustesse & v2.0 \\
 \hline
 \end{tabular}
@@ -108,7 +108,7 @@ Migration TypeScript & Moyenne & 3 semaines & Robustesse & v2.0 \\
     \item \textbf{Performance :} Stratégies de cache multi-niveaux
     \item \textbf{Sécurité :} Implémentation JWT avec refresh tokens
     \item \textbf{Tests :} Pyramide de tests avec couverture optimale
-    \item \textbf{DevOps :} Pipeline CI/CD avec déploiement blue-green
+    \item \textbf{DevOps :} Pipeline CI/CD avec déploiement SSH via docker-compose sur AWS EC2
 \end{itemize}
 
 \textbf{Exemple d'apprentissage concret :}
